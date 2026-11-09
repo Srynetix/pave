@@ -1,0 +1,3398 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "%@ (main)": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ (principal)"
+          }
+        }
+      }
+    },
+    "%@ + arrows move · %@⌥ + arrows focus · %@⌥⇧ + arrows resize · %@⇧Space floating": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ + arrows move · %2$@⌥ + arrows focus · %3$@⌥⇧ + arrows resize · %4$@⇧Space floating"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ + flèches déplace · %@⌥ + flèches focus · %@⌥⇧ + flèches redimensionne · %@⇧Espace flottante"
+          }
+        }
+      }
+    },
+    "%@ is a built-in layout: choose another name": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ est une disposition intégrée : choisissez un autre nom"
+          }
+        }
+      }
+    },
+    "%@ is already used by “%@”.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ is already used by “%2$@”."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ sert déjà à « %@ »."
+          }
+        }
+      }
+    },
+    "%@ · hidden windows: %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ · hidden windows: %2$lld"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ · fenêtres cachées : %lld"
+          }
+        }
+      }
+    },
+    "%@1…9 shows a workspace on its screen, %@⇧1…9 sends the active window there.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@1…9 shows a workspace on its screen, %2$@⇧1…9 sends the active window there."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@1…9 affiche un workspace sur son écran, %@⇧1…9 y envoie la fenêtre active."
+          }
+        }
+      }
+    },
+    "%@1…9 shows a workspace on its screen, %@⇧1…9 sends the window there.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@1…9 affiche un workspace sur son écran, %@⇧1…9 y envoie la fenêtre."
+          }
+        }
+      }
+    },
+    "%lld pt": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld pt"
+          }
+        }
+      }
+    },
+    "%lld windows in %lld apps": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$lld windows in %2$lld apps"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld fenêtres dans %lld apps"
+          }
+        }
+      }
+    },
+    "%lld windows in %lld apps · not responding: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$lld windows in %2$lld apps · not responding: %3$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld fenêtres dans %lld apps · figées : %@"
+          }
+        }
+      }
+    },
+    "%lld windows · %lld apps": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld fenêtres · %lld apps"
+          }
+        }
+      }
+    },
+    "%lld zones": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld zones"
+          }
+        }
+      }
+    },
+    "%lld zones · built-in": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld zones · intégrée"
+          }
+        }
+      }
+    },
+    "1–%lld put the window in that zone · ↩ apply the layout only · arrows back · esc cancel": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1–%lld place la fenêtre dans cette zone · ↩ applique seulement la disposition · flèches retour · échap annule"
+          }
+        }
+      }
+    },
+    "1–9 choose · arrows move · ↩ apply · E edit · esc cancel": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1–9 choisit · flèches déplacent · ↩ applique · E modifie · échap annule"
+          }
+        }
+      }
+    },
+    "1–9 choose, then a zone's number puts the window there · arrows move · ↩ apply · E edit · esc cancel": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1–9 choisit, puis le numéro d’une zone y place la fenêtre · flèches déplacent · ↩ applique · E modifie · échap annule"
+          }
+        }
+      }
+    },
+    "1–9 restore · ↩ restore · S save current · esc cancel": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1–9 rétablit · ↩ rétablit · S enregistre l'actuel · échap annule"
+          }
+        }
+      }
+    },
+    "A few steps: the permissions Pavé needs, your keyboard, and what to turn on. Everything can be changed later in Settings, or in the config file.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quelques étapes : les permissions dont Pavé a besoin, votre clavier, et ce que vous voulez activer. Tout se change ensuite dans les Réglages ou dans le fichier de configuration."
+          }
+        }
+      }
+    },
+    "A name of letters, digits, spaces, - or _": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un nom fait de lettres, chiffres, espaces, - ou _"
+          }
+        }
+      }
+    },
+    "A window dropped near another one or the screen's edge sticks to it. ⌥ while dragging: no magnet.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une fenêtre lâchée près d’une autre ou du bord de l’écran s’y colle. ⌥ pendant le glisser : pas d’aimant."
+          }
+        }
+      }
+    },
+    "About Pavé": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À propos de Pavé"
+          }
+        }
+      }
+    },
+    "Accessibility": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accessibilité"
+          }
+        }
+      }
+    },
+    "Accessibility missing: Settings…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accessibilité manquante : Réglages…"
+          }
+        }
+      }
+    },
+    "Add a rule": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter une règle"
+          }
+        }
+      }
+    },
+    "Add an app": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter une app"
+          }
+        }
+      }
+    },
+    "All workspaces": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tous les workspaces"
+          }
+        }
+      }
+    },
+    "Always": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toujours"
+          }
+        }
+      }
+    },
+    "Always %lld": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toujours le %lld"
+          }
+        }
+      }
+    },
+    "Always (one entry per app)": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toujours (une entrée par app)"
+          }
+        }
+      }
+    },
+    "An emoji, up to 2 letters, or sf: and an SF Symbol name": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un emoji, jusqu’à 2 lettres, ou sf: suivi du nom d’un symbole SF"
+          }
+        }
+      }
+    },
+    "App rules": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Règles par app"
+          }
+        }
+      }
+    },
+    "Applies when Pavé restarts.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pris en compte au redémarrage de Pavé."
+          }
+        }
+      }
+    },
+    "Apps not responding: %@": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps figées : %@"
+          }
+        }
+      }
+    },
+    "Arrangement not saved": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agencement non enregistré"
+          }
+        }
+      }
+    },
+    "Arrows move between zones": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les flèches passent d'une zone à l'autre"
+          }
+        }
+      }
+    },
+    "At launch and once a day. Nothing is installed without asking.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Au lancement, puis une fois par jour. Rien n'est installé sans demander."
+          }
+        }
+      }
+    },
+    "At most %lld zones": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld zones au plus"
+          }
+        }
+      }
+    },
+    "At the bottom of each screen, with the windows of the workspace shown.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En bas de chaque écran, avec les fenêtres du workspace affiché."
+          }
+        }
+      }
+    },
+    "Back": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retour"
+          }
+        }
+      }
+    },
+    "Bring Back All Windows": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ramener toutes les fenêtres"
+          }
+        }
+      }
+    },
+    "Bring back all windows": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ramener toutes les fenêtres"
+          }
+        }
+      }
+    },
+    "Built-in keyboard": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clavier intégré"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Annuler"
+          }
+        }
+      }
+    },
+    "Check Now": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vérifier"
+          }
+        }
+      }
+    },
+    "Check for Updates…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rechercher des mises à jour…"
+          }
+        }
+      }
+    },
+    "Check for updates automatically": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rechercher les mises à jour automatiquement"
+          }
+        }
+      }
+    },
+    "Checking…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recherche…"
+          }
+        }
+      }
+    },
+    "Choosing a screen shows the workspace there, and it stays attached to it. The icon replaces the number in the taskbar: an emoji, up to 2 letters, or sf: and an SF Symbol name (sf:globe). Names and icons never go to the logs.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisir un écran y affiche le workspace, qui y reste attaché. L’icône remplace le numéro dans la taskbar : un emoji, jusqu’à 2 lettres, ou sf: suivi du nom d’un symbole SF (sf:globe). Les noms et les icônes ne vont jamais dans les logs."
+          }
+        }
+      }
+    },
+    "Click a shortcut, then type the new one. Escape cancels, ⌫ removes it. Pavé's shortcuts are paused while you type.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clique sur un raccourci puis tape le nouveau. Échap annule, ⌫ le retire. Les raccourcis de Pavé sont suspendus pendant la saisie."
+          }
+        }
+      }
+    },
+    "Click a zone · ⇧-click a neighbour, then Merge · drag the lines (⇧: 1 %) · V / H split · ⌫ delete · ⌘Z undo · esc cancel": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cliquez une zone · ⇧-clic sur une voisine, puis Fusionner · glissez les lignes (⇧ : 1 %) · V / H coupent · ⌫ supprime · ⌘Z annule · échap ferme"
+          }
+        }
+      }
+    },
+    "Close": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fermer"
+          }
+        }
+      }
+    },
+    "Close All Windows (%lld)": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fermer les %lld fenêtres"
+          }
+        }
+      }
+    },
+    "Close Window": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fermer la fenêtre"
+          }
+        }
+      }
+    },
+    "Configuration and troubleshooting": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configuration et dépannage"
+          }
+        }
+      }
+    },
+    "Configuration file": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fichier de configuration"
+          }
+        }
+      }
+    },
+    "Configuration not read: Settings…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configuration non relue : Réglages…"
+          }
+        }
+      }
+    },
+    "Conflicting macOS settings": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages de macOS en conflit"
+          }
+        }
+      }
+    },
+    "Continue": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continuer"
+          }
+        }
+      }
+    },
+    "Continue once Accessibility is granted (macOS may ask to quit and reopen Pavé).": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continuez une fois l'Accessibilité accordée (macOS peut demander de quitter et rouvrir Pavé)."
+          }
+        }
+      }
+    },
+    "Copy": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copier"
+          }
+        }
+      }
+    },
+    "Copy and edit…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copier et modifier…"
+          }
+        }
+      }
+    },
+    "Could not install the update": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d'installer la mise à jour"
+          }
+        }
+      }
+    },
+    "Could not launch at login": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lancement à la connexion impossible"
+          }
+        }
+      }
+    },
+    "Could not look for updates": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de rechercher les mises à jour"
+          }
+        }
+      }
+    },
+    "Could not restart Pavé": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de redémarrer Pavé"
+          }
+        }
+      }
+    },
+    "Covers the taskbar": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couvre la barre"
+          }
+        }
+      }
+    },
+    "Cut": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couper"
+          }
+        }
+      }
+    },
+    "Delete": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer"
+          }
+        }
+      }
+    },
+    "Delete %@": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer %@"
+          }
+        }
+      }
+    },
+    "Delete the rule of %@": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer la règle de %@"
+          }
+        }
+      }
+    },
+    "Development build: updates go to the copy in Applications": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version de développement : les mises à jour vont à la copie dans Applications"
+          }
+        }
+      }
+    },
+    "Dialogs, sheets and panels (Open, Save, Settings) are never placed, whatever the rule.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les dialogues, feuilles et panneaux (Ouvrir, Enregistrer, Réglages) ne sont jamais placés, quelle que soit la règle."
+          }
+        }
+      }
+    },
+    "Drag a window to an edge to snap it, hold ⌥ to move it freely. Pavé lives in the menu bar: Settings, logs and help are there.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glissez une fenêtre vers un bord pour l'aimanter, tenez ⌥ pour la déplacer librement. Pavé vit dans la barre des menus : Réglages, journaux et aide s'y trouvent."
+          }
+        }
+      }
+    },
+    "Drag snap": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Colle au bord"
+          }
+        }
+      }
+    },
+    "Drag to reorder.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glisse pour changer l'ordre."
+          }
+        }
+      }
+    },
+    "Each window's app, workspace and place are saved, never its title. The same name replaces the arrangement.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'app, le workspace et la place de chaque fenêtre sont enregistrés, jamais son titre. Le même nom remplace l'agencement."
+          }
+        }
+      }
+    },
+    "Edit": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Édition"
+          }
+        }
+      }
+    },
+    "Edit Zone Layouts…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modifier les dispositions de zones…"
+          }
+        }
+      }
+    },
+    "Edit…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modifier…"
+          }
+        }
+      }
+    },
+    "Empty Trash": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vider la Corbeille"
+          }
+        }
+      }
+    },
+    "Empty Trash…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vider la Corbeille…"
+          }
+        }
+      }
+    },
+    "Empty the Trash?": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vider la Corbeille ?"
+          }
+        }
+      }
+    },
+    "Failed: %@": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Échec : %@"
+          }
+        }
+      }
+    },
+    "Fill the free space": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remplir l’espace libre"
+          }
+        }
+      }
+    },
+    "Floating ⇄ tiled": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flottante ⇄ tuile"
+          }
+        }
+      }
+    },
+    "Focus down": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Focus vers le bas"
+          }
+        }
+      }
+    },
+    "Focus left": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Focus vers la gauche"
+          }
+        }
+      }
+    },
+    "Focus right": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Focus vers la droite"
+          }
+        }
+      }
+    },
+    "Focus up": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Focus vers le haut"
+          }
+        }
+      }
+    },
+    "Gap between tiles": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marge entre les tuiles"
+          }
+        }
+      }
+    },
+    "Gaps": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marges"
+          }
+        }
+      }
+    },
+    "Gaps %lld": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marges %lld"
+          }
+        }
+      }
+    },
+    "General": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Général"
+          }
+        }
+      }
+    },
+    "Granted": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autorisée"
+          }
+        }
+      }
+    },
+    "Grant…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autoriser…"
+          }
+        }
+      }
+    },
+    "Group the windows of an app": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regrouper les fenêtres d'une app"
+          }
+        }
+      }
+    },
+    "Halves, or zones on a screen with a layout": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moitiés, ou zones sur un écran qui a une disposition"
+          }
+        }
+      }
+    },
+    "Hide Pavé": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masquer Pavé"
+          }
+        }
+      }
+    },
+    "Hide the Dock": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masquer le Dock"
+          }
+        }
+      }
+    },
+    "Hide the Dock while the taskbar is on": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masquer le Dock tant que la barre des tâches est active"
+          }
+        }
+      }
+    },
+    "Icon": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Icône"
+          }
+        }
+      }
+    },
+    "Icon of workspace %lld": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Icône du workspace %lld"
+          }
+        }
+      }
+    },
+    "Ignored": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ignorée"
+          }
+        }
+      }
+    },
+    "In progress…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En cours…"
+          }
+        }
+      }
+    },
+    "Install %@…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installer %@…"
+          }
+        }
+      }
+    },
+    "Install Pavé %@?": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installer Pavé %@ ?"
+          }
+        }
+      }
+    },
+    "Install Pavé %@…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installer Pavé %@…"
+          }
+        }
+      }
+    },
+    "Install and Restart": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installer et redémarrer"
+          }
+        }
+      }
+    },
+    "Installing Pavé %@…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installation de Pavé %@…"
+          }
+        }
+      }
+    },
+    "It moves windows on its own, against workspaces and tiling.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il déplace les fenêtres lui-même, contre les workspaces et le tiling."
+          }
+        }
+      }
+    },
+    "It snaps windows to the edges along with Pavé.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il colle les fenêtres aux bords en même temps que Pavé."
+          }
+        }
+      }
+    },
+    "Its settings come back when you turn the taskbar off or quit Pavé.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ses réglages sont remis si tu coupes la barre ou quittes Pavé."
+          }
+        }
+      }
+    },
+    "Keyboard": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clavier"
+          }
+        }
+      }
+    },
+    "Keyboard and shortcuts": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clavier et raccourcis"
+          }
+        }
+      }
+    },
+    "Keyboard remap": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remap du clavier"
+          }
+        }
+      }
+    },
+    "Language": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Langue"
+          }
+        }
+      }
+    },
+    "Later": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plus tard"
+          }
+        }
+      }
+    },
+    "Launch Pavé at login": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lancer Pavé à la connexion"
+          }
+        }
+      }
+    },
+    "Layout name": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nom de la disposition"
+          }
+        }
+      }
+    },
+    "Layout of %@": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disposition de %@"
+          }
+        }
+      }
+    },
+    "Layout of workspace %lld": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disposition du workspace %lld"
+          }
+        }
+      }
+    },
+    "Layouts": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dispositions"
+          }
+        }
+      }
+    },
+    "Layouts for wide screens: drag a window into a zone, %@⇧Z picks the layout.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Des dispositions pour les grands écrans : glissez une fenêtre dans une zone, %@⇧Z choisit la disposition."
+          }
+        }
+      }
+    },
+    "Leave alone": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ne pas toucher"
+          }
+        }
+      }
+    },
+    "Left alone": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas touché"
+          }
+        }
+      }
+    },
+    "Left as is (None preset)": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laissé tel quel (préréglage Aucun)"
+          }
+        }
+      }
+    },
+    "Left half": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moitié gauche"
+          }
+        }
+      }
+    },
+    "Like the Windows key.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comme la touche Windows."
+          }
+        }
+      }
+    },
+    "Logs": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Logs"
+          }
+        }
+      }
+    },
+    "Logs hold neither window titles nor workspace names.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les logs ne contiennent ni titre de fenêtre ni nom de workspace."
+          }
+        }
+      }
+    },
+    "MIT License · macOS %lld": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Licence MIT · macOS %lld"
+          }
+        }
+      }
+    },
+    "Mac keys": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touches Mac"
+          }
+        }
+      }
+    },
+    "Magnetic windows": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fenêtres magnétiques"
+          }
+        }
+      }
+    },
+    "Maximize": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agrandir"
+          }
+        }
+      }
+    },
+    "Maximize, quarters, back to the previous size": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agrandir, quarts, retour à la taille d'avant"
+          }
+        }
+      }
+    },
+    "Merge": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fusionner"
+          }
+        }
+      }
+    },
+    "Minimize": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réduire"
+          }
+        }
+      }
+    },
+    "Move All Windows to Workspace": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Déplacer toutes les fenêtres vers le workspace"
+          }
+        }
+      }
+    },
+    "Move to Workspace": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Déplacer vers le workspace"
+          }
+        }
+      }
+    },
+    "Moving and resizing": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Déplacer et redimensionner"
+          }
+        }
+      }
+    },
+    "Name (shown when hovering its number)": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nom (affiché au survol de son numéro)"
+          }
+        }
+      }
+    },
+    "Name of workspace %lld": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nom du workspace %lld"
+          }
+        }
+      }
+    },
+    "Name, like Code or Meeting": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nom, comme Code ou Réunion"
+          }
+        }
+      }
+    },
+    "Never (one entry per window)": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jamais (une entrée par fenêtre)"
+          }
+        }
+      }
+    },
+    "New layout…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouvelle disposition…"
+          }
+        }
+      }
+    },
+    "No rules: every app follows the general settings.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune règle : toutes les apps suivent les réglages généraux."
+          }
+        }
+      }
+    },
+    "No window to save.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune fenêtre à enregistrer."
+          }
+        }
+      }
+    },
+    "No windows": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune fenêtre"
+          }
+        }
+      }
+    },
+    "None": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun"
+          }
+        }
+      }
+    },
+    "None (halves)": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune (moitiés)"
+          }
+        }
+      }
+    },
+    "None yet: S saves the windows as they are now.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun pour l'instant : S enregistre les fenêtres telles qu'elles sont."
+          }
+        }
+      }
+    },
+    "Not checked yet": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas encore vérifié"
+          }
+        }
+      }
+    },
+    "Not connected": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non connecté"
+          }
+        }
+      }
+    },
+    "Not granted": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non accordée"
+          }
+        }
+      }
+    },
+    "Off": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Désactivé"
+          }
+        }
+      }
+    },
+    "Off: %@← → keep halves and quarters on every screen.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Désactivé : %@← → gardent les moitiés et les quarts sur tous les écrans."
+          }
+        }
+      }
+    },
+    "On": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actif"
+          }
+        }
+      }
+    },
+    "On a screen that has a zone layout, its new windows open in this zone.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sur un écran qui a une disposition de zones, ses nouvelles fenêtres s'ouvrent dans cette zone."
+          }
+        }
+      }
+    },
+    "On a screen with a layout, a dragged window goes into the zone under the pointer (⇧ spans several, ⌥ moves freely), and %@← → move between zones. %@⇧Z picks the layout.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sur un écran qui a une disposition, une fenêtre glissée va dans la zone sous le pointeur (⇧ en couvre plusieurs, ⌥ déplace librement), et %@← → passent d'une zone à l'autre. %@⇧Z choisit la disposition."
+          }
+        }
+      }
+    },
+    "One entry per window on every screen, previews, pinned apps, a Start button.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une entrée par fenêtre sur chaque écran, des aperçus, des apps épinglées, un bouton Démarrer."
+          }
+        }
+      }
+    },
+    "Only for the copy in Applications.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seulement pour la copie dans Applications."
+          }
+        }
+      }
+    },
+    "Only for the installed copy (just install).": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seulement pour la copie installée (just install)."
+          }
+        }
+      }
+    },
+    "Only on screens that have a layout. Tiled workspaces ignore zones.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seulement sur les écrans qui ont une disposition. Les workspaces en tiling ignorent les zones."
+          }
+        }
+      }
+    },
+    "Only two zones that make a rectangle together can merge": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seules deux zones qui forment un rectangle peuvent fusionner"
+          }
+        }
+      }
+    },
+    "Only with %@ held": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seulement avec %@ enfoncé"
+          }
+        }
+      }
+    },
+    "Open": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir"
+          }
+        }
+      }
+    },
+    "Open %@": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir %@"
+          }
+        }
+      }
+    },
+    "Open Trash": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir la Corbeille"
+          }
+        }
+      }
+    },
+    "Open the file": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir le fichier"
+          }
+        }
+      }
+    },
+    "Optional": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Facultatif"
+          }
+        }
+      }
+    },
+    "Optional: live previews in the switcher and the taskbar. Without it, Pavé shows app icons.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Facultatif : des aperçus en direct dans le sélecteur et la barre des tâches. Sans elle, Pavé affiche les icônes des apps."
+          }
+        }
+      }
+    },
+    "PC habits (recommended)": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Habitudes PC (recommandé)"
+          }
+        }
+      }
+    },
+    "PC preset: the key next to the space bar (Win on a PC keyboard) runs Pavé's shortcuts, the bottom-left key does copy and paste, right ⌘ is Alt Gr. Turn it off if you keep Karabiner.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Préréglage PC : la touche à côté de la barre d'espace (Windows sur un clavier PC) lance les raccourcis de Pavé, la touche en bas à gauche fait copier et coller, ⌘ droite devient Alt Gr. À couper si tu gardes Karabiner."
+          }
+        }
+      }
+    },
+    "Pavé %@ is available": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pavé %@ est disponible"
+          }
+        }
+      }
+    },
+    "Pavé Settings": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages de Pavé"
+          }
+        }
+      }
+    },
+    "Pavé is not allowed to control the Finder. Allow it in System Settings › Privacy & Security › Automation, then try again.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pavé n'a pas le droit de piloter le Finder. Autorise-le dans Réglages Système › Confidentialité et sécurité › Automatisation, puis réessaie."
+          }
+        }
+      }
+    },
+    "Pavé is running · tracked windows: %lld": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pavé est actif · fenêtres suivies : %lld"
+          }
+        }
+      }
+    },
+    "Pavé is starting…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pavé démarre…"
+          }
+        }
+      }
+    },
+    "Pavé is up to date": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pavé est à jour"
+          }
+        }
+      }
+    },
+    "Pavé is waiting for the Accessibility permission": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pavé attend l'autorisation Accessibilité"
+          }
+        }
+      }
+    },
+    "Pavé remaps each keyboard as it is plugged in, and steps aside when Karabiner-Elements runs.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pavé adapte chaque clavier dès son branchement, et s'efface quand Karabiner-Elements tourne."
+          }
+        }
+      }
+    },
+    "Paste": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coller"
+          }
+        }
+      }
+    },
+    "Permissions": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permissions"
+          }
+        }
+      }
+    },
+    "Permissions, keyboard and features, step by step.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permissions, clavier et fonctionnalités, pas à pas."
+          }
+        }
+      }
+    },
+    "Pick the zone layout of the screen": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisir la disposition de zones de l'écran"
+          }
+        }
+      }
+    },
+    "Pin to Taskbar": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Épingler à la barre"
+          }
+        }
+      }
+    },
+    "Pinned apps": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps épinglées"
+          }
+        }
+      }
+    },
+    "Preset": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Préréglage"
+          }
+        }
+      }
+    },
+    "Put back exactly as it was when you turn it off.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remis exactement comme avant quand vous le désactivez."
+          }
+        }
+      }
+    },
+    "Quit %@": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quitter %@"
+          }
+        }
+      }
+    },
+    "Quit Pavé": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quitter Pavé"
+          }
+        }
+      }
+    },
+    "Reapply the remap": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réappliquer le remap"
+          }
+        }
+      }
+    },
+    "Redo": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rétablir"
+          }
+        }
+      }
+    },
+    "Remap off": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remap désactivé"
+          }
+        }
+      }
+    },
+    "Remap paused (Karabiner running)": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remap suspendu (Karabiner actif)"
+          }
+        }
+      }
+    },
+    "Remapped": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remappé"
+          }
+        }
+      }
+    },
+    "Remapped keyboards: %lld": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Claviers remappés : %lld"
+          }
+        }
+      }
+    },
+    "Remove %@": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retirer %@"
+          }
+        }
+      }
+    },
+    "Replace": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remplacer"
+          }
+        }
+      }
+    },
+    "Required: it lets Pavé move and resize windows, and read your shortcuts.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obligatoire : elle permet à Pavé de déplacer et redimensionner les fenêtres, et de lire vos raccourcis."
+          }
+        }
+      }
+    },
+    "Reset Taskbar": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réinitialiser la barre des tâches"
+          }
+        }
+      }
+    },
+    "Resize down": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redimensionner vers le bas"
+          }
+        }
+      }
+    },
+    "Resize left": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redimensionner vers la gauche"
+          }
+        }
+      }
+    },
+    "Resize right": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redimensionner vers la droite"
+          }
+        }
+      }
+    },
+    "Resize the neighbours too": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redimensionner aussi les voisines"
+          }
+        }
+      }
+    },
+    "Resize up": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redimensionner vers le haut"
+          }
+        }
+      }
+    },
+    "Resizing a window by an edge another window touches moves that window's edge along.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redimensionner une fenêtre par un bord qu’une autre touche déplace aussi le bord de celle-ci."
+          }
+        }
+      }
+    },
+    "Restart Pavé": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redémarrer Pavé"
+          }
+        }
+      }
+    },
+    "Restore": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restaurer"
+          }
+        }
+      }
+    },
+    "Right half": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moitié droite"
+          }
+        }
+      }
+    },
+    "Rules": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Règles"
+          }
+        }
+      }
+    },
+    "Same as macOS": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Celle de macOS"
+          }
+        }
+      }
+    },
+    "Save": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer"
+          }
+        }
+      }
+    },
+    "Save Current Arrangement…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer l'agencement actuel…"
+          }
+        }
+      }
+    },
+    "Save or restore a window arrangement": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer ou rétablir un agencement de fenêtres"
+          }
+        }
+      }
+    },
+    "Save the window arrangement": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer l'agencement des fenêtres"
+          }
+        }
+      }
+    },
+    "Screen": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Écran"
+          }
+        }
+      }
+    },
+    "Screen Recording": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrement de l'écran"
+          }
+        }
+      }
+    },
+    "Screen of workspace %lld": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Écran du workspace %lld"
+          }
+        }
+      }
+    },
+    "Screen's": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Celle de l'écran"
+          }
+        }
+      }
+    },
+    "Screens": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Écrans"
+          }
+        }
+      }
+    },
+    "Search for an app": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rechercher une app"
+          }
+        }
+      }
+    },
+    "Select All": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout sélectionner"
+          }
+        }
+      }
+    },
+    "Send the window (%@⇧1…9)": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envoyer la fenêtre (%@⇧1…9)"
+          }
+        }
+      }
+    },
+    "Send the window to %lld": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envoyer la fenêtre vers le %lld"
+          }
+        }
+      }
+    },
+    "Send the window to the next screen": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envoyer la fenêtre sur l'écran voisin"
+          }
+        }
+      }
+    },
+    "Setting not changed": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglage non modifié"
+          }
+        }
+      }
+    },
+    "Setting not saved: %@": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglage non enregistré : %@"
+          }
+        }
+      }
+    },
+    "Settings…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages…"
+          }
+        }
+      }
+    },
+    "Shortcuts": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raccourcis"
+          }
+        }
+      }
+    },
+    "Shortcuts are shown as the keys you press. With the PC preset, ⌘ (next to the space bar) is what macOS receives as ⌃: the configuration file writes it \"ctrl\".": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les raccourcis sont affichés avec les touches sur lesquelles tu appuies. Avec le préréglage PC, ⌘ (à côté de la barre d'espace) arrive à macOS comme ⌃ : le fichier de configuration l'écrit « ctrl »."
+          }
+        }
+      }
+    },
+    "Show Logs": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher les logs"
+          }
+        }
+      }
+    },
+    "Show a workspace": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher un workspace"
+          }
+        }
+      }
+    },
+    "Show a workspace (%@1…9)": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher un workspace (%@1…9)"
+          }
+        }
+      }
+    },
+    "Show in Finder": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher dans le Finder"
+          }
+        }
+      }
+    },
+    "Show the zones while dragging": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher les zones pendant le glisser"
+          }
+        }
+      }
+    },
+    "Show workspace %lld": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher le workspace %lld"
+          }
+        }
+      }
+    },
+    "Show…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher…"
+          }
+        }
+      }
+    },
+    "Snapping and the switcher are always on. The rest is yours to choose.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'aimantation et le sélecteur sont toujours actifs. Le reste, c'est vous qui choisissez."
+          }
+        }
+      }
+    },
+    "Split into columns": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couper en colonnes"
+          }
+        }
+      }
+    },
+    "Split into rows": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couper en lignes"
+          }
+        }
+      }
+    },
+    "Stage Manager": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stage Manager"
+          }
+        }
+      }
+    },
+    "Stage Manager is on: Settings…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stage Manager actif : Réglages…"
+          }
+        }
+      }
+    },
+    "Start": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Démarrer"
+          }
+        }
+      }
+    },
+    "Start from…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partir de…"
+          }
+        }
+      }
+    },
+    "Start using Pavé": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commencer avec Pavé"
+          }
+        }
+      }
+    },
+    "Status": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "État"
+          }
+        }
+      }
+    },
+    "Step %lld of %lld": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Étape %lld sur %lld"
+          }
+        }
+      }
+    },
+    "Stuck against another window, it also takes the free space there: next to a window on the right two thirds, it fills the first third.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collée contre une autre fenêtre, elle prend aussi l’espace libre à côté : contre une fenêtre sur les deux tiers droits, elle remplit le premier tiers."
+          }
+        }
+      }
+    },
+    "Switch windows (type to search, W closes, Q quits)": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Changer de fenêtre (tapez pour chercher, W ferme, Q quitte)"
+          }
+        }
+      }
+    },
+    "Switcher": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Switcher"
+          }
+        }
+      }
+    },
+    "Switcher, same app": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Switcher, même app"
+          }
+        }
+      }
+    },
+    "Taskbar": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barre des tâches"
+          }
+        }
+      }
+    },
+    "The %@Tab switcher shows": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le switcher %@Tab montre"
+          }
+        }
+      }
+    },
+    "The Finder cancelled: a request (password, confirmation) was refused, or an item is locked or in use. Empty the Trash from the Finder to see which one.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le Finder a annulé l'opération : une demande (mot de passe, confirmation) a été refusée, ou un élément est verrouillé ou en cours d'utilisation. Tu peux vider la Corbeille depuis le Finder pour voir lequel."
+          }
+        }
+      }
+    },
+    "The Finder did not answer in time. Try again in a moment.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le Finder n'a pas répondu à temps. Réessaie dans un instant."
+          }
+        }
+      }
+    },
+    "The Finder returned error %lld.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le Finder a renvoyé l'erreur %lld."
+          }
+        }
+      }
+    },
+    "The Trash is already empty": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La Corbeille est déjà vide"
+          }
+        }
+      }
+    },
+    "The Trash was not emptied": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La Corbeille n'a pas été vidée"
+          }
+        }
+      }
+    },
+    "The configuration could not be read: %@. The previous settings stay active.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La configuration n'a pas pu être relue : %@. Les réglages d'avant restent actifs."
+          }
+        }
+      }
+    },
+    "The editor opens full screen on the screen under the pointer. Layouts are saved as [layouts.\"<name>\"] in the config file.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'éditeur s'ouvre en plein écran sur l'écran sous le pointeur. Les dispositions sont enregistrées sous [layouts.\"<nom>\"] dans le fichier de configuration."
+          }
+        }
+      }
+    },
+    "The items in the Trash will be deleted permanently.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les éléments de la Corbeille seront supprimés définitivement."
+          }
+        }
+      }
+    },
+    "The key next to the space bar drives Pavé (⌘Tab, ⌘ + arrows, like Alt+Tab and Win + arrows); the bottom-left key does copy and paste (Ctrl+C, Ctrl+V); right ⌘ is Alt Gr.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La touche à côté de la barre d'espace pilote Pavé (⌘Tab, ⌘ + flèches, comme Alt+Tab et Win + flèches) ; la touche en bas à gauche fait copier-coller (Ctrl+C, Ctrl+V) ; ⌘ droite devient Alt Gr."
+          }
+        }
+      }
+    },
+    "The switcher, snapping, taskbar and workspaces you know from Windows and Linux, on your Mac.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le sélecteur, l'aimantation, la barre des tâches et les workspaces de Windows et Linux, sur votre Mac."
+          }
+        }
+      }
+    },
+    "The visible workspace": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le workspace visible"
+          }
+        }
+      }
+    },
+    "This screen": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cet écran"
+          }
+        }
+      }
+    },
+    "This zone is too small to split": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette zone est trop petite pour être coupée"
+          }
+        }
+      }
+    },
+    "Tiled": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En tuile"
+          }
+        }
+      }
+    },
+    "Tiling": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiling"
+          }
+        }
+      }
+    },
+    "Tiling of workspace %lld": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiling du workspace %lld"
+          }
+        }
+      }
+    },
+    "To approve in System Settings > General > Login Items.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À approuver dans Réglages Système > Général > Ouverture."
+          }
+        }
+      }
+    },
+    "To the left screen": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vers l'écran de gauche"
+          }
+        }
+      }
+    },
+    "To the right screen": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vers l'écran de droite"
+          }
+        }
+      }
+    },
+    "Tracked windows": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fenêtres suivies"
+          }
+        }
+      }
+    },
+    "Trash": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Corbeille"
+          }
+        }
+      }
+    },
+    "Troubleshooting": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dépannage"
+          }
+        }
+      }
+    },
+    "Turn Off": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Désactiver"
+          }
+        }
+      }
+    },
+    "Turn On": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réactiver"
+          }
+        }
+      }
+    },
+    "Type the shortcut…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tape le raccourci…"
+          }
+        }
+      }
+    },
+    "Type to search…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tapez pour chercher…"
+          }
+        }
+      }
+    },
+    "Undo": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Annuler"
+          }
+        }
+      }
+    },
+    "Unpin from Taskbar": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Désépingler de la barre"
+          }
+        }
+      }
+    },
+    "Up to date (checked %@)": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À jour (vérifié à %@)"
+          }
+        }
+      }
+    },
+    "Updates": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mises à jour"
+          }
+        }
+      }
+    },
+    "Used by a screen or a workspace": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utilisée par un écran ou un workspace"
+          }
+        }
+      }
+    },
+    "Version %@ (build %@)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Version %1$@ (build %2$@)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version %@ (build %@)"
+          }
+        }
+      }
+    },
+    "Version %@ is the latest.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La version %@ est la plus récente."
+          }
+        }
+      }
+    },
+    "Virtual workspaces": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workspaces virtuels"
+          }
+        }
+      }
+    },
+    "Visible screen": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Écran visible"
+          }
+        }
+      }
+    },
+    "Welcome guide": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guide de bienvenue"
+          }
+        }
+      }
+    },
+    "Welcome to Pavé": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bienvenue dans Pavé"
+          }
+        }
+      }
+    },
+    "What to turn on": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce que vous activez"
+          }
+        }
+      }
+    },
+    "When first shown": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Au premier affichage"
+          }
+        }
+      }
+    },
+    "When the taskbar is full": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quand la barre est pleine"
+          }
+        }
+      }
+    },
+    "Where it opens": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Là où elle s'ouvre"
+          }
+        }
+      }
+    },
+    "Window": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fenêtre"
+          }
+        }
+      }
+    },
+    "Window Arrangements": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agencements de fenêtres"
+          }
+        }
+      }
+    },
+    "Window arrangements": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agencements de fenêtres"
+          }
+        }
+      }
+    },
+    "Window titles and workspace names never reach the logs, previews stay in memory, and nothing leaves your Mac.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les titres des fenêtres et les noms des workspaces n'arrivent jamais dans les journaux, les aperçus restent en mémoire, et rien ne quitte votre Mac."
+          }
+        }
+      }
+    },
+    "Windows": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fenêtres"
+          }
+        }
+      }
+    },
+    "Windows already in zones follow a new layout. A screen is found by its UUID, \"builtin\", or part of its name, so the layout survives a re-plug.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les fenêtres déjà rangées suivent une nouvelle disposition. Un écran est reconnu par son UUID, « builtin » ou une partie de son nom : la disposition survit à un rebranchement."
+          }
+        }
+      }
+    },
+    "Windows habits on macOS: switcher, snap, taskbar, workspaces and tiling.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les habitudes de Windows sur macOS : switcher, snap, barre des tâches, workspaces et tiling."
+          }
+        }
+      }
+    },
+    "Workspace": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workspace"
+          }
+        }
+      }
+    },
+    "Workspace %@": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workspace %@"
+          }
+        }
+      }
+    },
+    "Workspace %lld": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workspace %lld"
+          }
+        }
+      }
+    },
+    "Workspace %lld, shown": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workspace %lld, affiché"
+          }
+        }
+      }
+    },
+    "Workspace overrides": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dérogations par workspace"
+          }
+        }
+      }
+    },
+    "Workspaces": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workspaces"
+          }
+        }
+      }
+    },
+    "Workspaces %@": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workspaces %@"
+          }
+        }
+      }
+    },
+    "Workspaces and tiling": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workspaces et tiling"
+          }
+        }
+      }
+    },
+    "You have version %@. Pavé restarts once it is installed.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vous avez la version %@. Pavé redémarre une fois l'installation faite."
+          }
+        }
+      }
+    },
+    "You're all set": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout est prêt"
+          }
+        }
+      }
+    },
+    "Your keyboard": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre clavier"
+          }
+        }
+      }
+    },
+    "Your keys stay as they are; Pavé's shortcuts use ⌃ (⌃Tab, ⌃ + arrows).": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vos touches restent comme elles sont ; les raccourcis de Pavé utilisent ⌃ (⌃Tab, ⌃ + flèches)."
+          }
+        }
+      }
+    },
+    "Zone": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zone"
+          }
+        }
+      }
+    },
+    "Zone %lld": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zone %lld"
+          }
+        }
+      }
+    },
+    "Zone layout · %@": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disposition des zones · %@"
+          }
+        }
+      }
+    },
+    "Zone layouts": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dispositions de zones"
+          }
+        }
+      }
+    },
+    "Zones": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zones"
+          }
+        }
+      }
+    },
+    "[zones.screens] %@": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "[zones.screens] %@"
+          }
+        }
+      }
+    },
+    "dev build": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "build de dev"
+          }
+        }
+      }
+    },
+    "empty": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "vide"
+          }
+        }
+      }
+    },
+    "full screen": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "plein écran"
+          }
+        }
+      }
+    },
+    "hidden": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "masquée"
+          }
+        }
+      }
+    },
+    "invalid": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "invalide"
+          }
+        }
+      }
+    },
+    "loaded without errors": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "chargé sans erreur"
+          }
+        }
+      }
+    },
+    "macOS refused the write to com.apple.WindowManager.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS a refusé l'écriture dans com.apple.WindowManager."
+          }
+        }
+      }
+    },
+    "macOS window tiling": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiling natif de macOS"
+          }
+        }
+      }
+    },
+    "macOS window tiling is on: Settings…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiling natif de macOS actif : Réglages…"
+          }
+        }
+      }
+    },
+    "macOS window tiling not changed": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglage du tiling natif non modifié"
+          }
+        }
+      }
+    },
+    "minimized": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "minimisée"
+          }
+        }
+      }
+    },
+    "no file, defaults": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "aucun fichier, valeurs par défaut"
+          }
+        }
+      }
+    },
+    "no shortcut": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "aucun raccourci"
+          }
+        }
+      }
+    },
+    "warnings: %lld": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "avertissements : %lld"
+          }
+        }
+      }
+    },
+    "⌥ alone opens the launcher": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌥ seul ouvre le lanceur"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

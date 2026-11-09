@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" width="640" height="400" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+<defs>
+<linearGradient id="wall" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="0.55" stop-color="#2563eb"/><stop offset="1" stop-color="#1e1b4b"/></linearGradient>
+<linearGradient id="win" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e8edff"/></linearGradient>
+<filter id="sh" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0b1026" flood-opacity="0.35"/></filter>
+<clipPath id="scr"><rect x="20" y="20" width="600" height="360" rx="18"/></clipPath>
+
+</defs>
+<rect x="20" y="20" width="600" height="360" rx="18" fill="url(#wall)"/>
+<rect x="38" y="38" width="133.0" height="290" rx="10" fill="#0b1026" fill-opacity="0.22" stroke="#ffffff" stroke-opacity="0.55" stroke-width="2"/>
+<text x="104.5" y="197.0" font-size="40" font-weight="600" fill="#ffffff" fill-opacity="0.7" text-anchor="middle">1</text>
+<rect x="179.0" y="38" width="282.0" height="290" rx="10" fill="#60a5fa" fill-opacity="0.45" stroke="#ffffff" stroke-opacity="0.95" stroke-width="2"/>
+<text x="320.0" y="197.0" font-size="40" font-weight="600" fill="#ffffff" fill-opacity="0.95" text-anchor="middle">2</text>
+<rect x="469.0" y="38" width="133.0" height="141.0" rx="10" fill="#0b1026" fill-opacity="0.22" stroke="#ffffff" stroke-opacity="0.55" stroke-width="2"/>
+<text x="535.5" y="122.5" font-size="40" font-weight="600" fill="#ffffff" fill-opacity="0.7" text-anchor="middle">3</text>
+<rect x="469.0" y="187.0" width="133.0" height="141.0" rx="10" fill="#0b1026" fill-opacity="0.22" stroke="#ffffff" stroke-opacity="0.55" stroke-width="2"/>
+<text x="535.5" y="271.5" font-size="40" font-weight="600" fill="#ffffff" fill-opacity="0.7" text-anchor="middle">4</text>
+<g opacity="0.95" filter="url(#sh)"><rect x="250" y="208" width="210" height="104" rx="9" fill="url(#win)"/><rect x="250" y="230" width="210" height="1" fill="#1e3a8a" opacity="0.12"/><circle cx="263" cy="219" r="4" fill="#ff5f57"/><circle cx="276" cy="219" r="4" fill="#febc2e"/><circle cx="289" cy="219" r="4" fill="#28c840"/><rect x="265" y="246" width="160" height="7" rx="3.5" fill="#94a3b8" opacity="0.45"/><rect x="265" y="263" width="124" height="7" rx="3.5" fill="#94a3b8" opacity="0.45"/><rect x="265" y="280" width="90" height="7" rx="3.5" fill="#94a3b8" opacity="0.45"/><rect x="265" y="297" width="160" height="7" rx="3.5" fill="#94a3b8" opacity="0.45"/></g>
+<path d="M370 220 l0 17 l4.5 -4 l3 7 l3 -1.3 l-3 -6.8 l6 -0.4 z" fill="#0b1026" stroke="#ffffff" stroke-width="1.4" stroke-linejoin="round"/>
+<g clip-path="url(#scr)"><rect x="20" y="346" width="600" height="54" fill="#0b1026" opacity="0.78"/></g><rect x="20" y="346" width="600" height="1" fill="#ffffff" opacity="0.15"/><rect x="32" y="354" width="18" height="18" rx="5" fill="#ffffff" opacity="0.9"/><rect x="62" y="352" width="96" height="22" rx="6" fill="#ffffff" opacity="0.16"/><rect x="68" y="356" width="14" height="14" rx="4" fill="#60a5fa"/><rect x="88" y="360" width="54" height="6" rx="3" fill="#ffffff" opacity="0.55"/><rect x="92" y="375" width="36" height="3" rx="1.5" fill="#60a5fa"/><rect x="590" y="355" width="16" height="16" rx="4" fill="#ffffff" opacity="0.55"/>
+</svg>
