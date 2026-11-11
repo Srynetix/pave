@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 import SwiftUI
@@ -10,17 +11,24 @@ struct GeneralPane: View {
         Form {
             if let error = status.configError {
                 SwiftUI.Section {
-                    Banner(text: String(localized: "The configuration could not be read: \(error). The previous settings stay active."),
-                        action: (String(localized: "Open the file"), { model.perform(.openConfig) }))
-                        .padding(-20)
-                        .listRowInsets(EdgeInsets())
+                    Banner(
+                        text: String(
+                            localized:
+                                "The configuration could not be read: \(error). The previous settings stay active."),
+                        action: (String(localized: "Open the file"), { model.perform(.openConfig) })
+                    )
+                    .padding(-20)
+                    .listRowInsets(EdgeInsets())
                 }
             }
             SwiftUI.Section {
-                Toggle(isOn: Binding(get: { status.login == .on || status.login == .needsApproval }, set: { model.setLogin($0) })) {
+                Toggle(
+                    isOn: Binding(
+                        get: { status.login == .on || status.login == .needsApproval }, set: { model.setLogin($0) })
+                ) {
                     Text("Launch Pavé at login")
                     switch status.login {
-                    case .devCopy: Text("Only for the installed copy (just install).")
+                    case .devCopy: Text("Only for the installed copy (just deploy).")
                     case .needsApproval: Text("To approve in System Settings > General > Login Items.")
                     default: EmptyView()
                     }
@@ -30,7 +38,8 @@ struct GeneralPane: View {
                     if let version = status.updateAvailable {
                         Button("Install \(version)…") { model.perform(.checkUpdates) }.disabled(status.updateBusy)
                     } else {
-                        Button("Check Now") { model.perform(.checkUpdates) }.disabled(status.updateBusy || !status.canUpdate)
+                        Button("Check Now") { model.perform(.checkUpdates) }.disabled(
+                            status.updateBusy || !status.canUpdate)
                     }
                 } label: {
                     Text("Updates")
@@ -71,9 +80,13 @@ struct GeneralPane: View {
                     }
                 }
                 LabeledContent("Tracked windows") {
-                    Text(status.hung.isEmpty
-                        ? String(localized: "\(status.windows) windows in \(status.apps) apps")
-                        : String(localized: "\(status.windows) windows in \(status.apps) apps · not responding: \(status.hung.joined(separator: ", "))"))
+                    Text(
+                        status.hung.isEmpty
+                            ? String(localized: "\(status.windows) windows in \(status.apps) apps")
+                            : String(
+                                localized:
+                                    "\(status.windows) windows in \(status.apps) apps · not responding: \(status.hung.joined(separator: ", "))"
+                            ))
                 }
                 LabeledContent("Screens", value: status.screens.joined(separator: " · "))
                 LabeledContent("Keyboard", value: status.keyboard)
@@ -81,8 +94,12 @@ struct GeneralPane: View {
             SwiftUI.Section("Conflicting macOS settings") {
                 LabeledContent {
                     HStack {
-                        StatusDot(ok: !status.nativeTiling, text: status.nativeTiling ? String(localized: "On") : String(localized: "Off"))
-                        Button(status.nativeTiling ? String(localized: "Turn Off") : String(localized: "Turn On"), action: model.toggleNativeTiling)
+                        StatusDot(
+                            ok: !status.nativeTiling,
+                            text: status.nativeTiling ? String(localized: "On") : String(localized: "Off"))
+                        Button(
+                            status.nativeTiling ? String(localized: "Turn Off") : String(localized: "Turn On"),
+                            action: model.toggleNativeTiling)
                     }
                 } label: {
                     Text("macOS window tiling")
@@ -90,7 +107,9 @@ struct GeneralPane: View {
                 }
                 LabeledContent {
                     HStack {
-                        StatusDot(ok: !status.stageManager, text: status.stageManager ? String(localized: "On") : String(localized: "Off"))
+                        StatusDot(
+                            ok: !status.stageManager,
+                            text: status.stageManager ? String(localized: "On") : String(localized: "Off"))
                         if status.stageManager { Button("Settings…") { model.perform(.stageManager) } }
                     }
                 } label: {

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT OR Apache-2.0
 # Publishes this commit as a GitHub release that installed copies of Pavé update from
 # (Settings › General › Updates, `pave update`, `[updates] source`).
 #
@@ -18,7 +19,9 @@
 #   default), whose public half is Resources/update-key.pub: an installed Pavé
 #   installs only a file signed with it, and named in the signature
 #   (trusted comment "file:<name>").
-# - Notes: the commit subjects since the previous pave-v tag, then how to
+# - Checks first: the commits (scripts/check-commits.sh, even with
+#   --skip-checks), then `just ci` and the string catalog.
+# - Notes: scripts/changelog.sh since the previous pave-v tag, then how to
 #   install; --notes / --notes-file replace the first part.
 # - --repo: where to publish (PAVE_RELEASE_REPO, else Srynetix/pave).
 # - --dry-run: builds, signs and prints what would be published, publishes nothing.
@@ -38,7 +41,7 @@ while [[ $# -gt 0 ]]; do
     --notes-file) notes_file=${2:-}; shift ;;
     --skip-checks) checks=false ;;
     --dry-run) dry=true ;;
-    -h | --help) sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h | --help) sed -n '3,27p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "unknown option: $1 (see --help)" >&2; exit 2 ;;
   esac
   shift
@@ -74,14 +77,13 @@ commit=$(git rev-parse HEAD)
 git fetch -q origin
 [[ -n "$(git branch -r --contains "$commit")" ]] || fail "$(git rev-parse --short HEAD) is not pushed: push it first"
 
+# Checked even with --skip-checks: the notes are built from these subjects.
+step "The commits"
+scripts/check-commits.sh
+
 if $checks; then
-  step "Checks"
-  log=$(mktemp "${TMPDIR:-/tmp}/pave-test.XXXXXX")
-  if ! swift test >"$log" 2>&1; then
-    tail -40 "$log"
-    fail "tests failed (full output: $log)"
-  fi
-  tail -1 "$log"
+  step "The gate"
+  just ci
   # A string added in the code but never extracted would ship untranslated.
   scripts/strings.sh sync >/dev/null
   git diff --quiet Resources/Localizable.xcstrings || fail "the string catalog is out of date: run just strings, translate, commit"
@@ -128,8 +130,7 @@ previous=$(git describe --tags --match 'pave-v*' --abbrev=0 "$commit^" 2>/dev/nu
 {
   if [[ -n "$notes_file" ]]; then cat "$notes_file"
   elif [[ -n "$notes" ]]; then printf '%s\n' "$notes"
-  elif [[ -n "$previous" ]]; then git log --no-merges --format='- %s' "$previous..$commit"
-  else echo "First release of Pavé."
+  else scripts/changelog.sh ${previous:+--since "$previous"} "$commit"
   fi
   cat <<EOF
 

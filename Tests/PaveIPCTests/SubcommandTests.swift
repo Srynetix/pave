@@ -1,5 +1,7 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import PaveCore
 import Testing
+
 @testable import PaveIPC
 
 @Suite struct SubcommandTests {
@@ -18,7 +20,8 @@ import Testing
         #expect(try ZonesCommand.parse(["off"]).get() == .enable(false))
         #expect(try ZonesCommand.parse(["set", "LG", "thirds"]).get() == .set(screen: "LG", layout: "thirds"))
         #expect(try ZonesCommand.parse(["edit"]).get() == .edit(screen: nil, layout: nil))
-        #expect(try ZonesCommand.parse(["edit", "builtin", "focus"]).get() == .edit(screen: "builtin", layout: "focus"))
+        #expect(
+            try ZonesCommand.parse(["edit", "builtin", "focus"]).get() == .edit(screen: "builtin", layout: "focus"))
         for bad in [["set", "LG"], ["edit", "a", "b", "c"], ["on", "x"], ["wat"]] {
             #expect(throws: UsageError.self) { try ZonesCommand.parse(bad).get() }
         }

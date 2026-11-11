@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 
@@ -11,7 +12,6 @@ extension TaskbarController {
             DispatchQueue.main.async { MainActor.assumeIsolated { self.showTrash(empty) } }
         }
     }
-
 
     /// Asking the Finder costs an `osascript` process (≈ 130 ms, ~/.Trash is
     /// protected): every 5 s while the Finder is in front, where files get

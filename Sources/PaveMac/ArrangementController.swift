@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 import PaveIPC
@@ -32,8 +33,10 @@ public final class ArrangementController {
     private var deadline = Date.distantPast
     static let launchWindow: TimeInterval = 30
 
-    public init(registry: WindowRegistry, workspaces: WorkspaceController,
-                url: URL = StateFiles.url("arrangements.json")) {
+    public init(
+        registry: WindowRegistry, workspaces: WorkspaceController,
+        url: URL = StateFiles.url("arrangements.json")
+    ) {
         self.registry = registry
         self.workspaces = workspaces
         self.url = url
@@ -58,7 +61,9 @@ public final class ArrangementController {
         let places: [Arrangement.Place] = windows.compactMap { window, candidate in
             // A parked window: where it will come back.
             let frame = state.savedFrames[window.id] ?? window.frame
-            guard let screen = LayoutEngine.screen(for: frame, among: screens), let rank = ranks[window.id] else { return nil }
+            guard let screen = LayoutEngine.screen(for: frame, among: screens), let rank = ranks[window.id] else {
+                return nil
+            }
             var shown = window
             shown.frame = frame
             return Arrangement.Place(
@@ -165,7 +170,9 @@ public final class ArrangementController {
     /// frame; a screen gone: the same place on the main screen.
     private func frame(for place: Arrangement.Place, among screens: [Screen]) -> Rect {
         if let screen = screens.first(where: { $0.id == place.screen }) {
-            if let zones = place.zones, let layout = screenZones(screen), let last = zones.max(), last < layout.layout.zones.count {
+            if let zones = place.zones, let layout = screenZones(screen), let last = zones.max(),
+                last < layout.layout.zones.count
+            {
                 return layout.layout.frame(of: zones, in: screen.visibleFrame, gaps: layout.gaps)
             }
             return place.frame

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Virtual workspaces: native Spaces are not used. Windows of inactive
 /// workspaces are parked in a screen corner, their frame remembered.
 ///
@@ -92,7 +93,8 @@ public struct Workspaces: Codable, Sendable, Equatable {
             visible[sid] = nil
             departed[sid] = Departed(
                 visible: n, homes: home.filter { $0.value == sid }.map(\.key).sorted(),
-                windows: windows.filter { workspace(of: $0.id) == n && $0.state == .normal && !isHidden($0.id) }.map(\.id))
+                windows: windows.filter { workspace(of: $0.id) == n && $0.state == .normal && !isHidden($0.id) }.map(
+                    \.id))
         }
         for (n, sid) in home where !ids.contains(sid) { home[n] = primary.id }
 
@@ -117,7 +119,8 @@ public struct Workspaces: Codable, Sendable, Equatable {
         }
         // Windows macOS put back on a returning screen rejoin its workspace.
         for (screen, back) in returned {
-            for window in windows where back.windows.contains(window.id) && !isHidden(window.id)
+            for window in windows
+            where back.windows.contains(window.id) && !isHidden(window.id)
                 && LayoutEngine.screen(for: window.frame, among: screens)?.id == screen.id
             {
                 assignment[window.id] = visible[screen.id]
@@ -127,7 +130,7 @@ public struct Workspaces: Codable, Sendable, Equatable {
         return actions
     }
 
-    /// Planned restart of Pavé (`just install`, an update): the previous run
+    /// Planned restart of Pavé (`just deploy`, an update): the previous run
     /// left its windows parked on purpose, so this one carries on with its
     /// state instead of bringing everything back. Windows gone meanwhile are
     /// forgotten, new ones join the workspace shown on their screen, a changed
@@ -160,7 +163,9 @@ public struct Workspaces: Codable, Sendable, Equatable {
                     ParkingSpot.isSafe(c, of: s, among: screens, windowSize: window.frame)
                         && abs(ParkingSpot.frame(for: window.frame, at: c, of: s).x - window.frame.x) <= 2
                 }
-            }) { return nil }
+            }) {
+                return nil
+            }
             return .setFrame(window.id, spot)
         }
     }
@@ -252,7 +257,9 @@ public struct Workspaces: Codable, Sendable, Equatable {
         for window in windows where workspace(of: window.id) == outgoing {
             // Minimized windows stay attached to the workspace, without parking.
             assignment[window.id] = outgoing
-            if window.state == .normal, !isHidden(window.id) { actions += park(window, screens: all, preferring: screen) }
+            if window.state == .normal, !isHidden(window.id) {
+                actions += park(window, screens: all, preferring: screen)
+            }
         }
         actions += show(target, on: screen, screens: all, windows: windows)
         visible[screen.id] = target
@@ -265,10 +272,15 @@ public struct Workspaces: Codable, Sendable, Equatable {
     /// home. Hidden: as a switch, on that screen. Shown on another screen:
     /// its windows move over (frames carried), and the screen it leaves
     /// shows another workspace (one that lives there, else an empty one).
-    public mutating func display(_ target: Int, on screen: Screen, screens: [Screen], windows: [WindowSnapshot]) -> [Action] {
+    public mutating func display(_ target: Int, on screen: Screen, screens: [Screen], windows: [WindowSnapshot])
+        -> [Action]
+    {
         guard Self.range.contains(target), screens.contains(where: { $0.id == screen.id }) else { return [] }
         guard let from = self.screen(showing: target), from != screen.id else {
-            if visible[screen.id] == target { active = target; return focusAction(in: target, windows: windows) }
+            if visible[screen.id] == target {
+                active = target
+                return focusAction(in: target, windows: windows)
+            }
             home[target] = screen.id
             return switchTo(target, focusedScreen: screen, screens: screens, windows: windows)
         }
@@ -276,12 +288,17 @@ public struct Workspaces: Codable, Sendable, Equatable {
         let outgoing = visible[screen.id] ?? active
         for window in windows where workspace(of: window.id) == outgoing {
             assignment[window.id] = outgoing
-            if window.state == .normal, !isHidden(window.id) { actions += park(window, screens: screens, preferring: screen) }
+            if window.state == .normal, !isHidden(window.id) {
+                actions += park(window, screens: screens, preferring: screen)
+            }
         }
         let old = screens.first { $0.id == from }
-        for window in windows where workspace(of: window.id) == target && window.state == .normal && !isHidden(window.id) {
+        for window in windows
+        where workspace(of: window.id) == target && window.state == .normal && !isHidden(window.id) {
             assignment[window.id] = target
-            let frame = old.map { LayoutEngine.carry(window.frame, from: $0.visibleFrame, to: screen.visibleFrame) } ?? window.frame
+            let frame =
+                old.map { LayoutEngine.carry(window.frame, from: $0.visibleFrame, to: screen.visibleFrame) }
+                ?? window.frame
             actions.append(.setFrame(window.id, frame))
         }
         visible[screen.id] = target
@@ -331,7 +348,9 @@ public struct Workspaces: Codable, Sendable, Equatable {
                 let to = screens.first(where: { $0.id == sid }),
                 let from = LayoutEngine.screen(for: window.frame, among: screens), from.id != to.id
             else { return [] }
-            return [.setFrame(window.id, LayoutEngine.carry(window.frame, from: from.visibleFrame, to: to.visibleFrame))]
+            return [
+                .setFrame(window.id, LayoutEngine.carry(window.frame, from: from.visibleFrame, to: to.visibleFrame))
+            ]
         }
 
         var actions: [Action] = []
@@ -340,13 +359,18 @@ public struct Workspaces: Codable, Sendable, Equatable {
             if home[target] == nil, let current { home[target] = current.id }
             actions += park(window, screens: screens, preferring: current)
             // Restored later on the target's home screen: carry the frame there now.
-            if let current, let homeScreen = screens.first(where: { $0.id == home[target] }), homeScreen.id != current.id {
-                savedFrames[window.id] = LayoutEngine.carry(window.frame, from: current.visibleFrame, to: homeScreen.visibleFrame)
+            if let current, let homeScreen = screens.first(where: { $0.id == home[target] }),
+                homeScreen.id != current.id
+            {
+                savedFrames[window.id] = LayoutEngine.carry(
+                    window.frame, from: current.visibleFrame, to: homeScreen.visibleFrame)
             }
         }
-        if focusNext, let next = windows.first(where: {
-            $0.id != window.id && workspace(of: $0.id) == source && $0.state == .normal && !isHidden($0.id)
-        }) {
+        if focusNext,
+            let next = windows.first(where: {
+                $0.id != window.id && workspace(of: $0.id) == source && $0.state == .normal && !isHidden($0.id)
+            })
+        {
             actions.append(.focus(next.id))
         }
         return actions
@@ -417,7 +441,8 @@ public struct Workspaces: Codable, Sendable, Equatable {
     private mutating func park(_ window: WindowSnapshot, screens: [Screen], preferring: Screen? = nil) -> [Action] {
         guard let screen = preferring ?? LayoutEngine.screen(for: window.frame, among: screens) else { return [] }
         savedFrames[window.id] = window.frame
-        let spot = ParkingSpot.park(window.frame, on: screen, among: screens)
+        let spot =
+            ParkingSpot.park(window.frame, on: screen, among: screens)
             ?? Self.hiddenFrame(for: window.frame, on: screen)
         return [.setFrame(window.id, spot)]
     }

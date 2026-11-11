@@ -1647,12 +1647,12 @@
         }
       }
     },
-    "Only for the installed copy (just install).": {
+    "Only for the installed copy (just deploy).": {
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Seulement pour la copie installée (just install)."
+            "value": "Seulement pour la copie installée (just deploy)."
           }
         }
       }

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT OR Apache-2.0
 # Interface strings: Resources/Localizable.xcstrings (source language: English).
 #
 #   scripts/strings.sh sync    # extract the strings from the code (through the

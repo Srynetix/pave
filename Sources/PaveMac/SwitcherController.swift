@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 
@@ -125,13 +126,15 @@ public final class SwitcherController {
     /// the one under the mouse), minimized ones of that screen included.
     private func windowsOnScreenInUse() -> Set<WindowID> {
         let screens = Screens.all()
-        guard let screen = registry.focusedWindow.flatMap({ LayoutEngine.screen(for: $0.frame, among: screens) })
-            ?? Screens.underMouse(among: screens)
+        guard
+            let screen = registry.focusedWindow.flatMap({ LayoutEngine.screen(for: $0.frame, among: screens) })
+                ?? Screens.underMouse(among: screens)
         else { return [] }
         let state = workspaces.state
-        return Set(registry.store.orderedWindows.filter { window in
-            !state.isHidden(window.id) && LayoutEngine.screen(for: window.frame, among: screens) == screen
-        }.map(\.id))
+        return Set(
+            registry.store.orderedWindows.filter { window in
+                !state.isHidden(window.id) && LayoutEngine.screen(for: window.frame, among: screens) == screen
+            }.map(\.id))
     }
 
     private func open(sameApp: Bool, backwards: Bool, latencyStart: UInt64) {
@@ -166,7 +169,8 @@ public final class SwitcherController {
         let p95 = sorted[min(sorted.count - 1, Int(Double(sorted.count) * 0.95))]
         Log.info(
             "switcher panel shown \(String(format: "%.1f", shown)) ms after the key "
-                + "(S1 so far: n=\(sorted.count), p50 \(String(format: "%.1f", sorted[sorted.count / 2])), p95 \(String(format: "%.1f", p95)) ms)")
+                + "(S1 so far: n=\(sorted.count), p50 \(String(format: "%.1f", sorted[sorted.count / 2])), p95 \(String(format: "%.1f", p95)) ms)"
+        )
     }
 
     private func finish(_ effect: SwitcherSession.Effect, _ last: SwitcherSession, how: String) {

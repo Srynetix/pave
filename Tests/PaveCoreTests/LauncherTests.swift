@@ -1,4 +1,6 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import Testing
+
 @testable import PaveCore
 
 @Suite struct LauncherTests {
@@ -20,7 +22,7 @@ import Testing
         #expect(names("PREF") == ["Préférences Réseau"])
         #expect(names("reseau") == ["Préférences Réseau"])
         #expect(names("").count == apps.count)
-        #expect(names("") .first == "Brave Browser")
+        #expect(names("").first == "Brave Browser")
         #expect(names("zzz").isEmpty)
     }
 }

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 
@@ -93,16 +94,19 @@ public final class TaskbarController {
         badges.onChange = { [weak self] in self?.refresh(reason: "badges") }
         focus.addWillFocusObserver { [weak self] window in self?.willFocus(window) }
         let center = NSWorkspace.shared.notificationCenter
-        observers.append(center.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) {
-            [weak self] _ in MainActor.assumeIsolated { self?.refreshAfterTransition(reason: "activation") }
-        })
+        observers.append(
+            center.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) {
+                [weak self] _ in MainActor.assumeIsolated { self?.refreshAfterTransition(reason: "activation") }
+            })
         // Entering or leaving a full-screen Space.
-        observers.append(center.addObserver(forName: NSWorkspace.activeSpaceDidChangeNotification, object: nil, queue: .main) {
-            [weak self] _ in MainActor.assumeIsolated { self?.refreshAfterTransition(reason: "space") }
-        })
-        observers.append(NotificationCenter.default.addObserver(
-            forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main
-        ) { [weak self] _ in MainActor.assumeIsolated { self?.rebuildPanels() } })
+        observers.append(
+            center.addObserver(forName: NSWorkspace.activeSpaceDidChangeNotification, object: nil, queue: .main) {
+                [weak self] _ in MainActor.assumeIsolated { self?.refreshAfterTransition(reason: "space") }
+            })
+        observers.append(
+            NotificationCenter.default.addObserver(
+                forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main
+            ) { [weak self] _ in MainActor.assumeIsolated { self?.rebuildPanels() } })
         thumbnails.addUpdateObserver { [weak self] id, image in self?.preview.update(id, image) }
         preview.onPick = { [weak self] id in
             guard let self, let window = self.registry.store.windows[id] else { return }
@@ -111,7 +115,9 @@ public final class TaskbarController {
         }
         preview.onClose = { [weak self] id in
             guard let self, let window = self.registry.store.windows[id] else { return }
-            self.registry.close(window) { ok in Log.info("taskbar: close \(id) [\(window.appName)] from preview \(ok ? "requested" : "FAILED")") }
+            self.registry.close(window) { ok in
+                Log.info("taskbar: close \(id) [\(window.appName)] from preview \(ok ? "requested" : "FAILED")")
+            }
         }
         preview.onHover = { [weak self] inside in
             guard let self else { return }
@@ -125,7 +131,11 @@ public final class TaskbarController {
         guard new != settings else { return }
         let wasEnabled = settings.enabled
         settings = new
-        if new.enabled && !wasEnabled { start() } else if !new.enabled && wasEnabled { stop() } else {
+        if new.enabled && !wasEnabled {
+            start()
+        } else if !new.enabled && wasEnabled {
+            stop()
+        } else {
             applyDock()
             refresh(reason: "config")
         }
@@ -160,10 +170,12 @@ public final class TaskbarController {
     func checkDockReserve() {
         guard settings.enabled, settings.hideDock, dock.isHiddenByPave else { return }
         // Bottom or sides: the Dock sits on the left while hidden.
-        let reserve = NSScreen.screens.map { s in
-            let v = s.visibleFrame, f = s.frame
-            return max(v.minY - f.minY, v.minX - f.minX, f.maxX - v.maxX)
-        }.max() ?? 0
+        let reserve =
+            NSScreen.screens.map { s in
+                let v = s.visibleFrame
+                let f = s.frame
+                return max(v.minY - f.minY, v.minX - f.minX, f.maxX - v.maxX)
+            }.max() ?? 0
         if reserve > 10 {
             dock.rehideFully(reason: "hidden but still reserving \(Int(reserve)) pt (ignored)")
         } else {
@@ -209,7 +221,9 @@ public final class TaskbarController {
             }
         }
         preview.prewarm()
-        Log.info("taskbar: on, \(panels.count) screen(s), grouping \(settings.grouping.rawValue), \(settings.pinned.count) pinned")
+        Log.info(
+            "taskbar: on, \(panels.count) screen(s), grouping \(settings.grouping.rawValue), \(settings.pinned.count) pinned"
+        )
     }
 
     func stop() {
@@ -384,14 +398,17 @@ public final class TaskbarController {
         let ms = Double(clock_gettime_nsec_np(CLOCK_UPTIME_RAW) - start) / 1_000_000
         if ms >= Self.slowUpdate {
             let detail = phases.filter { $0.1 >= 1 }.map { "\($0.0) \(Int($0.1))" }.joined(separator: ", ")
-            Log.info("taskbar slow update (\(reason)): \(Int(ms)) ms (\(detail); icons loaded \(icons.count) in \(Int(icons.ms)) ms)")
+            Log.info(
+                "taskbar slow update (\(reason)): \(Int(ms)) ms (\(detail); icons loaded \(icons.count) in \(Int(icons.ms)) ms)"
+            )
         }
         updateTimes.append(ms)
         if updateTimes.count % 25 == 0 {
             let sorted = updateTimes.sorted()
             Log.info(
                 "taskbar (T1): n=\(sorted.count) updates, p50 \(String(format: "%.1f", sorted[sorted.count / 2])) ms, "
-                    + "p95 \(String(format: "%.1f", sorted[Int(Double(sorted.count) * 0.95)])) ms, max \(String(format: "%.1f", sorted.last!)) ms")
+                    + "p95 \(String(format: "%.1f", sorted[Int(Double(sorted.count) * 0.95)])) ms, max \(String(format: "%.1f", sorted.last!)) ms"
+            )
         }
     }
 
@@ -400,7 +417,9 @@ public final class TaskbarController {
 
     /// Windows the window server shows right now (current Spaces), IDs only.
     static func onScreenWindowIDs() -> Set<WindowID> {
-        let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
+        let list =
+            CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID)
+            as? [[String: Any]] ?? []
         return Set(list.compactMap { ($0[kCGWindowNumber as String] as? UInt32).map { WindowID($0) } })
     }
 
@@ -412,7 +431,8 @@ public final class TaskbarController {
         let mouse = NSEvent.mouseLocation
         let screen = NSScreen.screens.first { $0.frame.contains(mouse) } ?? NSScreen.main
         // No launcher where the bar is hidden (full screen).
-        guard let id = screen?.displayID ?? NSScreen.screens.first?.displayID, let panel = panels[id] ?? panels.values.first,
+        guard let id = screen?.displayID ?? NSScreen.screens.first?.displayID,
+            let panel = panels[id] ?? panels.values.first,
             panel.panel.isVisible
         else { return }
         hidePreview()
@@ -432,7 +452,10 @@ public final class TaskbarController {
         // Right click on Start or on an empty part of the bar.
         let barMenu: (NSEvent, NSView) -> Void = { [weak self] event, view in
             let menu = NSMenu()
-            menu.addItem(ClosureMenuItem(NSMenuItem(title: String(localized: "Reset Taskbar"), action: nil, keyEquivalent: "")) { self?.reset() })
+            menu.addItem(
+                ClosureMenuItem(NSMenuItem(title: String(localized: "Reset Taskbar"), action: nil, keyEquivalent: "")) {
+                    self?.reset()
+                })
             NSMenu.popUpContextMenu(menu, with: event, for: view)
         }
         panel.startButton.onRightClick = barMenu
@@ -440,12 +463,20 @@ public final class TaskbarController {
         panel.workspaceNumbers.onPick = { [weak self] n in self?.switchWorkspace(n) }
         panel.trashButton.onRightClick = { [weak self] event, view in
             let menu = NSMenu()
-            menu.addItem(ClosureMenuItem(NSMenuItem(title: String(localized: "Open Trash"), action: nil, keyEquivalent: "")) { Trash.open() })
-            let empty = ClosureMenuItem(NSMenuItem(title: String(localized: "Empty Trash…"), action: nil, keyEquivalent: "")) {
+            menu.addItem(
+                ClosureMenuItem(NSMenuItem(title: String(localized: "Open Trash"), action: nil, keyEquivalent: "")) {
+                    Trash.open()
+                })
+            let empty = ClosureMenuItem(
+                NSMenuItem(title: String(localized: "Empty Trash…"), action: nil, keyEquivalent: "")
+            ) {
                 Trash.emptyAfterConfirmation { _ in self?.updateTrash() }
             }
             // Known to be empty: nothing to do.
-            if self?.trashEmpty == .some(true) { empty.isEnabled = false; menu.autoenablesItems = false }
+            if self?.trashEmpty == .some(true) {
+                empty.isEnabled = false
+                menu.autoenablesItems = false
+            }
             menu.addItem(empty)
             NSMenu.popUpContextMenu(menu, with: event, for: view)
         }
@@ -454,7 +485,9 @@ public final class TaskbarController {
             rightClick: { [weak self] item, event, view in self?.contextMenu(item, event: event, view: view) },
             drop: { [weak self] item, urls in self?.open(urls, with: item) ?? false },
             dragHover: { [weak self] item in
-                if let id = item.windowIDs.first, let w = self?.registry.store.windows[id] { self?.focus(w, how: "file hover") }
+                if let id = item.windowIDs.first, let w = self?.registry.store.windows[id] {
+                    self?.focus(w, how: "file hover")
+                }
             },
             hover: { [weak self] item, view, inside in self?.hover(item, view: view, inside: inside) })
         return panel
@@ -485,8 +518,11 @@ public final class TaskbarController {
             // A group: pick one of its windows.
             let menu = NSMenu()
             let mru = registry.store.orderedWindows.map(\.id)
-            for window in windows.sorted(by: { (mru.firstIndex(of: $0.id) ?? .max) < (mru.firstIndex(of: $1.id) ?? .max) }) {
-                let entry = NSMenuItem(title: window.title.isEmpty ? window.appName : window.title, action: nil, keyEquivalent: "")
+            for window in windows.sorted(by: {
+                (mru.firstIndex(of: $0.id) ?? .max) < (mru.firstIndex(of: $1.id) ?? .max)
+            }) {
+                let entry = NSMenuItem(
+                    title: window.title.isEmpty ? window.appName : window.title, action: nil, keyEquivalent: "")
                 entry.state = window.id == registry.focusedWindow?.id ? .on : .off
                 menu.addItem(ClosureMenuItem(entry) { [weak self] in self?.focus(window, how: "group menu") })
             }
@@ -514,8 +550,11 @@ public final class TaskbarController {
     /// Files dropped on an entry open with its app, as on the Dock.
     func open(_ urls: [URL], with item: TaskbarItem) -> Bool {
         guard let app = appURL(item) else { return false }
-        NSWorkspace.shared.open(urls, withApplicationAt: app, configuration: NSWorkspace.OpenConfiguration()) { _, error in
-            Log.info("taskbar: \(urls.count) file(s) opened with \(item.app) " + (error.map { "FAILED (\($0.localizedDescription))" } ?? "ok"))
+        NSWorkspace.shared.open(urls, withApplicationAt: app, configuration: NSWorkspace.OpenConfiguration()) {
+            _, error in
+            Log.info(
+                "taskbar: \(urls.count) file(s) opened with \(item.app) "
+                    + (error.map { "FAILED (\($0.localizedDescription))" } ?? "ok"))
         }
         return true
     }
@@ -524,7 +563,9 @@ public final class TaskbarController {
 
 extension NSScreen {
     var displayID: CGDirectDisplayID? {
-        (deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber).map { CGDirectDisplayID($0.uint32Value) }
+        (deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber).map {
+            CGDirectDisplayID($0.uint32Value)
+        }
     }
 }
 

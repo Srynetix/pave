@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Per-keyboard key remapping.
 ///
 /// Pure: says *which* mapping each keyboard gets. PaveMac detects keyboards

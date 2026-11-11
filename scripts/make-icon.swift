@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 // Draws Pavé's app icon with AppKit, no image editor needed.
 //
 //   swift scripts/make-icon.swift <variant> <out.png> [size]
@@ -12,15 +13,19 @@ guard args.count >= 3 else {
     FileHandle.standardError.write(Data("usage: make-icon.swift cobbles|tiles|taskbar|snap OUT.png [SIZE]\n".utf8))
     exit(2)
 }
-let variant = args[1], out = args[2]
+let variant = args[1]
+let out = args[2]
 let size = args.count > 3 ? Int(args[3]) ?? 1024 : 1024
 
 func color(_ hex: UInt32, _ alpha: CGFloat = 1) -> NSColor {
-    NSColor(srgbRed: CGFloat((hex >> 16) & 0xFF) / 255, green: CGFloat((hex >> 8) & 0xFF) / 255,
-            blue: CGFloat(hex & 0xFF) / 255, alpha: alpha)
+    NSColor(
+        srgbRed: CGFloat((hex >> 16) & 0xFF) / 255, green: CGFloat((hex >> 8) & 0xFF) / 255,
+        blue: CGFloat(hex & 0xFF) / 255, alpha: alpha)
 }
 
-func rounded(_ r: NSRect, _ radius: CGFloat) -> NSBezierPath { NSBezierPath(roundedRect: r, xRadius: radius, yRadius: radius) }
+func rounded(_ r: NSRect, _ radius: CGFloat) -> NSBezierPath {
+    NSBezierPath(roundedRect: r, xRadius: radius, yRadius: radius)
+}
 
 /// A pave: a rounded rectangle filled with a vertical gradient, with a thin highlight line.
 func pave(_ r: NSRect, radius: CGFloat, top: NSColor, bottom: NSColor, shadow: Bool = true) {
@@ -47,14 +52,16 @@ func pave(_ r: NSRect, radius: CGFloat, top: NSColor, bottom: NSColor, shadow: B
 struct Seeded {
     var state: UInt64
     mutating func next() -> CGFloat {
-        state = state &* 6364136223846793005 &+ 1442695040888963407
+        state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
         return CGFloat((state >> 33) & 0xFFFFFF) / CGFloat(0xFFFFFF)
     }
 }
 
 /// A cobblestone: a slightly irregular, rounded block, bevelled (lit from the
 /// top left), speckled like granite. `tilt` in degrees.
-func cobble(_ r: NSRect, tilt: CGFloat, radius: CGFloat, top: NSColor, bottom: NSColor, seed: UInt64, speckles: Bool = true) {
+func cobble(
+    _ r: NSRect, tilt: CGFloat, radius: CGFloat, top: NSColor, bottom: NSColor, seed: UInt64, speckles: Bool = true
+) {
     NSGraphicsContext.saveGraphicsState()
     let t = NSAffineTransform()
     t.translateX(by: r.midX, yBy: r.midY)
@@ -78,16 +85,21 @@ func cobble(_ r: NSRect, tilt: CGFloat, radius: CGFloat, top: NSColor, bottom: N
     if speckles {
         var rng = Seeded(state: seed)
         for _ in 0..<Int(r.width * r.height / 900) {
-            let x = r.minX + rng.next() * r.width, y = r.minY + rng.next() * r.height, d = 3 + rng.next() * 7
-            (rng.next() > 0.5 ? color(0xFFFFFF, 0.10 + 0.08 * rng.next()) : color(0x000000, 0.06 + 0.06 * rng.next())).setFill()
+            let x = r.minX + rng.next() * r.width
+            let y = r.minY + rng.next() * r.height
+            let d = 3 + rng.next() * 7
+            (rng.next() > 0.5 ? color(0xFFFFFF, 0.10 + 0.08 * rng.next()) : color(0x000000, 0.06 + 0.06 * rng.next()))
+                .setFill()
             NSBezierPath(ovalIn: NSRect(x: x, y: y, width: d, height: d)).fill()
         }
     }
     // Domed: a soft light towards the top left.
     NSGradient(starting: color(0xFFFFFF, 0.28), ending: color(0xFFFFFF, 0))!
-        .draw(fromCenter: NSPoint(x: r.minX + r.width * 0.32, y: r.maxY - r.height * 0.25), radius: 0,
-              toCenter: NSPoint(x: r.minX + r.width * 0.32, y: r.maxY - r.height * 0.25), radius: max(r.width, r.height) * 0.75,
-              options: [])
+        .draw(
+            fromCenter: NSPoint(x: r.minX + r.width * 0.32, y: r.maxY - r.height * 0.25), radius: 0,
+            toCenter: NSPoint(x: r.minX + r.width * 0.32, y: r.maxY - r.height * 0.25),
+            radius: max(r.width, r.height) * 0.75,
+            options: [])
     // Bevel, as inner shadows of the same shape moved aside: light along the
     // top and left edges, dark along the bottom and right ones, no seam.
     for (dx, dy, c) in [(10.0, -10.0, color(0xFFFFFF, 0.45)), (-12.0, 12.0, color(0x000000, 0.30))] {
@@ -137,7 +149,8 @@ func draw(in ctx: CGContext) {
         let gap: CGFloat = 40
         let leftW = ((inner.width - gap) * 0.54).rounded()
         let left = NSRect(x: inner.minX, y: inner.minY, width: leftW, height: inner.height)
-        let rightX = left.maxX + gap, rightW = inner.maxX - rightX
+        let rightX = left.maxX + gap
+        let rightW = inner.maxX - rightX
         let h = ((inner.height - gap) / 2).rounded()
         let topRight = NSRect(x: rightX, y: inner.maxY - h, width: rightW, height: h)
         let bottomRight = NSRect(x: rightX, y: inner.minY, width: rightW, height: h - 6)
@@ -154,7 +167,8 @@ func draw(in ctx: CGContext) {
         t.concat()
         for (i, c) in [0xFF5F57, 0xFEBC2E, 0x28C840].enumerated() {
             color(UInt32(c)).setFill()
-            NSBezierPath(ovalIn: NSRect(x: left.minX + 48 + CGFloat(i) * 46, y: left.maxY - 78, width: 28, height: 28)).fill()
+            NSBezierPath(ovalIn: NSRect(x: left.minX + 48 + CGFloat(i) * 46, y: left.maxY - 78, width: 28, height: 28))
+                .fill()
         }
         color(0xFFFFFF, 0.22).setFill()
         NSBezierPath(rect: NSRect(x: left.minX + 14, y: left.maxY - 112, width: left.width - 28, height: 3)).fill()
@@ -162,11 +176,13 @@ func draw(in ctx: CGContext) {
     case "tiles":
         // Deep blue to violet, three glass panes: one tall, two stacked (a tiled workspace).
         NSGradient(colors: [color(0x3B82F6), color(0x4F46E5), color(0x7C3AED)])!.draw(in: body, angle: -60)
-        let m: CGFloat = 150, gap: CGFloat = 36
+        let m: CGFloat = 150
+        let gap: CGFloat = 36
         let inner = body.insetBy(dx: m - 100 + 40, dy: m - 100 + 40)
         let leftW = (inner.width - gap) * 0.52
         let left = NSRect(x: inner.minX, y: inner.minY, width: leftW, height: inner.height)
-        let rightX = left.maxX + gap, rightW = inner.maxX - rightX
+        let rightX = left.maxX + gap
+        let rightW = inner.maxX - rightX
         let h = (inner.height - gap) / 2
         let topRight = NSRect(x: rightX, y: inner.minY + h + gap, width: rightW, height: h)
         let bottomRight = NSRect(x: rightX, y: inner.minY, width: rightW, height: h)
@@ -176,7 +192,8 @@ func draw(in ctx: CGContext) {
         // Title-bar dots on the tall pave.
         for (i, c) in [0xFF5F57, 0xFEBC2E, 0x28C840].enumerated() {
             color(UInt32(c)).setFill()
-            NSBezierPath(ovalIn: NSRect(x: left.minX + 34 + CGFloat(i) * 40, y: left.maxY - 58, width: 24, height: 24)).fill()
+            NSBezierPath(ovalIn: NSRect(x: left.minX + 34 + CGFloat(i) * 40, y: left.maxY - 58, width: 24, height: 24))
+                .fill()
         }
     case "taskbar":
         // Dusk gradient, two overlapping windows, a taskbar along the bottom.
@@ -189,7 +206,8 @@ func draw(in ctx: CGContext) {
             NSBezierPath(rect: NSRect(x: r.minX, y: r.maxY - 62, width: r.width, height: 2)).fill()
             for (i, c) in [0xFF5F57, 0xFEBC2E, 0x28C840].enumerated() {
                 color(UInt32(c), alpha).setFill()
-                NSBezierPath(ovalIn: NSRect(x: r.minX + 28 + CGFloat(i) * 34, y: r.maxY - 44, width: 20, height: 20)).fill()
+                NSBezierPath(ovalIn: NSRect(x: r.minX + 28 + CGFloat(i) * 34, y: r.maxY - 44, width: 20, height: 20))
+                    .fill()
             }
         }
         // Taskbar.
@@ -201,7 +219,9 @@ func draw(in ctx: CGContext) {
         let icons: [UInt32] = [0x60A5FA, 0xF472B6, 0x34D399, 0xFBBF24]
         for (i, c) in icons.enumerated() {
             let x = 250 + CGFloat(i) * 140
-            pave(NSRect(x: x, y: bar.minY + 38, width: 84, height: 84), radius: 22, top: color(c), bottom: color(c, 0.8), shadow: false)
+            pave(
+                NSRect(x: x, y: bar.minY + 38, width: 84, height: 84), radius: 22, top: color(c), bottom: color(c, 0.8),
+                shadow: false)
             if i == 1 {
                 color(0xFFFFFF, 0.9).setFill()
                 rounded(NSRect(x: x + 22, y: bar.minY + 16, width: 40, height: 8), 4).fill()
@@ -212,7 +232,8 @@ func draw(in ctx: CGContext) {
         NSGradient(colors: [color(0xF97316), color(0xDB2777), color(0x7C3AED)])!.draw(in: body, angle: -45)
         let frame = NSRect(x: 230, y: 250, width: 564, height: 524)
         pave(frame, radius: 56, top: color(0xFFFFFF, 0.28), bottom: color(0xFFFFFF, 0.18))
-        let half = NSRect(x: frame.minX + 26, y: frame.minY + 26, width: (frame.width - 78) / 2, height: frame.height - 52)
+        let half = NSRect(
+            x: frame.minX + 26, y: frame.minY + 26, width: (frame.width - 78) / 2, height: frame.height - 52)
         pave(half, radius: 36, top: color(0xFFFFFF), bottom: color(0xFFE4F1))
         let other = NSRect(x: half.maxX + 26, y: half.minY, width: half.width, height: half.height)
         color(0xFFFFFF, 0.55).setStroke()

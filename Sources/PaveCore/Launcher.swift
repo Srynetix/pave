@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// The Start button's app launcher: which apps match what
 /// was typed, best first. Pure; PaveMac lists the apps and launches them.
 public enum Launcher {

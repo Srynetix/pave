@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 
@@ -44,7 +45,9 @@ extension DragSnapController {
 
     /// Where the magnet puts `frame`; `filled`: it takes the free space too
     /// (a size of its own until dragged away, as in a zone).
-    private func magnet(_ frame: Rect, id: WindowID, cursor: (x: Double, y: Double), screens: [Screen]) -> (frame: Rect, filled: Bool)? {
+    private func magnet(_ frame: Rect, id: WindowID, cursor: (x: Double, y: Double), screens: [Screen]) -> (
+        frame: Rect, filled: Bool
+    )? {
         guard let screen = LayoutEngine.screen(for: frame, among: screens) else { return nil }
         let others = otherFrames(than: id).map(\.1).filter { $0.intersectionArea(with: screen.frame) > 0 }
         let snapped = Magnet.snap(frame, to: others, area: screen.visibleFrame, distance: magnetDistance)
@@ -66,10 +69,16 @@ extension DragSnapController {
         moved.frame = now  // the live bounds: the AX frame lags behind the drag
         let report: @MainActor (MoveResult?) -> Void = { result in
             let verdict = result.map { $0.ok ? "ok" : "MISS" } ?? "skipped"
-            Log.info("drag \(id) [\(window.appName)]: magnet\(filled ? " (fills the free space)" : "") \(now) → \(target), \(verdict)")
+            Log.info(
+                "drag \(id) [\(window.appName)]: magnet\(filled ? " (fills the free space)" : "") \(now) → \(target), \(verdict)"
+            )
         }
         // Filled: placed like in a zone, dragging it out gives its size back.
-        if filled { commander.drop(moved, inZones: target, completion: report) } else { registry.setFrame(of: moved, to: target, completion: report) }
+        if filled {
+            commander.drop(moved, inZones: target, completion: report)
+        } else {
+            registry.setFrame(of: moved, to: target, completion: report)
+        }
         return true
     }
 
@@ -82,13 +91,16 @@ extension DragSnapController {
         else { return }
         current.lastFollowAt = at
         if current.neighbours == nil {
-            current.neighbours = Magnet.neighbours(of: start, among: otherFrames(than: id), tolerance: Self.sharedEdgeTolerance)
+            current.neighbours = Magnet.neighbours(
+                of: start, among: otherFrames(than: id), tolerance: Self.sharedEdgeTolerance)
         }
         guard let neighbours = current.neighbours, !neighbours.isEmpty, let now = Self.bounds(of: id) else { return }
         follow(neighbours, of: now, from: start)
     }
 
-    private func follow(_ neighbours: [Magnet.Neighbour], of now: Rect, from start: Rect, completion: (@MainActor (Bool) -> Void)? = nil) {
+    private func follow(
+        _ neighbours: [Magnet.Neighbour], of now: Rect, from start: Rect, completion: (@MainActor (Bool) -> Void)? = nil
+    ) {
         let edges = Magnet.movedEdges(from: start, to: now)
         var pending = 0
         var ok = true
@@ -124,10 +136,14 @@ extension DragSnapController {
                     let edges = Magnet.movedEdges(from: start, to: now)
                     let moved = neighbours.filter { edges.contains($0.edge) }
                     guard !moved.isEmpty else { return }
-                    if attempt < 5, moved.contains(where: { self.following.contains($0.id) }) { return settle(attempt + 1) }
+                    if attempt < 5, moved.contains(where: { self.following.contains($0.id) }) {
+                        return settle(attempt + 1)
+                    }
                     self.follow(moved, of: now, from: start) { ok in
                         let list = moved.map { "\($0.id) (\($0.edge.rawValue))" }.joined(separator: ", ")
-                        Log.info("resize \(id) [\(app)]: \(moved.count) neighbour(s) followed: \(list), \(ok ? "ok" : "MISS")")
+                        Log.info(
+                            "resize \(id) [\(app)]: \(moved.count) neighbour(s) followed: \(list), \(ok ? "ok" : "MISS")"
+                        )
                     }
                 }
             }

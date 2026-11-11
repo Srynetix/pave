@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 
@@ -51,7 +52,9 @@ extension TaskbarController {
         guard recent.count < 3 else {
             if recent.count == 3 {
                 overlapFixes[id] = recent + [Date()]
-                Log.info("taskbar overlap: \(id) [\(window.appName)] keeps covering the bar, left alone (rule taskbar-overlap = \"allow\" to silence)")
+                Log.info(
+                    "taskbar overlap: \(id) [\(window.appName)] keeps covering the bar, left alone (rule taskbar-overlap = \"allow\" to silence)"
+                )
             }
             return
         }

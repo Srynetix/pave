@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import IOKit
 import IOKit.hid
@@ -70,7 +71,8 @@ public final class KeyboardRemapService {
         guard notifyPort == nil else { return }
         let port = IONotificationPortCreate(kIOMainPortDefault)
         notifyPort = port
-        CFRunLoopAddSource(CFRunLoopGetMain(), IONotificationPortGetRunLoopSource(port).takeUnretainedValue(), .defaultMode)
+        CFRunLoopAddSource(
+            CFRunLoopGetMain(), IONotificationPortGetRunLoopSource(port).takeUnretainedValue(), .defaultMode)
         let me = Unmanaged.passUnretained(self).toOpaque()
         for (type, callback) in [
             (kIOFirstMatchNotification, Self.appearedCallback), (kIOTerminatedNotification, Self.goneCallback),
@@ -101,7 +103,9 @@ public final class KeyboardRemapService {
             guard app?.bundleIdentifier?.hasPrefix("org.pqrs.") == true else { return }
             MainActor.assumeIsolated { self?.reapplyAll(reason: "Karabiner quit") }
         }
-        Log.info("keyboard remap: \(settings.enabled ? "on, preset \(settings.preset.rawValue)" : "off"), \(keyboards.count) keyboard(s): \(keyboards.values.map(\.keyboard.description).sorted().joined(separator: ", "))")
+        Log.info(
+            "keyboard remap: \(settings.enabled ? "on, preset \(settings.preset.rawValue)" : "off"), \(keyboards.count) keyboard(s): \(keyboards.values.map(\.keyboard.description).sorted().joined(separator: ", "))"
+        )
     }
 
     public func update(settings new: Settings) {
@@ -191,7 +195,8 @@ public final class KeyboardRemapService {
                     self.setKarabiner(karabiner)
                     for (id, reason) in batch.sorted(by: { $0.key < $1.key }) {
                         guard let keyboard = self.keyboards[id]?.keyboard else { continue }
-                        self.apply(keyboard, reason: reason, since: since[id] ?? 0, settings: settings, karabiner: karabiner)
+                        self.apply(
+                            keyboard, reason: reason, since: since[id] ?? 0, settings: settings, karabiner: karabiner)
                     }
                 }
             }
@@ -201,9 +206,10 @@ public final class KeyboardRemapService {
     private func setKarabiner(_ running: Bool) {
         guard running != karabinerRunning else { return }
         karabinerRunning = running
-        Log.info(running
-            ? "keyboard remap: Karabiner-Elements is running, Pavé leaves the keyboards to it"
-            : "keyboard remap: Karabiner-Elements is no longer running")
+        Log.info(
+            running
+                ? "keyboard remap: Karabiner-Elements is running, Pavé leaves the keyboards to it"
+                : "keyboard remap: Karabiner-Elements is no longer running")
         onChange?()
     }
 
@@ -238,8 +244,9 @@ public final class KeyboardRemapService {
                             DispatchQueue.main.asyncAfter(deadline: .now() + Self.retryDelays[attempt]) {
                                 MainActor.assumeIsolated {
                                     guard let current = self.keyboards[id]?.keyboard else { return }
-                                    self.apply(current, reason: reason, since: since, settings: self.settings,
-                                               karabiner: self.karabinerRunning, attempt: attempt + 1)
+                                    self.apply(
+                                        current, reason: reason, since: since, settings: self.settings,
+                                        karabiner: self.karabinerRunning, attempt: attempt + 1)
                                 }
                             }
                             return
@@ -253,7 +260,8 @@ public final class KeyboardRemapService {
                         Log.info(
                             "keyboard remap: \(keyboard) after \(reason): "
                                 + (wanted.isEmpty ? "mapping removed" : "\(wanted.count) mapping(s) applied")
-                                + ", verified, \(String(format: "%.0f", ms)) ms" + (attempt > 0 ? " (attempt \(attempt + 1))" : "")
+                                + ", verified, \(String(format: "%.0f", ms)) ms"
+                                + (attempt > 0 ? " (attempt \(attempt + 1))" : "")
                                 + " [hidutil \(Int(setMs)) ms, queued \(Int(waitMs)) ms]")
                     }
                     self.onChange?()

@@ -1,5 +1,7 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import Foundation
 import Testing
+
 @testable import PaveCore
 
 private func hex(_ bytes: [UInt8]) -> String { bytes.map { String(format: "%02x", $0) }.joined() }
@@ -25,8 +27,14 @@ private let legacy = """
 
 @Suite struct Blake2bTests {
     @Test func matchesTheReferenceVectors() {
-        #expect(hex(Blake2b.hash([UInt8]())) == "786a02f742015903c6c6fd852552d272912f4740e15847618a86e217f71f5419d25e1031afee585313896444934eb04b903a685b1448b755d56f701afe9be2ce")
-        #expect(hex(Blake2b.hash(Array("abc".utf8))) == "ba80a53f981c4d0d6a2797b69f12f6e94c212f14685ac4b74b12bb6fdbffa2d17d87c5392aab792dc252d5de4533cc9518d38aa8dbf1925ab92386edd4009923")
+        #expect(
+            hex(Blake2b.hash([UInt8]()))
+                == "786a02f742015903c6c6fd852552d272912f4740e15847618a86e217f71f5419d25e1031afee585313896444934eb04b903a685b1448b755d56f701afe9be2ce"
+        )
+        #expect(
+            hex(Blake2b.hash(Array("abc".utf8)))
+                == "ba80a53f981c4d0d6a2797b69f12f6e94c212f14685ac4b74b12bb6fdbffa2d17d87c5392aab792dc252d5de4533cc9518d38aa8dbf1925ab92386edd4009923"
+        )
     }
 
     @Test func handlesBlockBoundaries() {
@@ -47,21 +55,28 @@ private let legacy = """
 @Suite struct MinisignTests {
     @Test func acceptsAFileSignedWithTheKey() throws {
         let key = try Minisign.PublicKey(testKey)
-        try Minisign.verify(file, signature: try Minisign.Signature(signature), key: key, trustedComment: "file:Pave_0.6.0.app.tar.gz")
+        try Minisign.verify(
+            file, signature: try Minisign.Signature(signature), key: key, trustedComment: "file:Pave_0.6.0.app.tar.gz")
     }
 
     @Test func refusesAnythingElse() throws {
         let key = try Minisign.PublicKey(testKey)
         let sig = try Minisign.Signature(signature)
-        #expect(throws: Minisign.Failure.self) { try Minisign.verify(Data("Pavé test archivE\n".utf8), signature: sig, key: key) }
+        #expect(throws: Minisign.Failure.self) {
+            try Minisign.verify(Data("Pavé test archivE\n".utf8), signature: sig, key: key)
+        }
         // Moved to another file.
-        #expect(throws: Minisign.Failure.self) { try Minisign.verify(file, signature: sig, key: key, trustedComment: "file:Pave_0.7.0.app.tar.gz") }
+        #expect(throws: Minisign.Failure.self) {
+            try Minisign.verify(file, signature: sig, key: key, trustedComment: "file:Pave_0.7.0.app.tar.gz")
+        }
         // Trusted comment altered.
         var altered = sig
         altered.trustedComment = "file:Pave_0.7.0.app.tar.gz"
         #expect(throws: Minisign.Failure.self) { try Minisign.verify(file, signature: altered, key: key) }
         // Legacy (not pre-hashed).
-        #expect(throws: Minisign.Failure.self) { try Minisign.verify(file, signature: try Minisign.Signature(legacy), key: key) }
+        #expect(throws: Minisign.Failure.self) {
+            try Minisign.verify(file, signature: try Minisign.Signature(legacy), key: key)
+        }
         // Another key: the release key Pavé ships.
         let other = try Minisign.PublicKey("RWRf1KUlSB8zDxlmnXRFoHhRSMja3NL0JNR8Lk9V+fkqWcXLhxRr9GpX")
         #expect(throws: Minisign.Failure.self) { try Minisign.verify(file, signature: sig, key: other) }

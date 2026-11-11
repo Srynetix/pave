@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 
@@ -42,14 +43,16 @@ final class SpaceTracker {
         guard Date().timeIntervalSince(lastSpaceChange) < Self.grace + 0.5 || missingSince[window.id] != nil else {
             return forget(window.id)
         }
-        let since = missingSince[window.id] ?? {
-            missingSince[window.id] = Date()
-            let pid = window.pid
-            DispatchQueue.main.asyncAfter(deadline: .now() + Self.grace + 0.1) { [weak self] in
-                MainActor.assumeIsolated { self?.requestSnapshot(pid) }
-            }
-            return Date()
-        }()
+        let since =
+            missingSince[window.id]
+            ?? {
+                missingSince[window.id] = Date()
+                let pid = window.pid
+                DispatchQueue.main.asyncAfter(deadline: .now() + Self.grace + 0.1) { [weak self] in
+                    MainActor.assumeIsolated { self?.requestSnapshot(pid) }
+                }
+                return Date()
+            }()
         if Date().timeIntervalSince(since) < Self.grace {
             if reported.insert(window.id).inserted { note(window, "grace, still known to the window server") }
             return true
@@ -90,7 +93,9 @@ final class SpaceTracker {
     }
 
     static func windowServerKnows(_ id: WindowID, pid: PID) -> Bool {
-        guard let list = CGWindowListCopyWindowInfo([.optionIncludingWindow], CGWindowID(id.rawValue)) as? [[String: Any]],
+        guard
+            let list = CGWindowListCopyWindowInfo([.optionIncludingWindow], CGWindowID(id.rawValue))
+                as? [[String: Any]],
             let info = list.first
         else { return false }
         return (info[kCGWindowOwnerPID as String] as? NSNumber)?.int32Value == pid

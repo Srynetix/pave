@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Platform-independent rectangle in global screen coordinates
 /// (top-left origin, as used by the Accessibility API).
 public struct Rect: Equatable, Hashable, Sendable, Codable, CustomStringConvertible {

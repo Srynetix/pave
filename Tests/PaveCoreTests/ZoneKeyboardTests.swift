@@ -1,4 +1,6 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import Testing
+
 @testable import PaveCore
 
 /// The LG on the left of the built-in screen, as plugged in.
@@ -74,7 +76,9 @@ private func window(_ frame: Rect) -> WindowSnapshot {
     @Test func zonesOffKeepHalves() {
         var engine = LayoutEngine()
         let free = Rect(x: -1500, y: 300, width: 600, height: 500)
-        #expect(engine.handle(.snapLeft, window: window(free), screens: screens) == .setFrame(Placement.left.frame(in: lg.visibleFrame)))
+        #expect(
+            engine.handle(.snapLeft, window: window(free), screens: screens)
+                == .setFrame(Placement.left.frame(in: lg.visibleFrame)))
     }
 
     @Test func aWindowLeavingACornerZoneStaysOnItsScreen() {
@@ -116,7 +120,8 @@ private func window(_ frame: Rect) -> WindowSnapshot {
 
     @Test func thePickerListsBuiltInsThenTheUsersThenNone() throws {
         var settings = ZoneSettings()
-        settings.layouts["Coding"] = try ZoneLayout(name: "Coding", zones: [.init(0, 0, 30, 100), .init(30, 0, 70, 100)])
+        settings.layouts["Coding"] = try ZoneLayout(
+            name: "Coding", zones: [.init(0, 0, 30, 100), .init(30, 0, 70, 100)])
         settings.layouts["focus"] = try ZoneLayout(name: "focus", zones: [.init(0, 0, 100, 100)])  // redefined
         #expect(settings.choices == ["focus", "thirds", "main-and-stack", "halves", "grid", "Coding", "none"])
     }
@@ -136,7 +141,9 @@ private func window(_ frame: Rect) -> WindowSnapshot {
         let thirdsFrames = thirds.layout.frames(in: lg.visibleFrame, gaps: 8)
         #expect(engine.reflow(window(zone(1)), from: focus, to: thirds, on: lg) == .setFrame(thirdsFrames[1]))
         #expect(engine.reflow(window(zone(3)), from: focus, to: thirds, on: lg) == .setFrame(thirdsFrames[2]))
-        #expect(engine.reflow(window(Rect(x: -2000, y: 100, width: 500, height: 400)), from: focus, to: thirds, on: lg) == nil)
+        #expect(
+            engine.reflow(window(Rect(x: -2000, y: 100, width: 500, height: 400)), from: focus, to: thirds, on: lg)
+                == nil)
     }
 
     @Test func windowsFollowNewGapsToo() {

@@ -26,3 +26,20 @@ version, and how to reproduce it. You should get an answer within a week.
 - **Hardened runtime**: no injected library can borrow Pavé's permissions.
 
 Private macOS APIs are confined to `Sources/PaveMac/Private.swift`.
+
+## What is supported
+
+Only the latest release: fixes go into a new release, not into old ones.
+
+## Checking what you download
+
+Every file of a release is published with its `.sha256` and its `.minisig`, signed with
+[minisign](https://jedisct1.github.io/minisign/) by the key whose public half is
+[`Resources/update-key.pub`](Resources/update-key.pub). To check a download:
+
+```sh
+minisign -Vm Pave_<version>.dmg -p Resources/update-key.pub
+```
+
+Download Pavé only from this repository's releases. It is not notarized by Apple: macOS warns
+about it the first time, and the README's *Download the app* says how past the warning.

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 import PaveIPC
@@ -60,7 +61,8 @@ public final class TilingController {
         self.registry = registry
         self.workspaces = workspaces
         self.focusService = focus
-        if let data = try? Data(contentsOf: Self.url), let saved = try? JSONDecoder().decode(Persisted.self, from: data) {
+        if let data = try? Data(contentsOf: Self.url), let saved = try? JSONDecoder().decode(Persisted.self, from: data)
+        {
             trees = saved.trees
             floating = Set(saved.floating)
         }
@@ -77,7 +79,9 @@ public final class TilingController {
         let removed = settings.workspaces.subtracting(new.workspaces)
         settings = new
         if !added.isEmpty || !removed.isEmpty {
-            Log.info("tiling: workspaces \(new.workspaces.sorted().map(String.init).joined(separator: ", ")), gaps \(Int(new.gaps))")
+            Log.info(
+                "tiling: workspaces \(new.workspaces.sorted().map(String.init).joined(separator: ", ")), gaps \(Int(new.gaps))"
+            )
         }
         // Workspaces leaving tiling: their windows get their floating frame back.
         for n in removed { untile(n) }
@@ -99,7 +103,8 @@ public final class TilingController {
         // Minimized and hidden (⌘H) windows keep their place in the tree; only
         // the shown ones are laid out (see `sync`).
         // AX gives no subrole for the windows of a hidden app: their state decides.
-        let standard = window.subrole == "AXStandardWindow" || window.state == .minimized
+        let standard =
+            window.subrole == "AXStandardWindow" || window.state == .minimized
             || (window.state == .hidden && trees.values.contains { $0.contains(window.id) })
         // A panel without a minimize button (Open, Save, settings) floats.
         return standard && window.minimizable != false && window.state != .fullscreen && !appRule.ignore && appRule.tile
@@ -131,8 +136,11 @@ public final class TilingController {
         var recheck = false
         for n in settings.workspaces.sorted() {
             let homeScreen = state.home[n].flatMap { id in screens.first { $0.id == id } } ?? screens.first
-            var tree = trees[n] ?? TilingTree(
-                orientation: (homeScreen.map { $0.frame.width >= $0.frame.height } ?? true) ? .horizontal : .vertical)
+            var tree =
+                trees[n]
+                ?? TilingTree(
+                    orientation: (homeScreen.map { $0.frame.width >= $0.frame.height } ?? true)
+                        ? .horizontal : .vertical)
             let members = windows.filter { tileable($0) && state.workspace(of: $0.id) == n }
             let ids = Set(members.map(\.id))
             for id in tree.windows where !ids.contains(id) {
@@ -154,7 +162,9 @@ public final class TilingController {
                 tree.insert(window.id, after: anchor)
             }
             trees[n] = tree
-            guard let sid = state.screen(showing: n), let screen = screens.first(where: { $0.id == sid }) else { continue }
+            guard let sid = state.screen(showing: n), let screen = screens.first(where: { $0.id == sid }) else {
+                continue
+            }
             for (id, frame) in shown(tree).frames(in: screen.visibleFrame, gaps: settings.gaps) {
                 guard let window = registry.store.windows[id], !state.isHidden(id), !inFlight.contains(id),
                     !mouseActive.contains(id), !window.frame.isClose(to: frame)
@@ -166,7 +176,11 @@ public final class TilingController {
         apply(placements, cause: cause)
         // A window kept while AX lost it: gone for good once the window
         // server forgets it too (a closed one), back if AX lists it again.
-        if recheck { DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) { [weak self] in MainActor.assumeIsolated { self?.sync() } } }
+        if recheck {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) { [weak self] in
+                MainActor.assumeIsolated { self?.sync() }
+            }
+        }
     }
 
     private enum KeepPlace { case no, fullscreen, absent }
@@ -220,7 +234,11 @@ public final class TilingController {
             refusals[window.id, default: 0] += 1
             if refusals[window.id]! >= 2 {
                 refusals[window.id] = nil
-                float(window.id, reason: "refuses its tile size (\(Int(actual.width))×\(Int(actual.height)) for \(Int(frame.width))×\(Int(frame.height))); rule tile = false to silence", restore: false)
+                float(
+                    window.id,
+                    reason:
+                        "refuses its tile size (\(Int(actual.width))×\(Int(actual.height)) for \(Int(frame.width))×\(Int(frame.height))); rule tile = false to silence",
+                    restore: false)
                 // At the size it insists on, but inside its screen: grown
                 // from its tile, it may stick out onto the next one (Slack).
                 if let screen = LayoutEngine.screen(for: frame, among: Screens.all()) {
@@ -248,7 +266,8 @@ public final class TilingController {
         let sorted = times.sorted()
         Log.info(
             "tiling (A1): \(count) window(s) placed \(Int(ms)) ms after the change · n=\(sorted.count), "
-                + "p50 \(Int(sorted[sorted.count / 2])) ms, p95 \(Int(sorted[min(sorted.count - 1, Int(Double(sorted.count) * 0.95))])) ms")
+                + "p50 \(Int(sorted[sorted.count / 2])) ms, p95 \(Int(sorted[min(sorted.count - 1, Int(Double(sorted.count) * 0.95))])) ms"
+        )
     }
 
     /// A workspace leaves tiling: its shown windows get their frame from before.
@@ -413,12 +432,13 @@ public final class TilingController {
 
     public func perform(_ command: LayoutCommand, windowID: WindowID? = nil, source: String) {
         guard let window = target(windowID) else { return }
-        let direction: Direction = switch command {
-        case .snapLeft: .left
-        case .snapRight: .right
-        case .maximize: .up
-        default: .down
-        }
+        let direction: Direction =
+            switch command {
+            case .snapLeft: .left
+            case .snapRight: .right
+            case .maximize: .up
+            default: .down
+            }
         let n = workspaces.state.workspace(of: window.id)
         guard var tree = trees[n] else { return }
         let result = tree.move(window.id, direction)
@@ -442,9 +462,10 @@ public final class TilingController {
     public func focus(_ direction: Direction, source: String) {
         guard let window = registry.focusedWindow else { return }
         let state = workspaces.state
-        let frames = Dictionary(uniqueKeysWithValues: registry.store.windows.values.filter {
-            $0.state == .normal && $0.subrole == "AXStandardWindow" && !state.isHidden($0.id)
-        }.map { ($0.id, $0.frame) })
+        let frames = Dictionary(
+            uniqueKeysWithValues: registry.store.windows.values.filter {
+                $0.state == .normal && $0.subrole == "AXStandardWindow" && !state.isHidden($0.id)
+            }.map { ($0.id, $0.frame) })
         guard let next = TilingTree.neighbour(of: window.id, direction, frames: frames),
             let target = registry.store.windows[next]
         else { return Log.info("\(source) focus \(direction.rawValue): no window that way") }

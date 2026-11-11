@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 import SwiftUI
@@ -13,10 +14,14 @@ struct WorkspacesPane: View {
             SwiftUI.Section {
                 Toggle(isOn: Binding(get: { c.workspacesEnabled }, set: { model.set("workspaces", "enabled", $0) })) {
                     Text("Virtual workspaces")
-                    Text("\(model.mainKey)1…9 shows a workspace on its screen, \(model.mainKey)⇧1…9 sends the active window there.")
+                    Text(
+                        "\(model.mainKey)1…9 shows a workspace on its screen, \(model.mainKey)⇧1…9 sends the active window there."
+                    )
                 }
-                Picker("The \(model.mainKey)Tab switcher shows", selection: Binding(
-                    get: { c.switcherScope }, set: { model.set("switcher", "scope", string: $0.rawValue) })
+                Picker(
+                    "The \(model.mainKey)Tab switcher shows",
+                    selection: Binding(
+                        get: { c.switcherScope }, set: { model.set("switcher", "scope", string: $0.rawValue) })
                 ) {
                     Text("The visible workspace").tag(PaveConfig.SwitcherScope.workspace)
                     Text("This screen").tag(PaveConfig.SwitcherScope.screen)
@@ -43,8 +48,10 @@ struct WorkspacesPane: View {
             } header: {
                 Text("Workspaces")
             } footer: {
-                Text("Choosing a screen shows the workspace there, and it stays attached to it. The icon replaces the number in the taskbar: an emoji, up to 2 letters, or sf: and an SF Symbol name (sf:globe). Names and icons never go to the logs.")
-                    .font(.caption).foregroundStyle(.secondary)
+                Text(
+                    "Choosing a screen shows the workspace there, and it stays attached to it. The icon replaces the number in the taskbar: an emoji, up to 2 letters, or sf: and an SF Symbol name (sf:globe). Names and icons never go to the logs."
+                )
+                .font(.caption).foregroundStyle(.secondary)
             }
             SwiftUI.Section("Tiling") {
                 LabeledContent("Gap between tiles") {
@@ -60,7 +67,9 @@ struct WorkspacesPane: View {
                     Button("Edit…", action: goToKeyboard)
                 } label: {
                     Text("Shortcuts")
-                    Text("\(model.mainKey) + arrows move · \(model.mainKey)⌥ + arrows focus · \(model.mainKey)⌥⇧ + arrows resize · \(model.mainKey)⇧Space floating")
+                    Text(
+                        "\(model.mainKey) + arrows move · \(model.mainKey)⌥ + arrows focus · \(model.mainKey)⌥⇧ + arrows resize · \(model.mainKey)⇧Space floating"
+                    )
                 }
             }
         }
@@ -98,9 +107,14 @@ private struct WorkspaceRowView: View {
             badge
                 .lineLimit(1)
                 .frame(width: 22, height: 22)
-                .background(row.visible ? Color.accentColor : Color.secondary.opacity(0.2), in: RoundedRectangle(cornerRadius: 5))
+                .background(
+                    row.visible ? Color.accentColor : Color.secondary.opacity(0.2),
+                    in: RoundedRectangle(cornerRadius: 5)
+                )
                 .foregroundStyle(row.visible ? Color.white : Color.primary)
-                .accessibilityLabel(row.visible ? String(localized: "Workspace \(row.id), shown") : String(localized: "Workspace \(row.id)"))
+                .accessibilityLabel(
+                    row.visible
+                        ? String(localized: "Workspace \(row.id), shown") : String(localized: "Workspace \(row.id)"))
             TextField("Name of workspace \(row.id)", text: $name, prompt: Text("Optional"))
                 .labelsHidden()
                 .textFieldStyle(.roundedBorder)
@@ -116,9 +130,11 @@ private struct WorkspaceRowView: View {
                 .help(iconValid ? "" : String(localized: "An emoji, up to 2 letters, or sf: and an SF Symbol name"))
                 .onSubmit { model.setIcon(row.id, icon) }
                 .onChange(of: editingIcon) { _, now in if !now { model.setIcon(row.id, icon) } }
-            Picker("Screen of workspace \(row.id)", selection: Binding(
-                get: { row.screen ?? -1 },
-                set: { if $0 >= 0 { model.displayWorkspace(row.id, $0) } })
+            Picker(
+                "Screen of workspace \(row.id)",
+                selection: Binding(
+                    get: { row.screen ?? -1 },
+                    set: { if $0 >= 0 { model.displayWorkspace(row.id, $0) } })
             ) {
                 if row.screen == nil { Text("When first shown").tag(-1) }
                 ForEach(model.screens) { Text($0.name).tag($0.id) }
@@ -134,7 +150,10 @@ private struct WorkspaceRowView: View {
                 .monospacedDigit()
                 .gridColumnAlignment(.trailing)
         }
-        .onAppear { name = row.name; icon = row.icon }
+        .onAppear {
+            name = row.name
+            icon = row.icon
+        }
         .onChange(of: row.name) { _, new in if !editing { name = new } }
         .onChange(of: row.icon) { _, new in if !editingIcon { icon = new } }
     }

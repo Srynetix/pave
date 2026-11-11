@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// The window manager's source of truth, as a pure value: every window known to
 /// Pavé plus the most-recently-used order. Fed with per-app snapshots; reports
 /// what changed so the UI and the logs can react.

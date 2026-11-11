@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// BLAKE2b (RFC 7693), unkeyed: what minisign hashes a file with before
 /// signing it (CryptoKit has no BLAKE2). Pure.
 public enum Blake2b {

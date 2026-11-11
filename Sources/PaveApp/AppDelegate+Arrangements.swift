@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 import PaveIPC
@@ -10,12 +11,17 @@ extension AppDelegate {
 
     func openArrangementPicker(_ id: Int) {
         let screens = Screens.all()
-        guard started, let screen = registry.focusedWindow.flatMap({ LayoutEngine.screen(for: $0.frame, among: screens) })
-            ?? Screens.underMouse(among: screens) ?? screens.first
+        guard started,
+            let screen = registry.focusedWindow.flatMap({ LayoutEngine.screen(for: $0.frame, among: screens) })
+                ?? Screens.underMouse(among: screens) ?? screens.first
         else { return hotkeys?.endSession(id) ?? () }
-        arrangementPicker.open(id: id, area: screen.visibleFrame, rows: arrangements.arrangements.map { a in
-            .init(name: a.name, detail: String(localized: "\(a.places.count) windows · \(Set(a.places.map(\.app)).count) apps"))
-        })
+        arrangementPicker.open(
+            id: id, area: screen.visibleFrame,
+            rows: arrangements.arrangements.map { a in
+                .init(
+                    name: a.name,
+                    detail: String(localized: "\(a.places.count) windows · \(Set(a.places.map(\.app)).count) apps"))
+            })
     }
 
     func restoreArrangement(_ name: String) {
@@ -29,7 +35,10 @@ extension AppDelegate {
         let previous = NSWorkspace.shared.frontmostApplication
         let alert = NSAlert()
         alert.messageText = String(localized: "Save the window arrangement")
-        alert.informativeText = String(localized: "Each window's app, workspace and place are saved, never its title. The same name replaces the arrangement.")
+        alert.informativeText = String(
+            localized:
+                "Each window's app, workspace and place are saved, never its title. The same name replaces the arrangement."
+        )
         let field = NSTextField(frame: NSRect(x: 0, y: 0, width: 260, height: 24))
         field.placeholderString = String(localized: "Name, like Code or Meeting")
         alert.accessoryView = field
@@ -42,7 +51,9 @@ extension AppDelegate {
         guard response == .alertFirstButtonReturn else { return }
         let name = field.stringValue.trimmingCharacters(in: .whitespaces)
         guard Arrangement.isValidName(name) else {
-            return showAlert(String(localized: "Arrangement not saved"), String(localized: "A name of letters, digits, spaces, - or _"))
+            return showAlert(
+                String(localized: "Arrangement not saved"),
+                String(localized: "A name of letters, digits, spaces, - or _"))
         }
         if arrangements.save(name) == nil {
             showAlert(String(localized: "Arrangement not saved"), String(localized: "No window to save."))
@@ -51,7 +62,9 @@ extension AppDelegate {
 
     @objc func saveArrangementFromMenu() { saveArrangementFromUI() }
 
-    @objc func restoreArrangementFromMenu(_ sender: NSMenuItem) { restoreArrangement(sender.representedObject as? String ?? "") }
+    @objc func restoreArrangementFromMenu(_ sender: NSMenuItem) {
+        restoreArrangement(sender.representedObject as? String ?? "")
+    }
 
     @objc func deleteArrangementFromMenu(_ sender: NSMenuItem) {
         _ = arrangements.delete(sender.representedObject as? String ?? "")
@@ -66,12 +79,16 @@ extension AppDelegate {
             arrangementsMenu.addItem(item)
         }
         if !list.isEmpty { arrangementsMenu.addItem(.separator()) }
-        arrangementsMenu.addItem(NSMenuItem(title: String(localized: "Save Current Arrangement…"), action: #selector(saveArrangementFromMenu), keyEquivalent: ""))
+        arrangementsMenu.addItem(
+            NSMenuItem(
+                title: String(localized: "Save Current Arrangement…"), action: #selector(saveArrangementFromMenu),
+                keyEquivalent: ""))
         if !list.isEmpty {
             let delete = NSMenuItem(title: String(localized: "Delete"), action: nil, keyEquivalent: "")
             let sub = NSMenu()
             for a in list {
-                let item = NSMenuItem(title: a.name, action: #selector(deleteArrangementFromMenu(_:)), keyEquivalent: "")
+                let item = NSMenuItem(
+                    title: a.name, action: #selector(deleteArrangementFromMenu(_:)), keyEquivalent: "")
                 item.representedObject = a.name
                 sub.addItem(item)
             }
@@ -92,7 +109,11 @@ extension AppDelegate {
         case .list:
             let list = arrangements.arrangements
             if list.isEmpty { return (true, "no arrangement yet: pave arrangement save NAME") }
-            return (true, list.map { "\($0.name): \($0.places.count) window(s) of \(Set($0.places.map(\.app)).count) app(s)" }.joined(separator: "\n"))
+            return (
+                true,
+                list.map { "\($0.name): \($0.places.count) window(s) of \(Set($0.places.map(\.app)).count) app(s)" }
+                    .joined(separator: "\n")
+            )
         case .save(let name):
             guard let summary = arrangements.save(name) else { return (false, "no window to save") }
             return (true, "\(name): \(summary)")

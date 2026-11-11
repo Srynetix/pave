@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// A layout of zones on one screen, FancyZones style: windows dragged or moved
 /// with the keyboard go into one zone, or span several. Pure.
 ///
@@ -35,7 +36,8 @@ public struct ZoneLayout: Equatable, Sendable {
         }
         for (i, z) in zones.enumerated() {
             guard z.x >= 0, z.y >= 0, z.width > 0, z.height > 0, z.maxX <= 100, z.maxY <= 100 else {
-                throw Invalid(message: "zone \(i + 1) [\(z.x), \(z.y), \(z.width), \(z.height)] must stay within 0 to 100 %")
+                throw Invalid(
+                    message: "zone \(i + 1) [\(z.x), \(z.y), \(z.width), \(z.height)] must stay within 0 to 100 %")
             }
             for (j, other) in zones.enumerated().prefix(i) where Self.overlap(z, other) {
                 throw Invalid(message: "zones \(j + 1) and \(i + 1) overlap")
@@ -52,9 +54,12 @@ public struct ZoneLayout: Equatable, Sendable {
     // MARK: Built-in layouts
 
     public static let builtIn: [ZoneLayout] = [
-        try! ZoneLayout(name: "focus", zones: [.init(0, 0, 25, 100), .init(25, 0, 50, 100), .init(75, 0, 25, 50), .init(75, 50, 25, 50)]),
+        try! ZoneLayout(
+            name: "focus",
+            zones: [.init(0, 0, 25, 100), .init(25, 0, 50, 100), .init(75, 0, 25, 50), .init(75, 50, 25, 50)]),
         try! ZoneLayout(name: "thirds", zones: [.init(0, 0, 33, 100), .init(33, 0, 34, 100), .init(67, 0, 33, 100)]),
-        try! ZoneLayout(name: "main-and-stack", zones: [.init(0, 0, 60, 100), .init(60, 0, 40, 50), .init(60, 50, 40, 50)]),
+        try! ZoneLayout(
+            name: "main-and-stack", zones: [.init(0, 0, 60, 100), .init(60, 0, 40, 50), .init(60, 50, 40, 50)]),
         try! ZoneLayout(name: "halves", zones: [.init(0, 0, 50, 100), .init(50, 0, 50, 100)]),
         try! ZoneLayout(
             name: "grid",
@@ -83,9 +88,12 @@ public struct ZoneLayout: Equatable, Sendable {
     /// An edge on the screen's border gets the whole gap; an inner one, half
     /// (the larger half on its leading side), so two neighbours are `gaps` apart.
     private static func inset(_ cell: Rect, _ z: Zone, _ gaps: Double) -> Rect {
-        let lead = gaps - (gaps / 2).rounded(.down), trail = (gaps / 2).rounded(.down)
-        let left = z.x == 0 ? gaps : trail, right = z.maxX == 100 ? gaps : lead
-        let top = z.y == 0 ? gaps : trail, bottom = z.maxY == 100 ? gaps : lead
+        let lead = gaps - (gaps / 2).rounded(.down)
+        let trail = (gaps / 2).rounded(.down)
+        let left = z.x == 0 ? gaps : trail
+        let right = z.maxX == 100 ? gaps : lead
+        let top = z.y == 0 ? gaps : trail
+        let bottom = z.maxY == 100 ? gaps : lead
         return Rect(
             x: cell.x + left, y: cell.y + top,
             width: max(1, cell.width - left - right), height: max(1, cell.height - top - bottom))
@@ -122,7 +130,8 @@ public struct ZoneLayout: Equatable, Sendable {
             frames[i].x >= frame.x - tolerance && frames[i].maxX <= frame.maxX + tolerance
                 && frames[i].y >= frame.y - tolerance && frames[i].maxY <= frame.maxY + tolerance
         }
-        guard inside.count > 1, self.frame(of: inside, in: area, gaps: gaps).isClose(to: frame, tolerance: tolerance) else {
+        guard inside.count > 1, self.frame(of: inside, in: area, gaps: gaps).isClose(to: frame, tolerance: tolerance)
+        else {
             return nil
         }
         return inside
@@ -150,7 +159,8 @@ public struct ZoneLayout: Equatable, Sendable {
     }
 
     private static func union(_ a: Rect, _ b: Rect) -> Rect {
-        let x = min(a.x, b.x), y = min(a.y, b.y)
+        let x = min(a.x, b.x)
+        let y = min(a.y, b.y)
         return Rect(x: x, y: y, width: max(a.maxX, b.maxX) - x, height: max(a.maxY, b.maxY) - y)
     }
 
@@ -220,7 +230,8 @@ public struct ZoneSettings: Equatable, Sendable {
     /// The `[zones.screens]` key naming a screen, if one does.
     public func screenKey(screenID: String, screenName: String, isBuiltIn: Bool) -> String? {
         let keys = screens.keys.sorted()
-        let id = screenID.lowercased(), name = screenName.lowercased()
+        let id = screenID.lowercased()
+        let name = screenName.lowercased()
         let builtIn: (String) -> Bool = { ["builtin", "built-in"].contains($0.lowercased()) }
         return keys.first { !id.isEmpty && $0.lowercased() == id }
             ?? (isBuiltIn ? keys.first(where: builtIn) : nil)

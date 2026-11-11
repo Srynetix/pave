@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// The workspace numbers of one taskbar: the workspaces that live on this
 /// screen and have windows, plus the one shown there even when empty. Pure:
 /// PaveMac draws them and switches on a click.
@@ -20,7 +21,9 @@ public enum WorkspaceIndicator {
     ) -> [Item] {
         // Same windows as the bar lists: standard ones, minimized included.
         let occupied = Set(
-            windows.filter { $0.subrole == "AXStandardWindow" || $0.state == .minimized }.map { state.workspace(of: $0.id) })
+            windows.filter { $0.subrole == "AXStandardWindow" || $0.state == .minimized }.map {
+                state.workspace(of: $0.id)
+            })
         let shownHere = state.visible[screenID] ?? (screenID == primaryID ? state.active : nil)
         return Workspaces.range.compactMap { n in
             let home = state.screen(showing: n) ?? state.home[n] ?? primaryID
@@ -49,7 +52,9 @@ public enum WorkspaceIcon: Equatable, Sendable {
             guard Self.isSymbolName(name) else { return nil }
             self = .symbol(name)
         } else {
-            guard !value.isEmpty, value.count <= Self.maxCharacters, !value.contains(where: \.isNewline) else { return nil }
+            guard !value.isEmpty, value.count <= Self.maxCharacters, !value.contains(where: \.isNewline) else {
+                return nil
+            }
             self = .text(value)
         }
     }
@@ -61,7 +66,8 @@ public enum WorkspaceIcon: Equatable, Sendable {
 
     /// SF Symbol names: lowercase words, digits and dots ("chevron.left.forwardslash.chevron.right").
     static func isSymbolName(_ name: String) -> Bool {
-        !name.isEmpty && name.count <= 80 && name.allSatisfy { ($0.isASCII && ($0.isLetter || $0.isNumber)) || $0 == "." }
+        !name.isEmpty && name.count <= 80
+            && name.allSatisfy { ($0.isASCII && ($0.isLetter || $0.isNumber)) || $0 == "." }
             && name.first != "." && name.last != "."
     }
 }

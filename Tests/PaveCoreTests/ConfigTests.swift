@@ -1,4 +1,7 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import Testing
+
+@testable import PaveCore
 
 @Test func pcPresetShortcutsShowTheKeysPressed() {
     // ⌃⌥← as macOS receives it is ⌥⌘← on the keys (⌘ next to the space bar).
@@ -7,7 +10,6 @@ import Testing
     #expect(Hotkey(8, .command).pressedWithPCPreset == Hotkey(8, .control))
     #expect(Hotkey(49, .shift).pressedWithPCPreset == Hotkey(49, .shift))
 }
-@testable import PaveCore
 
 @Suite struct TOMLTests {
     @Test func parsesTheSupportedSubset() throws {
@@ -27,7 +29,10 @@ import Testing
             "quoted key" = false
             """)
         #expect(root["top"] == .string("a \"quoted\" value"))
-        guard case .table(let section)? = root["section"] else { Issue.record("no section"); return }
+        guard case .table(let section)? = root["section"] else {
+            Issue.record("no section")
+            return
+        }
         #expect(section["flag"] == .bool(true))
         #expect(section["count"] == .integer(1000))
         #expect(section["literal"] == .string("C:\\path"))
@@ -165,8 +170,9 @@ import Testing
     @Test func pcPresetMatchesTheReadmeTable() {
         let common: [KeyRemap.Mapping] = [.init(.leftCommand, .leftControl), .init(.rightCommand, .rightOption)]
         // Built-in: no §/< swap (A/B tested: macOS already places ² and <).
-        #expect(KeyRemap.mappings(for: builtIn, preset: .pc)
-            == common + [.init(.fn, .leftCommand), .init(.leftControl, .fn)])
+        #expect(
+            KeyRemap.mappings(for: builtIn, preset: .pc)
+                == common + [.init(.fn, .leftCommand), .init(.leftControl, .fn)])
         // No §/< swap on external keyboards either (tested on a Logitech MX Keys S).
         #expect(KeyRemap.mappings(for: logitech, preset: .pc) == common + [.init(.leftControl, .leftCommand)])
         #expect(KeyRemap.mappings(for: logitech, preset: .none).isEmpty)
@@ -180,8 +186,10 @@ import Testing
         #expect(logitech.matching == #"{"VendorID":1133,"ProductID":45944}"#)
         #expect(logitech.configID == "1133:45944")
         #expect(KeyRemap.hidutilProperty([]) == #"{"UserKeyMapping":[]}"#)
-        #expect(KeyRemap.hidutilProperty([.init(.fn, .leftCommand)])
-            == #"{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":1095216660483,"HIDKeyboardModifierMappingDst":30064771299}]}"#)
+        #expect(
+            KeyRemap.hidutilProperty([.init(.fn, .leftCommand)])
+                == #"{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":1095216660483,"HIDKeyboardModifierMappingDst":30064771299}]}"#
+        )
     }
 
     @Test func keyboardSettingsParse() throws {
@@ -199,16 +207,19 @@ import Testing
     @Test func replacesTheLineAndKeepsEverythingElse() throws {
         let text = "# mine\n[workspaces]\n# comment\n  enabled = false # off for now\n\n[switcher]\nenabled = true\n"
         let edited = ConfigEdit.set("workspaces", "enabled", to: "true", in: text)
-        #expect(edited == "# mine\n[workspaces]\n# comment\n  enabled = true # off for now\n\n[switcher]\nenabled = true\n")
+        #expect(
+            edited == "# mine\n[workspaces]\n# comment\n  enabled = true # off for now\n\n[switcher]\nenabled = true\n")
         #expect(try PaveConfig.parse(edited).config.workspacesEnabled)
     }
 
     @Test func commentedOutKeysAreNotTheKey() {
         let text = "[keyboard]\n# remap = true\npreset = \"pc\" # a # in a comment\n"
-        #expect(ConfigEdit.set("keyboard", "remap", to: "false", in: text)
-            == "[keyboard]\nremap = false\n# remap = true\npreset = \"pc\" # a # in a comment\n")
-        #expect(ConfigEdit.set("keyboard", "preset", to: "\"none\"", in: text)
-            == "[keyboard]\n# remap = true\npreset = \"none\" # a # in a comment\n")
+        #expect(
+            ConfigEdit.set("keyboard", "remap", to: "false", in: text)
+                == "[keyboard]\nremap = false\n# remap = true\npreset = \"pc\" # a # in a comment\n")
+        #expect(
+            ConfigEdit.set("keyboard", "preset", to: "\"none\"", in: text)
+                == "[keyboard]\n# remap = true\npreset = \"none\" # a # in a comment\n")
     }
 
     @Test func missingTableIsAppended() throws {
@@ -225,8 +236,9 @@ import Testing
 
 @Suite struct AppRuleTests {
     private func window(_ subrole: String = "AXStandardWindow") -> WindowSnapshot {
-        WindowSnapshot(id: WindowID(1), pid: 1, appName: "App", title: "", frame: Rect(x: 0, y: 0, width: 10, height: 10),
-                       state: .normal, subrole: subrole)
+        WindowSnapshot(
+            id: WindowID(1), pid: 1, appName: "App", title: "", frame: Rect(x: 0, y: 0, width: 10, height: 10),
+            state: .normal, subrole: subrole)
     }
 
     @Test func rulesParseByBundleID() throws {
@@ -257,10 +269,12 @@ import Testing
 
 @Suite struct AppWorkspaceRuleTests {
     @Test func workspaceRuleParses() throws {
-        let config = try PaveConfig.parse("""
+        let config = try PaveConfig.parse(
+            """
             [apps."com.tinyspeck.slackmacgap"]
             workspace = 3
-            """).config
+            """
+        ).config
         #expect(config.rule(for: "com.tinyspeck.slackmacgap").workspace == 3)
         #expect(config.rule(for: "com.tinyspeck.slackmacgap").summary == "workspace 3")
     }
@@ -273,13 +287,15 @@ import Testing
 
 @Suite struct TilingConfigTests {
     @Test func tilingSettingsParse() throws {
-        let config = try PaveConfig.parse("""
+        let config = try PaveConfig.parse(
+            """
             [workspaces]
             tiling = [2, 3]
             gaps = 0
             [apps."com.apple.systempreferences"]
             tile = false
-            """).config
+            """
+        ).config
         #expect(config.tilingWorkspaces == [2, 3])
         #expect(config.tilingGaps == 0)
         #expect(!config.rule(for: "com.apple.systempreferences").tile)
@@ -401,7 +417,9 @@ import Testing
         #expect(WorkspaceIcon("👩‍💻") == .text("👩‍💻"))  // one character, several scalars
         #expect(WorkspaceIcon("JS") == .text("JS"))
         #expect(WorkspaceIcon(" sf:globe ") == .symbol("globe"))
-        #expect(WorkspaceIcon("sf:chevron.left.forwardslash.chevron.right") == .symbol("chevron.left.forwardslash.chevron.right"))
+        #expect(
+            WorkspaceIcon("sf:chevron.left.forwardslash.chevron.right")
+                == .symbol("chevron.left.forwardslash.chevron.right"))
         for bad in ["", "Web", "sf:", "sf:a b", "sf:.globe", "sf:globe/x", "a\nb"] {
             #expect(WorkspaceIcon(bad) == nil)
         }
@@ -420,7 +438,9 @@ import Testing
     }
 
     @Test func indicatorCarriesTheIcons() {
-        let screen = Screen(frame: Rect(x: 0, y: 0, width: 1800, height: 1169), visibleFrame: Rect(x: 0, y: 40, width: 1800, height: 1069))
+        let screen = Screen(
+            frame: Rect(x: 0, y: 0, width: 1800, height: 1169),
+            visibleFrame: Rect(x: 0, y: 40, width: 1800, height: 1069))
         var ws = Workspaces()
         _ = ws.screensChanged([screen], windows: [])
         let items = WorkspaceIndicator.items(

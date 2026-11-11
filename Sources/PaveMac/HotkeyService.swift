@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import CoreGraphics
 import Foundation
 import PaveCore
@@ -18,7 +19,9 @@ public final class HotkeyService: @unchecked Sendable {
         /// `id` identifies the tap session: `endSession(id)` only ends that one.
         case open(id: Int, sameApp: Bool, backwards: Bool, latencyStart: UInt64)
         case next, previous, left, right, up, down
-        case close, quit, enterSearch, type(String), backspace
+        case close, quit, enterSearch
+        case type(String)
+        case backspace
         case commit, cancel
         /// The session modifiers were released (held mode only).
         case released
@@ -220,9 +223,10 @@ public final class HotkeyService: @unchecked Sendable {
                 lastDragSent = now
                 let p = event.location
                 let flags = event.flags
-                sendDrag(.dragged(
-                    x: p.x, y: p.y, option: flags.contains(.maskAlternate), shift: flags.contains(.maskShift),
-                    control: flags.contains(.maskControl), at: now))
+                sendDrag(
+                    .dragged(
+                        x: p.x, y: p.y, option: flags.contains(.maskAlternate), shift: flags.contains(.maskShift),
+                        control: flags.contains(.maskControl), at: now))
             }
             return Unmanaged.passUnretained(event)
 
@@ -239,10 +243,12 @@ public final class HotkeyService: @unchecked Sendable {
             // ⇧, ⌥ or ⌃ pressed or released mid-drag: the zones react now,
             // not at the next mouse move.
             if leftDown {
-                let p = event.location, flags = event.flags
-                sendDrag(.dragged(
-                    x: p.x, y: p.y, option: flags.contains(.maskAlternate), shift: flags.contains(.maskShift),
-                    control: flags.contains(.maskControl), at: clock_gettime_nsec_np(CLOCK_UPTIME_RAW)))
+                let p = event.location
+                let flags = event.flags
+                sendDrag(
+                    .dragged(
+                        x: p.x, y: p.y, option: flags.contains(.maskAlternate), shift: flags.contains(.maskShift),
+                        control: flags.contains(.maskControl), at: clock_gettime_nsec_np(CLOCK_UPTIME_RAW)))
             }
             if let current = session, !current.searching, !current.picker,
                 Self.modifiers(of: event.flags).isDisjoint(with: current.modifiers)
@@ -268,7 +274,10 @@ public final class HotkeyService: @unchecked Sendable {
                 mods.remove(.shift)
                 sessionCounter += 1
                 session = Session(modifiers: mods.isEmpty ? .shift : mods, triggerKey: keyCode, id: sessionCounter)
-                send(.open(id: sessionCounter, sameApp: sameApp, backwards: backwards, latencyStart: clock_gettime_nsec_np(CLOCK_UPTIME_RAW)))
+                send(
+                    .open(
+                        id: sessionCounter, sameApp: sameApp, backwards: backwards,
+                        latencyStart: clock_gettime_nsec_np(CLOCK_UPTIME_RAW)))
                 watchIdle()
                 return nil
             }
@@ -375,8 +384,12 @@ public final class HotkeyService: @unchecked Sendable {
         case Hotkey.Key.rightArrow: key = .right
         case Hotkey.Key.upArrow: key = .up
         case Hotkey.Key.downArrow: key = .down
-        case 53: key = nil; endSession(sending: .cancel)  // escape
-        case 36, 76: key = nil; endSession(sending: .commit)  // return, keypad enter
+        case 53:
+            key = nil
+            endSession(sending: .cancel)  // escape
+        case 36, 76:
+            key = nil
+            endSession(sending: .commit)  // return, keypad enter
         default:
             if let index = Hotkey.Key.digits.firstIndex(of: keyCode) {
                 // The picker closes by itself (onClose ends the session): a
@@ -402,7 +415,10 @@ public final class HotkeyService: @unchecked Sendable {
     /// Left ⌥ down with no other modifier starts a tap; released within
     /// `optionTapMax` with nothing in between, it fires.
     private func trackOptionTap(_ event: CGEvent) {
-        guard optionTapEnabled, session == nil else { return optionDownAt = nil }
+        guard optionTapEnabled, session == nil else {
+            optionDownAt = nil
+            return
+        }
         let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
         let modifiers = Self.modifiers(of: event.flags)
         let now = clock_gettime_nsec_np(CLOCK_UPTIME_RAW)
@@ -434,10 +450,12 @@ public final class HotkeyService: @unchecked Sendable {
         }
         guard !queued else { return }
         DispatchQueue.main.async { [weak self] in
-            guard let self, let latest = self.pendingDrag.withLock({ slot in
-                defer { slot = nil }
-                return slot
-            }) else { return }
+            guard let self,
+                let latest = self.pendingDrag.withLock({ slot in
+                    defer { slot = nil }
+                    return slot
+                })
+            else { return }
             MainActor.assumeIsolated { self.onMouse?(latest) }
         }
     }

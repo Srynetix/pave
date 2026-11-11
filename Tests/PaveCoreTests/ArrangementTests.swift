@@ -1,15 +1,20 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import Testing
+
 @testable import PaveCore
 
 private func place(_ app: String, _ index: Int, workspace: Int = 1) -> Arrangement.Place {
-    .init(app: app, index: index, workspace: workspace, screen: "S", frame: Rect(x: Double(index) * 10, y: 0, width: 100, height: 100))
+    .init(
+        app: app, index: index, workspace: workspace, screen: "S",
+        frame: Rect(x: Double(index) * 10, y: 0, width: 100, height: 100))
 }
 
 private func candidate(_ id: UInt32, _ app: String) -> Arrangement.Candidate { .init(id: WindowID(id), app: app) }
 
 @Suite struct ArrangementTests {
     @Test func windowsTakeThePlacesOfTheirAppInCreationOrder() {
-        let arrangement = Arrangement(name: "Code", places: [place("brave", 0), place("brave", 1, workspace: 2), place("prism", 0)])
+        let arrangement = Arrangement(
+            name: "Code", places: [place("brave", 0), place("brave", 1, workspace: 2), place("prism", 0)])
         // IDs grow with creation: #12 is Brave's first window, whatever order they come in.
         let match = arrangement.match([candidate(40, "brave"), candidate(12, "brave"), candidate(7, "prism")])
         #expect(match.placed.map(\.window) == [WindowID(12), WindowID(40), WindowID(7)])
@@ -28,7 +33,8 @@ private func candidate(_ id: UInt32, _ app: String) -> Arrangement.Candidate { .
 
     @Test func extraWindowsAreLeftAlone() {
         let arrangement = Arrangement(name: "Code", places: [place("brave", 0)])
-        #expect(arrangement.match([candidate(1, "brave"), candidate(2, "brave")]).placed.map(\.window) == [WindowID(1)])
+        #expect(
+            arrangement.match([candidate(1, "brave"), candidate(2, "brave")]).placed.map(\.window) == [WindowID(1)])
     }
 
     @Test func indicesRankEachAppsWindows() {

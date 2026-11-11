@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import Combine
 import PaveCore
 import SwiftUI
@@ -36,7 +37,8 @@ struct OnboardingView: View {
             HStack {
                 HStack(spacing: 6) {
                     ForEach(0..<pages, id: \.self) { i in
-                        Circle().fill(i == page ? Color.accentColor : Color.secondary.opacity(0.3)).frame(width: 7, height: 7)
+                        Circle().fill(i == page ? Color.accentColor : Color.secondary.opacity(0.3)).frame(
+                            width: 7, height: 7)
                     }
                 }
                 .accessibilityLabel("Step \(page + 1) of \(pages)")
@@ -66,8 +68,10 @@ struct OnboardingView: View {
             Text("Welcome to Pavé").font(.largeTitle.weight(.semibold))
             Text("The switcher, snapping, taskbar and workspaces you know from Windows and Linux, on your Mac.")
                 .font(.title3).foregroundStyle(.secondary)
-            Text("A few steps: the permissions Pavé needs, your keyboard, and what to turn on. Everything can be changed later in Settings, or in the config file.")
-                .fixedSize(horizontal: false, vertical: true)
+            Text(
+                "A few steps: the permissions Pavé needs, your keyboard, and what to turn on. Everything can be changed later in Settings, or in the config file."
+            )
+            .fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -81,10 +85,14 @@ struct OnboardingView: View {
                 action: { model.perform(.accessibility) })
             PermissionRow(
                 granted: status.screenRecording, title: String(localized: "Screen Recording"),
-                detail: String(localized: "Optional: live previews in the switcher and the taskbar. Without it, Pavé shows app icons."),
+                detail: String(
+                    localized:
+                        "Optional: live previews in the switcher and the taskbar. Without it, Pavé shows app icons."),
                 action: { model.perform(.screenRecording) })
-            Text("Window titles and workspace names never reach the logs, previews stay in memory, and nothing leaves your Mac.")
-                .font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            Text(
+                "Window titles and workspace names never reach the logs, previews stay in memory, and nothing leaves your Mac."
+            )
+            .font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             if !status.trusted {
                 Text("Continue once Accessibility is granted (macOS may ask to quit and reopen Pavé).")
                     .font(.callout).foregroundStyle(.orange)
@@ -96,17 +104,21 @@ struct OnboardingView: View {
         let c = model.config
         return VStack(alignment: .leading, spacing: 18) {
             Text("Your keyboard").font(.title.weight(.semibold))
-            Picker("Keyboard", selection: Binding(
-                get: { c.keyboardRemap && c.keyboardPreset == .pc ? 0 : 1 },
-                set: { pc in
-                    model.set("keyboard", "remap", pc == 0)
-                    if pc == 0 { model.set("keyboard", "preset", string: KeyRemap.Preset.pc.rawValue) }
-                })
+            Picker(
+                "Keyboard",
+                selection: Binding(
+                    get: { c.keyboardRemap && c.keyboardPreset == .pc ? 0 : 1 },
+                    set: { pc in
+                        model.set("keyboard", "remap", pc == 0)
+                        if pc == 0 { model.set("keyboard", "preset", string: KeyRemap.Preset.pc.rawValue) }
+                    })
             ) {
                 VStack(alignment: .leading) {
                     Text("PC habits (recommended)")
-                    Text("The key next to the space bar drives Pavé (⌘Tab, ⌘ + arrows, like Alt+Tab and Win + arrows); the bottom-left key does copy and paste (Ctrl+C, Ctrl+V); right ⌘ is Alt Gr.")
-                        .font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                    Text(
+                        "The key next to the space bar drives Pavé (⌘Tab, ⌘ + arrows, like Alt+Tab and Win + arrows); the bottom-left key does copy and paste (Ctrl+C, Ctrl+V); right ⌘ is Alt Gr."
+                    )
+                    .font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                 }
                 .tag(0)
                 VStack(alignment: .leading) {
@@ -131,27 +143,35 @@ struct OnboardingView: View {
             Text("Snapping and the switcher are always on. The rest is yours to choose.").foregroundStyle(.secondary)
             SwitchRow(
                 title: String(localized: "Taskbar"),
-                detail: String(localized: "One entry per window on every screen, previews, pinned apps, a Start button."),
+                detail: String(
+                    localized: "One entry per window on every screen, previews, pinned apps, a Start button."),
                 isOn: Binding(get: { c.taskbarEnabled }, set: { model.set("taskbar", "enabled", $0) }))
             SwitchRow(
                 title: String(localized: "Hide the Dock while the taskbar is on"),
                 detail: String(localized: "Put back exactly as it was when you turn it off."),
-                isOn: Binding(get: { c.taskbarHideDock }, set: { model.set("taskbar", "hide-dock", $0) }))
-                .disabled(!c.taskbarEnabled)
-                .padding(.leading, 20)
+                isOn: Binding(get: { c.taskbarHideDock }, set: { model.set("taskbar", "hide-dock", $0) })
+            )
+            .disabled(!c.taskbarEnabled)
+            .padding(.leading, 20)
             SwitchRow(
                 title: String(localized: "Virtual workspaces"),
-                detail: String(localized: "\(model.mainKey)1…9 shows a workspace on its screen, \(model.mainKey)⇧1…9 sends the window there."),
+                detail: String(
+                    localized:
+                        "\(model.mainKey)1…9 shows a workspace on its screen, \(model.mainKey)⇧1…9 sends the window there."
+                ),
                 isOn: Binding(get: { c.workspacesEnabled }, set: { model.set("workspaces", "enabled", $0) }))
             SwitchRow(
                 title: String(localized: "Zones"),
-                detail: String(localized: "Layouts for wide screens: drag a window into a zone, \(model.mainKey)⇧Z picks the layout."),
+                detail: String(
+                    localized:
+                        "Layouts for wide screens: drag a window into a zone, \(model.mainKey)⇧Z picks the layout."),
                 isOn: Binding(get: { c.zones.enabled }, set: { model.set("zones", "enabled", $0) }))
             SwitchRow(
                 title: String(localized: "Launch Pavé at login"),
                 detail: login == .devCopy ? String(localized: "Only for the copy in Applications.") : nil,
-                isOn: Binding(get: { login == .on || login == .needsApproval }, set: { model.setLogin($0) }))
-                .disabled(login == .devCopy)
+                isOn: Binding(get: { login == .on || login == .needsApproval }, set: { model.setLogin($0) })
+            )
+            .disabled(login == .devCopy)
         }
     }
 
@@ -160,7 +180,8 @@ struct OnboardingView: View {
         return VStack(alignment: .leading, spacing: 14) {
             Text("You're all set").font(.title.weight(.semibold))
             Grid(alignment: .leading, horizontalSpacing: 18, verticalSpacing: 9) {
-                ShortcutRow(keys: "\(k)Tab", text: String(localized: "Switch windows (type to search, W closes, Q quits)"))
+                ShortcutRow(
+                    keys: "\(k)Tab", text: String(localized: "Switch windows (type to search, W closes, Q quits)"))
                 ShortcutRow(keys: "\(k)← →", text: String(localized: "Halves, or zones on a screen with a layout"))
                 ShortcutRow(keys: "\(k)↑ ↓", text: String(localized: "Maximize, quarters, back to the previous size"))
                 ShortcutRow(keys: "\(k)⇧← →", text: String(localized: "Send the window to the next screen"))
@@ -172,8 +193,10 @@ struct OnboardingView: View {
                 }
                 ShortcutRow(keys: "\(k)⇧A", text: String(localized: "Save or restore a window arrangement"))
             }
-            Text("Drag a window to an edge to snap it, hold ⌥ to move it freely. Pavé lives in the menu bar: Settings, logs and help are there.")
-                .font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            Text(
+                "Drag a window to an edge to snap it, hold ⌥ to move it freely. Pavé lives in the menu bar: Settings, logs and help are there."
+            )
+            .font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
         }
     }
 }
@@ -188,7 +211,9 @@ private struct SwitchRow: View {
         HStack(alignment: .center, spacing: 16) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                if let detail { Text(detail).font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
+                if let detail {
+                    Text(detail).font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                }
             }
             Spacer(minLength: 12)
             Toggle(title, isOn: $isOn).labelsHidden().toggleStyle(.switch)

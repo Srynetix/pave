@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Logical modifiers, as received *after* Karabiner / hidutil remapping.
 public struct Modifiers: OptionSet, Hashable, Sendable, Codable, CustomStringConvertible {
     public let rawValue: UInt8
@@ -166,7 +167,9 @@ extension String {
     /// Leading and trailing spaces and tabs removed (PaveCore stays Foundation-free).
     var trimmedSpaces: String {
         let isSpace: (Character) -> Bool = { $0 == " " || $0 == "\t" }
-        guard let start = firstIndex(where: { !isSpace($0) }), let end = lastIndex(where: { !isSpace($0) }) else { return "" }
+        guard let start = firstIndex(where: { !isSpace($0) }), let end = lastIndex(where: { !isSpace($0) }) else {
+            return ""
+        }
         return String(self[start...end])
     }
 }

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 
@@ -46,7 +47,9 @@ public final class FocusService {
     /// Told before every focus request (the taskbar hides itself at once when
     /// a full-screen window is about to come up).
     private var willFocusObservers: [(WindowSnapshot) -> Void] = []
-    public func addWillFocusObserver(_ observer: @escaping (WindowSnapshot) -> Void) { willFocusObservers.append(observer) }
+    public func addWillFocusObserver(_ observer: @escaping (WindowSnapshot) -> Void) {
+        willFocusObservers.append(observer)
+    }
 
     public func focus(
         _ window: WindowSnapshot, source: String, completion: @escaping @MainActor (Outcome) -> Void = { _ in }
@@ -63,7 +66,9 @@ public final class FocusService {
             Log.info("focus \(window.id) [\(window.appName)]: first try \(first.rawValue), retrying")
             // One retry: raising again usually wins once the app is active.
             self.attempt(window) { second in
-                if second != .firstTry, self.generation != request { return self.done(window, .superseded, source, start, completion) }
+                if second != .firstTry, self.generation != request {
+                    return self.done(window, .superseded, source, start, completion)
+                }
                 self.done(window, second == .firstTry ? .afterRetry : second, source, start, completion)
             }
         }
@@ -79,7 +84,9 @@ public final class FocusService {
             app.unhide()
             let start = Date()
             return waitUntilOnScreen(window.id, deadline: start.addingTimeInterval(1)) { [weak self] in
-                Log.info("focus \(window.id) [\(window.appName)]: unhidden, on screen after \(Int(Date().timeIntervalSince(start) * 1000)) ms")
+                Log.info(
+                    "focus \(window.id) [\(window.appName)]: unhidden, on screen after \(Int(Date().timeIntervalSince(start) * 1000)) ms"
+                )
                 // Let the unhide's own ordering finish first.
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
                     MainActor.assumeIsolated { self?.focusNow(window, completion: completion) }
@@ -135,10 +142,14 @@ public final class FocusService {
         let request = generation
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.lateCheckDelay) { [weak self] in
             MainActor.assumeIsolated {
-                guard let self, self.generation == request, NSWorkspace.shared.frontmostApplication?.processIdentifier != window.pid else { return }
+                guard let self, self.generation == request,
+                    NSWorkspace.shared.frontmostApplication?.processIdentifier != window.pid
+                else { return }
                 self.lateLosses += 1
                 let thief = NSWorkspace.shared.frontmostApplication?.localizedName ?? "?"
-                Log.info("focus \(window.id) [\(window.appName)]: LOST within \(Self.lateCheckDelay) s, \(thief) is frontmost")
+                Log.info(
+                    "focus \(window.id) [\(window.appName)]: LOST within \(Self.lateCheckDelay) s, \(thief) is frontmost"
+                )
             }
         }
     }

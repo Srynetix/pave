@@ -1,4 +1,6 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import Testing
+
 @testable import PaveCore
 
 private let screen = Screen(
@@ -24,8 +26,9 @@ private let floating = Rect(x: 200, y: 150, width: 640, height: 480)
 
     @Test func snapRemembersOriginalFrameOnce() {
         var engine = LayoutEngine()
-        #expect(engine.handle(.snapLeft, window: window(floating), screen: screen)
-            == .setFrame(LayoutEngine.target(.snapLeft, in: screen.visibleFrame)))
+        #expect(
+            engine.handle(.snapLeft, window: window(floating), screen: screen)
+                == .setFrame(LayoutEngine.target(.snapLeft, in: screen.visibleFrame)))
         // Second placement must not overwrite the original frame.
         let left = LayoutEngine.target(.snapLeft, in: screen.visibleFrame)
         _ = engine.handle(.maximize, window: window(left), screen: screen)
@@ -48,10 +51,12 @@ private let floating = Rect(x: 200, y: 150, width: 640, height: 480)
 
     @Test func ignoresMinimizedAndFullscreenWindows() {
         var engine = LayoutEngine()
-        #expect(engine.handle(.snapLeft, window: window(floating, state: .minimized), screen: screen)
-            == .none(reason: "window is minimized"))
-        #expect(engine.handle(.restore, window: window(floating, state: .fullscreen), screen: screen)
-            == .none(reason: "window is fullscreen"))
+        #expect(
+            engine.handle(.snapLeft, window: window(floating, state: .minimized), screen: screen)
+                == .none(reason: "window is minimized"))
+        #expect(
+            engine.handle(.restore, window: window(floating, state: .fullscreen), screen: screen)
+                == .none(reason: "window is fullscreen"))
     }
 
     @Test func forgetDropsRestoreFrame() {
@@ -67,14 +72,16 @@ private let floating = Rect(x: 200, y: 150, width: 640, height: 480)
             visibleFrame: Rect(x: 1801, y: 25, width: 1920, height: 1055))
         let mostlyOnSecond = Rect(x: 1700, y: 100, width: 800, height: 600)
         #expect(LayoutEngine.screen(for: mostlyOnSecond, among: [screen, second]) == second)
-        #expect(LayoutEngine.screen(for: Rect(x: -5000, y: 0, width: 10, height: 10), among: [screen, second]) == screen)
+        #expect(
+            LayoutEngine.screen(for: Rect(x: -5000, y: 0, width: 10, height: 10), among: [screen, second]) == screen)
     }
 
     @Test func constrainedResultIsOkWhenCentered() {
         let target = Rect(x: 0, y: 40, width: 900, height: 1069)
         let centered = LayoutEngine.centered(width: 700, height: 600, in: target)
         #expect(centered == Rect(x: 100, y: 275, width: 700, height: 600))
-        let result = MoveResult(window: 1, target: target, actual: centered, constrained: true, durationMs: 5, error: nil)
+        let result = MoveResult(
+            window: 1, target: target, actual: centered, constrained: true, durationMs: 5, error: nil)
         #expect(result.ok)
         let off = MoveResult(window: 1, target: target, actual: floating, constrained: false, durationMs: 5, error: nil)
         #expect(!off.ok)
@@ -88,10 +95,12 @@ private let rightScreen = Screen(
     frame: Rect(x: 1801, y: 0, width: 1920, height: 1080), visibleFrame: Rect(x: 1801, y: 0, width: 1920, height: 1080))
 /// The same, to the left (negative x in AX coordinates).
 private let leftScreen = Screen(
-    frame: Rect(x: -1920, y: 100, width: 1920, height: 1080), visibleFrame: Rect(x: -1920, y: 100, width: 1920, height: 1080))
+    frame: Rect(x: -1920, y: 100, width: 1920, height: 1080),
+    visibleFrame: Rect(x: -1920, y: 100, width: 1920, height: 1080))
 /// Above the built-in screen (negative y).
 private let aboveScreen = Screen(
-    frame: Rect(x: 0, y: -1080, width: 1920, height: 1080), visibleFrame: Rect(x: 0, y: -1080, width: 1920, height: 1080))
+    frame: Rect(x: 0, y: -1080, width: 1920, height: 1080),
+    visibleFrame: Rect(x: 0, y: -1080, width: 1920, height: 1080))
 
 private func at(_ placement: Placement, _ s: Screen = screen) -> Rect { placement.frame(in: s.visibleFrame) }
 
@@ -117,27 +126,33 @@ private func at(_ placement: Placement, _ s: Screen = screen) -> Rect { placemen
 
     @Test func upAndDownFromAHalfGiveQuarters() {
         // Windows 11: ← then ↑ = top-left quarter; ↓ goes back to the half, ↓ again = bottom quarter.
-        #expect(run([.snapLeft, .maximize, .restore, .restore], from: floating)
-            == [.setFrame(at(.left)), .setFrame(at(.topLeft)), .setFrame(at(.left)), .setFrame(at(.bottomLeft))])
+        #expect(
+            run([.snapLeft, .maximize, .restore, .restore], from: floating)
+                == [.setFrame(at(.left)), .setFrame(at(.topLeft)), .setFrame(at(.left)), .setFrame(at(.bottomLeft))])
         // From a bottom quarter: ↑ = the half; from a top quarter: ↑ = maximized.
-        #expect(run([.snapRight, .restore, .maximize, .maximize, .maximize], from: floating)
-            == [.setFrame(at(.right)), .setFrame(at(.bottomRight)), .setFrame(at(.right)), .setFrame(at(.topRight)),
-                .setFrame(at(.maximized))])
+        #expect(
+            run([.snapRight, .restore, .maximize, .maximize, .maximize], from: floating)
+                == [
+                    .setFrame(at(.right)), .setFrame(at(.bottomRight)), .setFrame(at(.right)), .setFrame(at(.topRight)),
+                    .setFrame(at(.maximized)),
+                ])
         // ↓ on a bottom quarter minimizes, as Windows does.
         #expect(run([.snapLeft, .restore, .restore], from: floating).last == .minimize)
     }
 
     @Test func maximizedThenDownRestoresTheFloatingFrame() {
-        #expect(run([.maximize, .restore, .restore], from: floating)
-            == [.setFrame(at(.maximized)), .setFrame(floating), .minimize])
+        #expect(
+            run([.maximize, .restore, .restore], from: floating)
+                == [.setFrame(at(.maximized)), .setFrame(floating), .minimize])
         // Through quarters and halves, the frame to restore stays the floating one.
         #expect(run([.snapLeft, .maximize, .maximize, .restore], from: floating).last == .setFrame(floating))
     }
 
     @Test func oppositeArrowOnAHalfGoesBackToFloating() {
         // Windows: right half + Win+← = restored, then Win+← = left half.
-        #expect(run([.snapRight, .snapLeft, .snapLeft], from: floating)
-            == [.setFrame(at(.right)), .setFrame(floating), .setFrame(at(.left))])
+        #expect(
+            run([.snapRight, .snapLeft, .snapLeft], from: floating)
+                == [.setFrame(at(.right)), .setFrame(floating), .setFrame(at(.left))])
         // Quarters slide to the other side, keeping their row.
         #expect(run([.snapRight, .maximize, .snapLeft], from: floating).last == .setFrame(at(.topLeft)))
     }
@@ -147,18 +162,24 @@ private func at(_ placement: Placement, _ s: Screen = screen) -> Rect { placemen
         // → → → →: right half, left half of the external screen, floating *on the
         // external screen* (Windows restores on the current screen), its right half.
         let restoredThere = LayoutEngine.carry(floating, from: screen.visibleFrame, to: rightScreen.visibleFrame)
-        #expect(run([.snapRight, .snapRight, .snapRight, .snapRight], from: floating, screens: screens)
-            == [.setFrame(at(.right)), .setFrame(at(.left, rightScreen)), .setFrame(restoredThere),
-                .setFrame(at(.right, rightScreen))])
+        #expect(
+            run([.snapRight, .snapRight, .snapRight, .snapRight], from: floating, screens: screens)
+                == [
+                    .setFrame(at(.right)), .setFrame(at(.left, rightScreen)), .setFrame(restoredThere),
+                    .setFrame(at(.right, rightScreen)),
+                ])
         // Back: left half of the external screen → right half of the built-in one; then,
         // with no floating frame known, the left half.
-        #expect(run([.snapLeft, .snapLeft], from: at(.left, rightScreen), screens: screens)
-            == [.setFrame(at(.right)), .setFrame(at(.left))])
+        #expect(
+            run([.snapLeft, .snapLeft], from: at(.left, rightScreen), screens: screens)
+                == [.setFrame(at(.right)), .setFrame(at(.left))])
         // A quarter keeps its row across screens; at the end of the chain, nothing happens.
-        #expect(run([.snapRight, .maximize, .snapRight], from: floating, screens: screens).last
-            == .setFrame(at(.topLeft, rightScreen)))
-        #expect(run([.snapLeft, .snapLeft], from: floating, screens: screens).last
-            == .none(reason: "already left, no screen on the left"))
+        #expect(
+            run([.snapRight, .maximize, .snapRight], from: floating, screens: screens).last
+                == .setFrame(at(.topLeft, rightScreen)))
+        #expect(
+            run([.snapLeft, .snapLeft], from: floating, screens: screens).last
+                == .none(reason: "already left, no screen on the left"))
     }
 
     @Test func neighbourScreensFollowTheArrangement() {
@@ -170,20 +191,25 @@ private func at(_ placement: Placement, _ s: Screen = screen) -> Rect { placemen
         #expect(LayoutEngine.neighbour(of: screen, toLeft: true, among: [screen, aboveScreen]) == nil)
         // Built-in centre 900, above-screen centre 960: the above screen is "to the right",
         // but a screen that overlaps vertically wins.
-        #expect(LayoutEngine.neighbour(of: screen, toLeft: false, among: [screen, aboveScreen, rightScreen]) == rightScreen)
+        #expect(
+            LayoutEngine.neighbour(of: screen, toLeft: false, among: [screen, aboveScreen, rightScreen]) == rightScreen)
     }
 
     @Test func moveToScreenKeepsThePlacementOrTheRelativePosition() {
         let screens = [screen, rightScreen]
-        #expect(run([.snapLeft, .moveToScreenRight], from: floating, screens: screens).last
-            == .setFrame(at(.left, rightScreen)))
+        #expect(
+            run([.snapLeft, .moveToScreenRight], from: floating, screens: screens).last
+                == .setFrame(at(.left, rightScreen)))
         let moved = run([.moveToScreenRight], from: floating, screens: screens).last
         // 640×480 at 200/1161 of the free width → same fraction on the external screen.
-        #expect(moved == .setFrame(LayoutEngine.carry(floating, from: screen.visibleFrame, to: rightScreen.visibleFrame)))
-        #expect(run([.moveToScreenLeft], from: floating, screens: screens).last == .none(reason: "no screen on the left"))
+        #expect(
+            moved == .setFrame(LayoutEngine.carry(floating, from: screen.visibleFrame, to: rightScreen.visibleFrame)))
+        #expect(
+            run([.moveToScreenLeft], from: floating, screens: screens).last == .none(reason: "no screen on the left"))
         // Too big for the target: shrunk to fit, inside it.
         let big = Rect(x: 0, y: 40, width: 1801, height: 1069)
-        let carried = LayoutEngine.carry(big, from: screen.visibleFrame, to: Rect(x: 1801, y: 0, width: 1280, height: 800))
+        let carried = LayoutEngine.carry(
+            big, from: screen.visibleFrame, to: Rect(x: 1801, y: 0, width: 1280, height: 800))
         #expect(carried == Rect(x: 1801, y: 0, width: 1280, height: 800))
     }
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 import SwiftUI
@@ -16,10 +17,14 @@ struct KeyboardPane: View {
             SwiftUI.Section {
                 Toggle(isOn: Binding(get: { c.keyboardRemap }, set: { model.set("keyboard", "remap", $0) })) {
                     Text("Keyboard remap")
-                    Text("PC preset: the key next to the space bar (Win on a PC keyboard) runs Pavé's shortcuts, the bottom-left key does copy and paste, right ⌘ is Alt Gr. Turn it off if you keep Karabiner.")
+                    Text(
+                        "PC preset: the key next to the space bar (Win on a PC keyboard) runs Pavé's shortcuts, the bottom-left key does copy and paste, right ⌘ is Alt Gr. Turn it off if you keep Karabiner."
+                    )
                 }
-                Picker("Preset", selection: Binding(
-                    get: { c.keyboardPreset }, set: { model.set("keyboard", "preset", string: $0.rawValue) })
+                Picker(
+                    "Preset",
+                    selection: Binding(
+                        get: { c.keyboardPreset }, set: { model.set("keyboard", "preset", string: $0.rawValue) })
                 ) {
                     Text(verbatim: "PC").tag(KeyRemap.Preset.pc)
                     Text("None").tag(KeyRemap.Preset.none)
@@ -28,9 +33,13 @@ struct KeyboardPane: View {
                 .disabled(!c.keyboardRemap)
                 ForEach(model.keyboards) { keyboard in
                     LabeledContent {
-                        Toggle("Leave alone", isOn: Binding(
-                            get: { c.keyboardSkip.contains(keyboard.id) }, set: { model.setSkipped(keyboard.id, $0) }))
-                            .toggleStyle(.checkbox)
+                        Toggle(
+                            "Leave alone",
+                            isOn: Binding(
+                                get: { c.keyboardSkip.contains(keyboard.id) },
+                                set: { model.setSkipped(keyboard.id, $0) })
+                        )
+                        .toggleStyle(.checkbox)
                     } label: {
                         Text(keyboard.name)
                         Text(keyboard.state)
@@ -39,10 +48,14 @@ struct KeyboardPane: View {
             }
             if let conflict = model.conflict {
                 SwiftUI.Section {
-                    Banner(text: String(localized: "\(model.label(conflict.hotkey)) is already used by “\(conflict.other.label)”."),
-                        action: (String(localized: "Replace"), { model.replaceConflict() }), dismiss: { model.conflict = nil })
-                        .padding(-20)
-                        .listRowInsets(EdgeInsets())
+                    Banner(
+                        text: String(
+                            localized: "\(model.label(conflict.hotkey)) is already used by “\(conflict.other.label)”."),
+                        action: (String(localized: "Replace"), { model.replaceConflict() }),
+                        dismiss: { model.conflict = nil }
+                    )
+                    .padding(-20)
+                    .listRowInsets(EdgeInsets())
                 }
             }
             SwiftUI.Section("Windows") {
@@ -50,19 +63,27 @@ struct KeyboardPane: View {
             }
             SwiftUI.Section("Workspaces and tiling") {
                 DisclosureGroup("Show a workspace (\(model.mainKey)1…9)") {
-                    ForEach(Workspaces.range.map { HotkeyAction.workspace($0) }, id: \.configName) { ShortcutRow(model: model, action: $0) }
+                    ForEach(Workspaces.range.map { HotkeyAction.workspace($0) }, id: \.configName) {
+                        ShortcutRow(model: model, action: $0)
+                    }
                 }
                 DisclosureGroup("Send the window (\(model.mainKey)⇧1…9)") {
-                    ForEach(Workspaces.range.map { HotkeyAction.moveToWorkspace($0) }, id: \.configName) { ShortcutRow(model: model, action: $0) }
+                    ForEach(Workspaces.range.map { HotkeyAction.moveToWorkspace($0) }, id: \.configName) {
+                        ShortcutRow(model: model, action: $0)
+                    }
                 }
                 ForEach(Self.tilingActions, id: \.configName) { ShortcutRow(model: model, action: $0) }
             }
             SwiftUI.Section {
                 VStack(alignment: .leading, spacing: 6) {
                     if model.status.pcKeys {
-                        Text("Shortcuts are shown as the keys you press. With the PC preset, ⌘ (next to the space bar) is what macOS receives as ⌃: the configuration file writes it \"ctrl\".")
+                        Text(
+                            "Shortcuts are shown as the keys you press. With the PC preset, ⌘ (next to the space bar) is what macOS receives as ⌃: the configuration file writes it \"ctrl\"."
+                        )
                     }
-                    Text("Click a shortcut, then type the new one. Escape cancels, ⌫ removes it. Pavé's shortcuts are paused while you type.")
+                    Text(
+                        "Click a shortcut, then type the new one. Escape cancels, ⌫ removes it. Pavé's shortcuts are paused while you type."
+                    )
                 }
                 .font(.caption).foregroundStyle(.secondary)
             }
@@ -82,11 +103,16 @@ private struct ShortcutRow: View {
             Button {
                 if recording { model.stopRecording() } else { model.startRecording(action) }
             } label: {
-                Text(recording ? String(localized: "Type the shortcut…") : model.hotkey(action).map(model.label) ?? String(localized: "None"))
-                    .frame(minWidth: 110)
-                    .foregroundStyle(recording ? Color.accentColor : (model.hotkey(action) == nil ? .secondary : .primary))
+                Text(
+                    recording
+                        ? String(localized: "Type the shortcut…")
+                        : model.hotkey(action).map(model.label) ?? String(localized: "None")
+                )
+                .frame(minWidth: 110)
+                .foregroundStyle(recording ? Color.accentColor : (model.hotkey(action) == nil ? .secondary : .primary))
             }
-            .accessibilityLabel("\(action.label): " + (model.hotkey(action).map(model.label) ?? String(localized: "no shortcut")))
+            .accessibilityLabel(
+                "\(action.label): " + (model.hotkey(action).map(model.label) ?? String(localized: "no shortcut")))
         }
     }
 }

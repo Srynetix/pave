@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Changes one setting of a config file **as text** (menu toggles, Settings
 /// window), so the user's comments, order and other settings stay untouched.
 public enum ConfigEdit {
@@ -54,7 +55,10 @@ public enum ConfigEdit {
     /// Comments right above the header stay: they may introduce something else.
     public static func removeTable(_ table: String, in text: String) -> String {
         var lines = text.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
-        guard let start = lines.firstIndex(where: { $0.trimmedSpaces.hasPrefix("[") && tableName($0.trimmedSpaces) == table })
+        guard
+            let start = lines.firstIndex(where: {
+                $0.trimmedSpaces.hasPrefix("[") && tableName($0.trimmedSpaces) == table
+            })
         else { return text }
         var end = start + 1
         while end < lines.count, !lines[end].trimmedSpaces.hasPrefix("[") { end += 1 }

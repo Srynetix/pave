@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import PaveCore
 
 /// The sub-commands of `pave tiling | zones | arrangement | update`, parsed
@@ -10,9 +11,12 @@ public struct UsageError: Error, Equatable, CustomStringConvertible {
 
 public enum TilingCommand: Equatable, Sendable {
     case on, off, toggle, float, orientation
-    case focus(Direction), resize(Direction), move(Direction)
+    case focus(Direction)
+    case resize(Direction)
+    case move(Direction)
 
-    public static let usage = "usage: pave tiling [on|off|toggle|float|orientation|focus DIR|resize DIR|move DIR] (DIR: left right up down)"
+    public static let usage =
+        "usage: pave tiling [on|off|toggle|float|orientation|focus DIR|resize DIR|move DIR] (DIR: left right up down)"
 
     public static func parse(_ args: [String]) -> Result<TilingCommand, UsageError> {
         let direction = args.count == 2 ? Direction(rawValue: args[1]) : nil
@@ -58,7 +62,9 @@ public enum ZonesCommand: Equatable, Sendable {
 
 public enum ArrangementCommand: Equatable, Sendable {
     case list
-    case save(String), restore(String), delete(String)
+    case save(String)
+    case restore(String)
+    case delete(String)
 
     public static let usage = "usage: pave arrangement [list | save NAME | restore NAME | delete NAME]"
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 
@@ -52,7 +53,8 @@ public enum Screens {
             var visible = ax(usableArea(of: $0))
             // A secondary screen's menu bar ("separate Spaces") is not always
             // left out of visibleFrame (seen on an LG 2560×1440): take it out.
-            if let bottom = menuBars.first(where: { $0.x >= frame.x && $0.x < frame.maxX && abs($0.y - frame.y) < 1 })?.bottom,
+            if let bottom = menuBars.first(where: { $0.x >= frame.x && $0.x < frame.maxX && abs($0.y - frame.y) < 1 })?
+                .bottom,
                 bottom > visible.y
             {
                 visible.height -= bottom - visible.y

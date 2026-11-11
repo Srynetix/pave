@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import Foundation
 import PaveCore
 import PaveIPC
@@ -14,8 +15,7 @@ public struct StateStore: Sendable {
 
     public let url: URL
 
-    public init(url: URL = StateFiles.url("state.json"))
-    {
+    public init(url: URL = StateFiles.url("state.json")) {
         self.url = url
     }
 

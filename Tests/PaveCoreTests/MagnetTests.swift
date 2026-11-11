@@ -1,4 +1,6 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import Testing
+
 @testable import PaveCore
 
 @Suite struct MagnetTests {
@@ -8,9 +10,11 @@ import Testing
     @Test func aWindowDroppedNearAnotherSticksToIt() {
         // 8 pt right of the window on the left, same top: against it.
         let dropped = Rect(x: 908, y: 300, width: 600, height: 400)
-        #expect(Magnet.snap(dropped, to: [left], area: area, distance: 12) == Rect(x: 900, y: 300, width: 600, height: 400))
+        #expect(
+            Magnet.snap(dropped, to: [left], area: area, distance: 12) == Rect(x: 900, y: 300, width: 600, height: 400))
         // Overlapping it by 10 pt: pushed out to touch.
-        #expect(Magnet.snap(Rect(x: 890, y: 300, width: 600, height: 400), to: [left], area: area, distance: 12).x == 900)
+        #expect(
+            Magnet.snap(Rect(x: 890, y: 300, width: 600, height: 400), to: [left], area: area, distance: 12).x == 900)
     }
 
     @Test func edgesOfTheScreenAndAlignmentCount() {
@@ -19,31 +23,41 @@ import Testing
         #expect(Magnet.snap(dropped, to: [], area: area, distance: 12) == Rect(x: 1210, y: 40, width: 590, height: 400))
         // Tops aligned with a window it faces (side by side).
         let other = Rect(x: 100, y: 200, width: 500, height: 500)
-        #expect(Magnet.snap(Rect(x: 700, y: 207, width: 400, height: 300), to: [other], area: area, distance: 12).y == 200)
+        #expect(
+            Magnet.snap(Rect(x: 700, y: 207, width: 400, height: 300), to: [other], area: area, distance: 12).y == 200)
     }
 
     @Test func farOrDistantWindowsDoNotPull() {
         let dropped = Rect(x: 950, y: 300, width: 600, height: 400)
         #expect(Magnet.snap(dropped, to: [left], area: area, distance: 12) == dropped)
-        #expect(Magnet.snap(Rect(x: 905, y: 300, width: 600, height: 400), to: [left], area: area, distance: 0).x == 905)
+        #expect(
+            Magnet.snap(Rect(x: 905, y: 300, width: 600, height: 400), to: [left], area: area, distance: 0).x == 905)
         // Same x as the left window's right edge, but far below it on the other axis: no pull.
         let high = Rect(x: 0, y: 40, width: 900, height: 200)
-        #expect(Magnet.snap(Rect(x: 905, y: 700, width: 300, height: 300), to: [high], area: area, distance: 12).x == 905)
+        #expect(
+            Magnet.snap(Rect(x: 905, y: 700, width: 300, height: 300), to: [high], area: area, distance: 12).x == 905)
     }
 
     @Test func neighboursAreTheWindowsTouchingAnEdge() {
         let right = Rect(x: 908, y: 40, width: 892, height: 1069)  // a zone gap away
         let below = Rect(x: 0, y: 700, width: 900, height: 409)
         let top = Rect(x: 0, y: 40, width: 900, height: 652)
-        let found = Magnet.neighbours(of: top, among: [(WindowID(2), right), (WindowID(3), below), (WindowID(4), Rect(x: 1300, y: 40, width: 500, height: 300))], tolerance: 24)
-        #expect(found == [
-            .init(id: WindowID(2), frame: right, edge: .right, gap: 8),
-            .init(id: WindowID(3), frame: below, edge: .bottom, gap: 8),
-        ])
+        let found = Magnet.neighbours(
+            of: top,
+            among: [
+                (WindowID(2), right), (WindowID(3), below),
+                (WindowID(4), Rect(x: 1300, y: 40, width: 500, height: 300)),
+            ], tolerance: 24)
+        #expect(
+            found == [
+                .init(id: WindowID(2), frame: right, edge: .right, gap: 8),
+                .init(id: WindowID(3), frame: below, edge: .bottom, gap: 8),
+            ])
     }
 
     @Test func aNeighbourFollowsTheSharedEdge() {
-        let right = Magnet.Neighbour(id: WindowID(2), frame: Rect(x: 908, y: 40, width: 892, height: 1069), edge: .right, gap: 8)
+        let right = Magnet.Neighbour(
+            id: WindowID(2), frame: Rect(x: 908, y: 40, width: 892, height: 1069), edge: .right, gap: 8)
         let wider = Rect(x: 0, y: 40, width: 1100, height: 1069)
         #expect(Magnet.movedEdges(from: left, to: wider) == [.right])
         #expect(Magnet.follow(right, resized: wider) == Rect(x: 1108, y: 40, width: 692, height: 1069))
@@ -66,7 +80,9 @@ import Testing
     @Test func againstAWindowItFillsTheFreeThird() {
         let twoThirds = Rect(x: 600, y: 40, width: 1200, height: 1069)
         let snapped = Rect(x: 100, y: 300, width: 500, height: 400)  // against its left edge
-        #expect(Magnet.fill(snapped, point: (300, 320), others: [twoThirds], area: area) == Rect(x: 0, y: 40, width: 600, height: 1069))
+        #expect(
+            Magnet.fill(snapped, point: (300, 320), others: [twoThirds], area: area)
+                == Rect(x: 0, y: 40, width: 600, height: 1069))
     }
 
     @Test func theFreeSpaceIsBoundedByEveryWindow() {
@@ -75,8 +91,9 @@ import Testing
         let rightBottom = Rect(x: 900, y: 574, width: 900, height: 535)
         let leftTop = Rect(x: 0, y: 40, width: 900, height: 534)
         let snapped = Rect(x: 300, y: 600, width: 600, height: 300)
-        #expect(Magnet.fill(snapped, point: (500, 620), others: [rightTop, rightBottom, leftTop], area: area)
-            == Rect(x: 0, y: 574, width: 900, height: 535))
+        #expect(
+            Magnet.fill(snapped, point: (500, 620), others: [rightTop, rightBottom, leftTop], area: area)
+                == Rect(x: 0, y: 574, width: 900, height: 535))
     }
 
     @Test func noFillAgainstTheScreenAloneOrInATinySpace() {

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Timing samples for the log's p50 / p95 lines: the latest `limit` values
 /// only, so a Pavé running for weeks does not keep (and sort) every one.
 public struct Samples: Sendable {

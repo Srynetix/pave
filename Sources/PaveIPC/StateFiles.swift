@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import Foundation
 
 /// Pavé's state directory, `~/.local/state/pave`: the socket, the workspaces
@@ -16,7 +17,9 @@ public enum StateFiles {
         let fm = FileManager.default
         let path = directory.path
         try fm.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700])
-        if let mode = (try? fm.attributesOfItem(atPath: path))?[.posixPermissions] as? NSNumber, mode.intValue & 0o777 != 0o700 {
+        if let mode = (try? fm.attributesOfItem(atPath: path))?[.posixPermissions] as? NSNumber,
+            mode.intValue & 0o777 != 0o700
+        {
             try fm.setAttributes([.posixPermissions: 0o700], ofItemAtPath: path)
         }
     }
@@ -25,8 +28,12 @@ public enum StateFiles {
     /// a temporary file created 0600, then renamed over the old one.
     public static func write(_ data: Data, to url: URL) throws {
         try prepareDirectory()
-        let temporary = url.deletingLastPathComponent().appendingPathComponent(".\(url.lastPathComponent).\(getpid()).tmp")
-        guard FileManager.default.createFile(atPath: temporary.path, contents: data, attributes: [.posixPermissions: 0o600]) else {
+        let temporary = url.deletingLastPathComponent().appendingPathComponent(
+            ".\(url.lastPathComponent).\(getpid()).tmp")
+        guard
+            FileManager.default.createFile(
+                atPath: temporary.path, contents: data, attributes: [.posixPermissions: 0o600])
+        else {
             throw CocoaError(.fileWriteUnknown, userInfo: [NSFilePathErrorKey: temporary.path])
         }
         guard rename(temporary.path, url.path) == 0 else {

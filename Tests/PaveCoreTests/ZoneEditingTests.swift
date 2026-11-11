@@ -1,4 +1,6 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import Testing
+
 @testable import PaveCore
 
 private func layout(_ name: String) -> ZoneLayout { ZoneSettings().layout(named: name)! }
@@ -71,7 +73,8 @@ private func layout(_ name: String) -> ZoneLayout { ZoneSettings().layout(named:
         draft.beginMove()
         let moved = draft.move(line, to: 68)
         #expect(moved.position == 70)
-        #expect(draft.zones == [.init(0, 0, 25, 100), .init(25, 0, 45, 100), .init(70, 0, 30, 50), .init(70, 50, 30, 50)])
+        #expect(
+            draft.zones == [.init(0, 0, 25, 100), .init(25, 0, 45, 100), .init(70, 0, 30, 50), .init(70, 50, 30, 50)])
         // Free with ⇧ (step 1), and never past the minimum size.
         draft.move(moved, to: 68, step: 1)
         #expect(draft.zones[1].width == 43)
@@ -94,6 +97,7 @@ private func layout(_ name: String) -> ZoneLayout { ZoneSettings().layout(named:
         #expect(saved.tomlZones == "[[0, 0, 25, 100], [25, 0, 50, 100], [75, 0, 25, 50], [75, 50, 25, 50]]")
         let (config, _) = try PaveConfig.parse("[layouts.\"My Coding\"]\nzones = \(saved.tomlZones)")
         #expect(config.zones.layouts["My Coding"]?.zones == saved.zones)
-        #expect(ZoneLayout.isValidName("My Coding") && !ZoneLayout.isValidName("a\"b") && !ZoneLayout.isValidName("none"))
+        #expect(
+            ZoneLayout.isValidName("My Coding") && !ZoneLayout.isValidName("a\"b") && !ZoneLayout.isValidName("none"))
     }
 }

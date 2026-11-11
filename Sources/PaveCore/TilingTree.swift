@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Tiling of one workspace, as i3 / AeroSpace: a tree of horizontal and
 /// vertical containers, windows as leaves, each child taking a share of its
 /// container proportional to its weight.
@@ -134,7 +135,8 @@ public struct TilingTree: Codable, Equatable, Sendable, CustomStringConvertible 
                 if case .split = children[target].node {
                     // Enter the neighbour container, on its near side.
                     detach(id)
-                    insertInto(neighbourOf: containerPath, from: index, target: target, id: id, forward: direction.isForward)
+                    insertInto(
+                        neighbourOf: containerPath, from: index, target: target, id: id, forward: direction.isForward)
                 } else {
                     update(containerPath) { node in
                         guard case .split(let o, var children) = node else { return node }
@@ -199,7 +201,8 @@ public struct TilingTree: Codable, Equatable, Sendable, CustomStringConvertible 
                 guard case .split(let o, let children) = node(at: containerPath), o == axis, children.count > 1,
                     let containerFrame = frames(in: area, gaps: gaps, containerPath: containerPath)
                 else { continue }
-                let length = (axis == .horizontal ? containerFrame.width : containerFrame.height)
+                let length =
+                    (axis == .horizontal ? containerFrame.width : containerFrame.height)
                     - gaps * Double(children.count - 1)
                 guard length > 0 else { break }
                 let index = path[depth]
@@ -316,7 +319,11 @@ public struct TilingTree: Codable, Equatable, Sendable, CustomStringConvertible 
         switch root {
         case .window(let id): root = .split(.horizontal, [Child(node: .window(id), weight: 1)])
         case .split(let o, let children) where children.count == 1:
-            if case .split(let inner, let grand) = children[0].node { root = .split(inner, grand) } else { root = .split(o, children) }
+            if case .split(let inner, let grand) = children[0].node {
+                root = .split(inner, grand)
+            } else {
+                root = .split(o, children)
+            }
         default: break
         }
     }
@@ -385,7 +392,8 @@ public struct TilingTree: Codable, Equatable, Sendable, CustomStringConvertible 
         let index = target > from ? target - 1 : target
         update(containerPath + [index]) { node in
             guard case .split(let o, var children) = node else { return node }
-            children.insert(Child(node: .window(id), weight: Self.averageWeight(children)), at: forward ? 0 : children.count)
+            children.insert(
+                Child(node: .window(id), weight: Self.averageWeight(children)), at: forward ? 0 : children.count)
             return .split(o, children)
         }
     }
@@ -403,9 +411,12 @@ public struct TilingTree: Codable, Equatable, Sendable, CustomStringConvertible 
             let target = min(max(wanted, minShare), 1 - minShare * Double(others))
             let otherTotal = children.enumerated().filter { $0.offset != index }.reduce(0) { $0 + $1.element.weight }
             for i in children.indices {
-                children[i].weight = i == index
+                children[i].weight =
+                    i == index
                     ? target
-                    : max(minShare, (1 - target) * (otherTotal > 0 ? children[i].weight / otherTotal : 1 / Double(others)))
+                    : max(
+                        minShare, (1 - target) * (otherTotal > 0 ? children[i].weight / otherTotal : 1 / Double(others))
+                    )
             }
             return .split(o, children)
         }

@@ -1,12 +1,13 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
-import ServiceManagement
 import PaveIPC
 import PaveMac
+import ServiceManagement
 
 /// Menu-bar agent: tracks every window (WindowRegistry), places them
 /// (Commander), runs the virtual workspaces, tiling and taskbar, and answers
-/// the `pave` CLI (IPCServer). Logs go to build/pave.log with `just run`.
+/// the `pave` CLI (IPCServer). Logs go to build/pave.log with `just dev`.
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSMenuItemValidation {
     var statusItem: NSStatusItem!
@@ -17,9 +18,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSMenu
     let warningItem = NSMenuItem(title: "", action: #selector(openSettings), keyEquivalent: "")
     var remap: KeyboardRemapService?
     let updates = UpdateService()
-    let updateItem = NSMenuItem(title: String(localized: "Check for Updates…"), action: #selector(updateFromMenu), keyEquivalent: "")
-    let resetTaskbarItem = NSMenuItem(title: String(localized: "Reset Taskbar"), action: #selector(resetTaskbarFromMenu), keyEquivalent: "")
-    let workspacesToggle = NSMenuItem(title: String(localized: "Virtual workspaces"), action: #selector(toggleWorkspaces), keyEquivalent: "")
+    let updateItem = NSMenuItem(
+        title: String(localized: "Check for Updates…"), action: #selector(updateFromMenu), keyEquivalent: "")
+    let resetTaskbarItem = NSMenuItem(
+        title: String(localized: "Reset Taskbar"), action: #selector(resetTaskbarFromMenu), keyEquivalent: "")
+    let workspacesToggle = NSMenuItem(
+        title: String(localized: "Virtual workspaces"), action: #selector(toggleWorkspaces), keyEquivalent: "")
     let workspaceTilingToggle = NSMenuItem(title: "", action: #selector(toggleWorkspaceTiling), keyEquivalent: "")
     var taskbar: TaskbarController?
     let dock = DockController()
@@ -64,7 +68,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSMenu
         // switchers and fight over the socket and the parked windows.
         let me = NSRunningApplication.current
         if let id = Bundle.main.bundleIdentifier,
-            let other = NSRunningApplication.runningApplications(withBundleIdentifier: id).first(where: { $0 != me && !$0.isTerminated })
+            let other = NSRunningApplication.runningApplications(withBundleIdentifier: id).first(where: {
+                $0 != me && !$0.isTerminated
+            })
         {
             Log.info("another Pavé is already running (pid \(other.processIdentifier)): quitting")
             exit(0)
@@ -78,19 +84,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSMenu
         menu.addItem(.separator())
         for item in [workspaceTilingToggle, workspacesToggle] { menu.addItem(item) }
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: String(localized: "Edit Zone Layouts…"), action: #selector(editZonesFromMenu), keyEquivalent: ""))
-        let arrangementsItem = NSMenuItem(title: String(localized: "Window Arrangements"), action: nil, keyEquivalent: "")
+        menu.addItem(
+            NSMenuItem(
+                title: String(localized: "Edit Zone Layouts…"), action: #selector(editZonesFromMenu), keyEquivalent: "")
+        )
+        let arrangementsItem = NSMenuItem(
+            title: String(localized: "Window Arrangements"), action: nil, keyEquivalent: "")
         arrangementsItem.submenu = arrangementsMenu
         menu.addItem(arrangementsItem)
-        menu.addItem(NSMenuItem(title: String(localized: "Settings…"), action: #selector(openSettings), keyEquivalent: ","))
-        menu.addItem(NSMenuItem(title: String(localized: "About Pavé"), action: #selector(openAbout), keyEquivalent: ""))
+        menu.addItem(
+            NSMenuItem(title: String(localized: "Settings…"), action: #selector(openSettings), keyEquivalent: ","))
+        menu.addItem(
+            NSMenuItem(title: String(localized: "About Pavé"), action: #selector(openAbout), keyEquivalent: ""))
         menu.addItem(updateItem)
         menu.addItem(NSMenuItem(title: String(localized: "Show Logs"), action: #selector(showLogs), keyEquivalent: ""))
         menu.addItem(.separator())
         menu.addItem(resetTaskbarItem)
         menu.addItem(
             NSMenuItem(
-                title: String(localized: "Bring Back All Windows"), action: #selector(restoreAllFromMenu), keyEquivalent: ""))
+                title: String(localized: "Bring Back All Windows"), action: #selector(restoreAllFromMenu),
+                keyEquivalent: ""))
         menu.addItem(
             NSMenuItem(
                 title: String(localized: "Quit Pavé"), action: #selector(NSApplication.terminate(_:)),
@@ -101,8 +114,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSMenu
         let trusted = Permissions.isAccessibilityTrusted(prompt: true)
         Log.info("launched build \(build) from \(Bundle.main.bundlePath), accessibility trusted: \(trusted)")
         let native = NativeTiling.enabledSettings()
-        if !native.isEmpty { Log.info("native tiling is ON (\(native.joined(separator: ", "))): it will snap along with Pavé") }
-        if NativeTiling.stageManagerEnabled { Log.info("Stage Manager is ON: it moves windows on its own, against workspaces and tiling") }
+        if !native.isEmpty {
+            Log.info("native tiling is ON (\(native.joined(separator: ", "))): it will snap along with Pavé")
+        }
+        if NativeTiling.stageManagerEnabled {
+            Log.info("Stage Manager is ON: it moves windows on its own, against workspaces and tiling")
+        }
 
         registry.onChange = { [weak self] in self?.refresh() }
         configureSettings()
@@ -113,7 +130,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSMenu
 
     // MARK: - Quitting without losing windows
 
-    /// SIGTERM (`pkill`, `just run`) and SIGINT go through the normal quit path,
+    /// SIGTERM (`pkill`, `just dev`) and SIGINT go through the normal quit path,
     /// which brings parked windows back first.
     func installSignalHandlers() {
         // Belt and braces with SO_NOSIGPIPE: a client hanging up early must never
@@ -141,7 +158,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSMenu
     /// run: Pavé hung forever. Instead: cancel, restore, terminate again.
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         guard started, !readyToQuit, workspaces.state.hiddenCount > 0 else { return .terminateNow }
-        // A restart (`just run`, `just install`): the next run picks the
+        // A restart (`just dev`, `just deploy`): the next run picks the
         // parked windows up where they are (WorkspaceController.recover).
         if RestartMarker.isSet, workspaces.prepareRestart() {
             return .terminateNow
@@ -200,14 +217,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSMenu
     }
 
     static func taskbarSettings(_ c: PaveConfig) -> TaskbarController.Settings {
-        .init(enabled: c.taskbarEnabled, grouping: c.taskbarGrouping, pinned: c.taskbarPinned, hideDock: c.taskbarHideDock)
+        .init(
+            enabled: c.taskbarEnabled, grouping: c.taskbarGrouping, pinned: c.taskbarPinned, hideDock: c.taskbarHideDock
+        )
     }
 
     func startTaskbar() {
         guard taskbar == nil else { return }
         let workspaces = self.workspaces
         taskbar = TaskbarController(
-            registry: registry, focus: focus, thumbnails: thumbnails, dock: dock, settings: Self.taskbarSettings(config.config),
+            registry: registry, focus: focus, thumbnails: thumbnails, dock: dock,
+            settings: Self.taskbarSettings(config.config),
             bundleID: { [unowned self] pid in self.bundleID(pid) },
             rule: { [unowned self] window in self.commander.rule(window) },
             isOutOfSight: { id in workspaces.isEnabled ? workspaces.state.isOutOfSight(id) : false },
@@ -289,7 +309,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSMenu
     func perform(_ action: HotkeyAction, source: String) {
         switch action {
         case .layout(let command):
-            if tiling.handles(command) { tiling.perform(command, source: source) } else { commander.perform(command, source: source) }
+            if tiling.handles(command) {
+                tiling.perform(command, source: source)
+            } else {
+                commander.perform(command, source: source)
+            }
         case .focus(let direction): tiling.focus(direction, source: source)
         case .resize(let direction): tiling.resize(direction, source: source)
         case .toggleFloating: tiling.toggleFloating(source: source)

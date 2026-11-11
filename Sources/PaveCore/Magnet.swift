@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Window magnetism and shared edges. Pure: PaveMac reads the frames (the
 /// dragged window's live bounds, the others' AX frames) and applies the result.
 ///
@@ -27,7 +28,9 @@ public enum Magnet {
         var dy = [area.y - frame.y, area.maxY - frame.maxY]
         dy += above.flatMap { [$0.maxY - frame.y, $0.y - frame.maxY] }
         dy += beside.flatMap { [$0.y - frame.y, $0.maxY - frame.maxY] }
-        return Rect(x: frame.x + smallest(dx, distance), y: frame.y + smallest(dy, distance), width: frame.width, height: frame.height)
+        return Rect(
+            x: frame.x + smallest(dx, distance), y: frame.y + smallest(dy, distance), width: frame.width,
+            height: frame.height)
     }
 
     private static func smallest(_ moves: [Double], _ distance: Double) -> Double {
@@ -39,7 +42,9 @@ public enum Magnet {
     /// `area` (a window on the right 2/3, one dropped against it fills the
     /// first third). Nil when not against a window, when `point` is over
     /// another window, or when the space is smaller than `minSize`.
-    public static func fill(_ snapped: Rect, point: (x: Double, y: Double), others: [Rect], area: Rect, minSize: Double = 150) -> Rect? {
+    public static func fill(
+        _ snapped: Rect, point: (x: Double, y: Double), others: [Rect], area: Rect, minSize: Double = 150
+    ) -> Rect? {
         func overlap(_ a: (Double, Double), _ b: (Double, Double)) -> Bool { min(a.1, b.1) - max(a.0, b.0) > 1 }
         let against = others.contains { o in
             let rows = overlap((o.y, o.maxY), (snapped.y, snapped.maxY))
@@ -49,16 +54,25 @@ public enum Magnet {
         }
         guard against, !others.contains(where: { $0.contains(x: point.x, y: point.y) }) else { return nil }
         // Across first then up and down, or the other way: the larger one.
-        let candidates = [true, false].map { horizontalFirst in free(around: point, others: others, area: area, horizontalFirst: horizontalFirst) }
-        guard let best = candidates.max(by: { $0.area < $1.area }), best.width >= minSize, best.height >= minSize else { return nil }
+        let candidates = [true, false].map { horizontalFirst in
+            free(around: point, others: others, area: area, horizontalFirst: horizontalFirst)
+        }
+        guard let best = candidates.max(by: { $0.area < $1.area }), best.width >= minSize, best.height >= minSize else {
+            return nil
+        }
         return best
     }
 
     /// The empty rectangle around `p`: grown along one axis up to the windows
     /// on its line, then along the other up to the windows in that band.
-    private static func free(around p: (x: Double, y: Double), others: [Rect], area: Rect, horizontalFirst: Bool) -> Rect {
+    private static func free(around p: (x: Double, y: Double), others: [Rect], area: Rect, horizontalFirst: Bool)
+        -> Rect
+    {
         func span(_ value: Double, _ lo: Double, _ hi: Double, _ obstacles: [(Double, Double)]) -> (Double, Double) {
-            (obstacles.map(\.1).filter { $0 <= value }.reduce(lo, max), obstacles.map(\.0).filter { $0 >= value }.reduce(hi, min))
+            (
+                obstacles.map(\.1).filter { $0 <= value }.reduce(lo, max),
+                obstacles.map(\.0).filter { $0 >= value }.reduce(hi, min)
+            )
         }
         func crosses(_ a: (Double, Double), _ b: (Double, Double)) -> Bool { min(a.1, b.1) - max(a.0, b.0) > 1 }
         if horizontalFirst {
@@ -107,7 +121,9 @@ public enum Magnet {
                 (.right, other.x - frame.maxX, rows), (.left, frame.x - other.maxX, rows),
                 (.bottom, other.y - frame.maxY, columns), (.top, frame.y - other.maxY, columns),
             ]
-            guard let (edge, gap, _) = facing.first(where: { $0.2 && $0.1 >= -1 && $0.1 <= tolerance }) else { return nil }
+            guard let (edge, gap, _) = facing.first(where: { $0.2 && $0.1 >= -1 && $0.1 <= tolerance }) else {
+                return nil
+            }
             return Neighbour(id: id, frame: other, edge: edge, gap: max(0, gap))
         }
     }

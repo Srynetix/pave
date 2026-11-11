@@ -1,6 +1,8 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import Foundation
-import Testing
 import PaveCore
+import Testing
+
 @testable import PaveIPC
 
 private func store(title: String) -> WindowStore {
@@ -43,7 +45,10 @@ private func store(title: String) -> WindowStore {
     @Test func echoOverSocket() throws {
         let path = NSTemporaryDirectory() + "pave-test-\(getpid()).sock"
         let server = try UnixSocket.listen(path: path)
-        defer { close(server); unlink(path) }
+        defer {
+            close(server)
+            unlink(path)
+        }
 
         let client = try UnixSocket.connect(path: path)
         defer { close(client) }
@@ -64,7 +69,10 @@ private func store(title: String) -> WindowStore {
     @Test func writingToAClosedPeerDoesNotRaiseSigPipe() throws {
         let path = NSTemporaryDirectory() + "pave-pipe-\(getpid()).sock"
         let server = try UnixSocket.listen(path: path)
-        defer { close(server); unlink(path) }
+        defer {
+            close(server)
+            unlink(path)
+        }
 
         let client = try UnixSocket.connect(path: path)
         let peer = accept(server, nil, nil)

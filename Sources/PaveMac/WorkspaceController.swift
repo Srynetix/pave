@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 import PaveIPC
@@ -64,8 +65,8 @@ public final class WorkspaceController {
     /// relaunching Pavé after a crash): they wait, then report what recovery did.
     private var waitingForRecovery: [@MainActor (Int) -> Void] = []
 
-    /// Written by a run that quits to be restarted at once (`just run`,
-    /// `just install`): it left its windows parked, the next run resumes.
+    /// Written by a run that quits to be restarted at once (`just dev`,
+    /// `just deploy`): it left its windows parked, the next run resumes.
     public static var resumeMarker: URL { StateFiles.url("resume") }
 
     /// Quitting for a restart: parked windows stay parked, the state on disk
@@ -88,14 +89,18 @@ public final class WorkspaceController {
             let windows = registry.store.orderedWindows
             let before = resumed.hiddenCount
             // Every window the window server still knows (IDs only, never titles).
-            let info = CGWindowListCopyWindowInfo([.optionAll, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
+            let info =
+                CGWindowListCopyWindowInfo([.optionAll, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]]
+                ?? []
             let alive = Set(info.compactMap { ($0[kCGWindowNumber as String] as? UInt32).map { WindowID($0) } })
                 .union(windows.map(\.id))
             let actions = resumed.resume(screens: screens, windows: windows, alive: alive)
             state = resumed
             knownScreens = screens.map(\.id)
             persist()
-            Log.info("workspaces (restart): resumed, \(state.hiddenCount) parked (\(before) left by the previous run), \(describeVisible(screens))")
+            Log.info(
+                "workspaces (restart): resumed, \(state.hiddenCount) parked (\(before) left by the previous run), \(describeVisible(screens))"
+            )
             recoveryDone = true
             if !actions.isEmpty { execute(actions, label: "resume") { _ in } }
             let waiting = waitingForRecovery
@@ -136,15 +141,21 @@ public final class WorkspaceController {
         guard let focused = focusedScreen(among: screens) else { return completion("no screen") }
         let from = state.active
         let wasVisible = state.isVisible(target)
-        let actions = state.switchTo(target, focusedScreen: focused, screens: screens, windows: registry.store.orderedWindows)
+        let actions = state.switchTo(
+            target, focusedScreen: focused, screens: screens, windows: registry.store.orderedWindows)
         guard state.active != from || !wasVisible && state.isVisible(target) else {
             Log.info("\(source) workspace \(target): no-op (already active or invalid)")
             return completion("workspace \(state.active) already active")
         }
         ignoreFocusUntil = .distantFuture
         persist()
-        let screen = state.screen(showing: target).flatMap { id in screens.firstIndex { $0.id == id } }.map { "screen\($0)" } ?? "?"
-        execute(actions, label: "\(source) workspace \(from) → \(target) (\(wasVisible ? "focus only" : "shown"), \(screen))") { [weak self] _ in
+        let screen =
+            state.screen(showing: target).flatMap { id in screens.firstIndex { $0.id == id } }.map { "screen\($0)" }
+            ?? "?"
+        execute(
+            actions,
+            label: "\(source) workspace \(from) → \(target) (\(wasVisible ? "focus only" : "shown"), \(screen))"
+        ) { [weak self] _ in
             self?.ignoreFocusUntil = Date().addingTimeInterval(0.4)
             completion("workspace \(target)")
         }
@@ -153,12 +164,16 @@ public final class WorkspaceController {
     /// `pave workspace N --screen S`. `selector`: the screen's index (0 is
     /// the primary one, as in the logs), part of its name ("LG"), "builtin",
     /// or its UUID.
-    public func display(_ target: Int, onScreen selector: String, source: String, completion: @escaping @MainActor (String) -> Void) {
+    public func display(
+        _ target: Int, onScreen selector: String, source: String, completion: @escaping @MainActor (String) -> Void
+    ) {
         guard isEnabled else { return completion("workspaces are disabled (workspaces.enabled in the config)") }
         guard !registry.isSessionLocked else { return completion("session locked, ignored") }
         let screens = Screens.all()
         guard let index = Screens.index(matching: selector), index < screens.count else {
-            return completion("no screen matches \"\(selector)\" (\(Screens.names().enumerated().map { "\($0.offset): \($0.element)" }.joined(separator: ", ")))")
+            return completion(
+                "no screen matches \"\(selector)\" (\(Screens.names().enumerated().map { "\($0.offset): \($0.element)" }.joined(separator: ", ")))"
+            )
         }
         let screen = screens[index]
         let from = state.active
@@ -188,7 +203,8 @@ public final class WorkspaceController {
         guard state.workspace(of: window.id) == target else { return completion("invalid workspace \(target)") }
         ignoreFocusUntil = .distantFuture
         persist()
-        execute(actions, label: "\(source) move \(window.id) [\(window.appName)] → workspace \(target)") { [weak self] _ in
+        execute(actions, label: "\(source) move \(window.id) [\(window.appName)] → workspace \(target)") {
+            [weak self] _ in
             self?.ignoreFocusUntil = Date().addingTimeInterval(0.4)
             completion("\(window.id) → workspace \(target)")
         }
@@ -255,7 +271,8 @@ public final class WorkspaceController {
     }
 
     private func describeVisible(_ screens: [Screen]) -> String {
-        screens.enumerated().map { i, s in "screen\(i) → \(state.visible[s.id].map(String.init) ?? "?")" }.joined(separator: ", ")
+        screens.enumerated().map { i, s in "screen\(i) → \(state.visible[s.id].map(String.init) ?? "?")" }.joined(
+            separator: ", ")
     }
 
     /// Every parked window back on screen. Used by `pave restore-all` and on quit.
@@ -274,7 +291,9 @@ public final class WorkspaceController {
 
     // MARK: - Applying actions
 
-    private func execute(_ actions: [Workspaces.Action], label: String, completion: @escaping @MainActor (_ shown: Int) -> Void) {
+    private func execute(
+        _ actions: [Workspaces.Action], label: String, completion: @escaping @MainActor (_ shown: Int) -> Void
+    ) {
         let start = Date()
         var frames: [(WindowSnapshot, Rect)] = []
         var focus: WindowSnapshot?
@@ -288,7 +307,9 @@ public final class WorkspaceController {
         }
 
         var remaining = frames.count
-        var parked = 0, shown = 0, misses: [String] = []
+        var parked = 0
+        var shown = 0
+        var misses: [String] = []
         let finish = { [weak self] in
             guard let self else { return }
             let ms = Int(Date().timeIntervalSince(start) * 1000)
@@ -317,7 +338,10 @@ public final class WorkspaceController {
                 } else {
                     shown += 1
                     self.parkedAt[window.id] = nil
-                    if !result.ok { misses.append("\(window.id) [\(window.appName)] actual \(result.actual.map(\.description) ?? "?")") }
+                    if !result.ok {
+                        misses.append(
+                            "\(window.id) [\(window.appName)] actual \(result.actual.map(\.description) ?? "?")")
+                    }
                 }
                 remaining -= 1
                 if remaining == 0 { finish() }
@@ -332,7 +356,9 @@ public final class WorkspaceController {
             let w = max(0, min(actual.maxX, screen.frame.maxX) - max(actual.x, screen.frame.x))
             let h = max(0, min(actual.maxY, screen.frame.maxY) - max(actual.y, screen.frame.y))
             if w > 1 && h > 1 {
-                Log.info("W1 VISIBLE parked \(window.id) [\(window.appName)] at \(actual): \(Int(w))×\(Int(h)) pt on screen\(i)")
+                Log.info(
+                    "W1 VISIBLE parked \(window.id) [\(window.appName)] at \(actual): \(Int(w))×\(Int(h)) pt on screen\(i)"
+                )
             }
         }
     }
@@ -352,11 +378,14 @@ public final class WorkspaceController {
                 if isEnabled, recoveryDone {
                     // App rule `workspace = N`: standard windows only, a dialog
                     // must never open on a hidden workspace.
-                    let choice = window.subrole == "AXStandardWindow" ? workspaceRule(window) : AppRule.WorkspaceChoice()
+                    let choice =
+                        window.subrole == "AXStandardWindow" ? workspaceRule(window) : AppRule.WorkspaceChoice()
                     let preferred = choice.workspace
                     let adopted = state.adopt(window, screens: screens, preferred: preferred)
                     if let preferred, !adopted.isEmpty || state.workspace(of: window.id) == preferred {
-                        Log.info("\(window.id) [\(window.appName)] → workspace \(preferred) (\(choice.byProfile ? "profile" : "app") rule)")
+                        Log.info(
+                            "\(window.id) [\(window.appName)] → workspace \(preferred) (\(choice.byProfile ? "profile" : "app") rule)"
+                        )
                     }
                     if choice.awaitsTitle { awaitingTitle[window.id] = Date().addingTimeInterval(Self.titleWait) }
                     actions += adopted
@@ -426,7 +455,10 @@ public final class WorkspaceController {
         guard let deadline = awaitingTitle[id] else { return }
         guard Date() < deadline, isEnabled, recoveryDone, !registry.isSessionLocked,
             let window = registry.store.windows[id]
-        else { awaitingTitle[id] = nil; return }
+        else {
+            awaitingTitle[id] = nil
+            return
+        }
         let choice = workspaceRule(window)
         guard choice.byProfile, let target = choice.workspace else { return }
         awaitingTitle[id] = nil
@@ -440,17 +472,24 @@ public final class WorkspaceController {
         persist()
         ignoreFocusUntil = .distantFuture
         let shown = follow ? ", workspace \(from) → \(state.active)" : ""
-        execute(actions, label: "\(id) [\(window.appName)] → workspace \(target) (profile rule, title came late)\(shown)") {
+        execute(
+            actions, label: "\(id) [\(window.appName)] → workspace \(target) (profile rule, title came late)\(shown)"
+        ) {
             [weak self] _ in self?.ignoreFocusUntil = Date().addingTimeInterval(0.4)
         }
     }
 
     private func parkIfStray(_ id: WindowID) {
-        guard isEnabled, recoveryDone, !registry.isSessionLocked, let window = registry.store.windows[id] else { return }
+        guard isEnabled, recoveryDone, !registry.isSessionLocked, let window = registry.store.windows[id] else {
+            return
+        }
         let actions = state.parkStray(window, screens: Screens.all())
         guard !actions.isEmpty else { return }
         persist()
-        execute(actions, label: "\(id) [\(window.appName)] shown again on hidden workspace \(state.workspace(of: id)), parked") { _ in }
+        execute(
+            actions,
+            label: "\(id) [\(window.appName)] shown again on hidden workspace \(state.workspace(of: id)), parked"
+        ) { _ in }
     }
 
     /// When Pavé itself last asked for a window's focus (FocusService): W3.
@@ -468,13 +507,17 @@ public final class WorkspaceController {
         if let asked = paveRequestedFocus(id), Date().timeIntervalSince(asked) < 2 { return true }
         // flagsChanged: releasing ⌘ ends a ⌘Tab that may have been browsed a while.
         let types: [CGEventType] = [.keyDown, .flagsChanged, .leftMouseDown, .rightMouseDown, .otherMouseDown]
-        let idle = types.map { CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: $0) }.min() ?? .infinity
+        let idle =
+            types.map { CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: $0) }.min()
+            ?? .infinity
         return idle < 1.5
     }
 
     /// Alt+Tab, ⌘Tab or a notification focused a window of another workspace: go there.
     private func followFocus(to id: WindowID) {
-        guard isEnabled, recoveryDone, Date() >= ignoreFocusUntil, state.workspace(of: id) != state.active else { return }
+        guard isEnabled, recoveryDone, Date() >= ignoreFocusUntil, state.workspace(of: id) != state.active else {
+            return
+        }
         let screens = Screens.all()
         guard let focused = focusedScreen(among: screens) else { return }
         let from = state.active
@@ -486,15 +529,19 @@ public final class WorkspaceController {
         if !wasVisible, let pid = registry.store.windows[id]?.pid, let at = minimizedAt[pid],
             Date().timeIntervalSince(at) < Self.minimizeFocusWindow
         {
-            Log.info("focus moved to \(id) [\(app)] of workspace \(state.workspace(of: id)) after a minimize, not followed")
+            Log.info(
+                "focus moved to \(id) [\(app)] of workspace \(state.workspace(of: id)) after a minimize, not followed")
             return giveFocusBack(from: id, throttled: false)
         }
         if !wasVisible, !isIntended(id) {
             ignoredFocusChanges += 1
-            Log.info("W3: focus moved to \(id) [\(app)] of workspace \(state.workspace(of: id)) without the user, ignored (\(ignoredFocusChanges) so far)")
+            Log.info(
+                "W3: focus moved to \(id) [\(app)] of workspace \(state.workspace(of: id)) without the user, ignored (\(ignoredFocusChanges) so far)"
+            )
             return giveFocusBack(from: id, throttled: true)
         }
-        let actions = state.focused(id, focusedScreen: focused, screens: screens, windows: registry.store.orderedWindows)
+        let actions = state.focused(
+            id, focusedScreen: focused, screens: screens, windows: registry.store.orderedWindows)
         persist()
         if wasVisible { return }  // another screen got the focus: nothing to move
         ignoreFocusUntil = .distantFuture
@@ -513,7 +560,8 @@ public final class WorkspaceController {
     private func giveFocusBack(from id: WindowID, throttled: Bool) {
         guard !throttled || Date().timeIntervalSince(lastRefocus) > 2,
             let back = registry.store.orderedWindows.first(where: {
-                $0.id != id && $0.state == .normal && !state.isHidden($0.id) && state.isVisible(state.workspace(of: $0.id))
+                $0.id != id && $0.state == .normal && !state.isHidden($0.id)
+                    && state.isVisible(state.workspace(of: $0.id))
             })
         else { return }
         lastRefocus = Date()

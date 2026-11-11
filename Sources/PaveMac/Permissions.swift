@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import ApplicationServices
 
 /// TCC permissions the window manager depends on.
