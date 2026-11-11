@@ -246,7 +246,9 @@ public final class WindowRegistry {
         guard !isReady else { return }
         isReady = true
         let missing = pendingInitial.compactMap { connections[$0]?.name }.sorted()
-        Log.info("registry ready (\(reason))" + (missing.isEmpty ? "" : ", still waiting for: \(missing.joined(separator: ", "))"))
+        Log.info(
+            "registry ready (\(reason))"
+                + (missing.isEmpty ? "" : ", still waiting for: \(missing.joined(separator: ", "))"))
         onReady?()
         readyObservers.forEach { $0() }
         readyObservers.removeAll()

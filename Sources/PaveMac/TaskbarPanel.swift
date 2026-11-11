@@ -86,7 +86,8 @@ final class TaskbarPanel {
         trashButton.frame = NSRect(x: bounds.maxX - side - 2, y: 3, width: side - 4, height: bounds.height - 6)
         overflowLabel.frame = NSRect(x: trashButton.frame.minX - 40, y: 12, width: 36, height: 16)
         let numbersWidth = workspaceNumbers.preferredWidth
-        workspaceNumbers.frame = NSRect(x: startButton.frame.maxX + (numbersWidth > 0 ? 4 : 0), y: 0, width: numbersWidth, height: bounds.height)
+        workspaceNumbers.frame = NSRect(
+            x: startButton.frame.maxX + (numbersWidth > 0 ? 4 : 0), y: 0, width: numbersWidth, height: bounds.height)
         let left = numbersWidth > 0 ? workspaceNumbers.frame.maxX : startButton.frame.maxX
         entries.frame = NSRect(x: left + 8, y: 0, width: overflowLabel.frame.minX - left - 12, height: bounds.height)
     }
@@ -124,7 +125,8 @@ final class TaskbarPanel {
         let pinnedCount = items.prefix { $0.isPinned }.count
         let hasSeparator = pinnedCount > 0 && pinnedCount < items.count
         let free = max(0, entriesWidth - Double(icons) * widths.icon - (hasSeparator ? widths.separator : 0))
-        let windowWidth = windows == 0 ? widths.window : min(widths.window, max(widths.minWindow, free / Double(windows)))
+        let windowWidth =
+            windows == 0 ? widths.window : min(widths.window, max(widths.minWindow, free / Double(windows)))
         while buttons.count < items.count {
             let button = TaskbarButton()
             button.actions = actions
@@ -139,7 +141,8 @@ final class TaskbarPanel {
                 continue
             }
             if hasSeparator, index == pinnedCount {
-                separator.frame = NSRect(x: x + Self.separatorGap / 2 - 3, y: 9, width: 1, height: TaskbarPanel.height - 18)
+                separator.frame = NSRect(
+                    x: x + Self.separatorGap / 2 - 3, y: 9, width: 1, height: TaskbarPanel.height - 18)
                 x += Self.separatorGap
             }
             let item = items[index]
@@ -156,7 +159,11 @@ final class TaskbarPanel {
     private func icon(for item: TaskbarItem) -> NSImage {
         if let cached = icons[item.app] { return cached }
         let start = clock_gettime_nsec_np(CLOCK_UPTIME_RAW)
-        defer { iconLoads = (iconLoads.count + 1, iconLoads.ms + Double(clock_gettime_nsec_np(CLOCK_UPTIME_RAW) - start) / 1_000_000) }
+        defer {
+            iconLoads = (
+                iconLoads.count + 1, iconLoads.ms + Double(clock_gettime_nsec_np(CLOCK_UPTIME_RAW) - start) / 1_000_000
+            )
+        }
         var image: NSImage?
         if let pid = item.pid { image = NSRunningApplication(processIdentifier: pid)?.icon }
         if image == nil, !item.app.hasPrefix("pid:"),
@@ -229,7 +236,8 @@ final class TaskbarButton: NSView {
     override func updateTrackingAreas() {
         super.updateTrackingAreas()
         trackingAreas.forEach(removeTrackingArea)
-        addTrackingArea(NSTrackingArea(rect: .zero, options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect], owner: self))
+        addTrackingArea(
+            NSTrackingArea(rect: .zero, options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect], owner: self))
     }
 
     override func mouseEntered(with event: NSEvent) {
@@ -260,7 +268,10 @@ final class TaskbarButton: NSView {
 
     override func mouseUp(with event: NSEvent) {
         layer?.opacity = 1
-        guard pressed, let item, bounds.contains(convert(event.locationInWindow, from: nil)) else { return pressed = false }
+        guard pressed, let item, bounds.contains(convert(event.locationInWindow, from: nil)) else {
+            pressed = false
+            return
+        }
         pressed = false
         actions.click(item, self)
     }
@@ -306,7 +317,8 @@ final class TaskbarButton: NSView {
     }
 
     private func fileURLs(_ sender: NSDraggingInfo) -> [URL] {
-        sender.draggingPasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL] ?? []
+        sender.draggingPasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true])
+            as? [URL] ?? []
     }
 
     func configure(_ item: TaskbarItem, icon: NSImage) {
@@ -317,7 +329,9 @@ final class TaskbarButton: NSView {
         let isWindow: Bool
         if case .window = item.kind { isWindow = true } else { isWindow = false }
         let h = bounds.height
-        iconView.frame = isWindow ? NSRect(x: 6, y: (h - 20) / 2, width: 20, height: 20)
+        iconView.frame =
+            isWindow
+            ? NSRect(x: 6, y: (h - 20) / 2, width: 20, height: 20)
             : NSRect(x: (bounds.width - 22) / 2, y: (h - 22) / 2, width: 22, height: 22)
         title.isHidden = !isWindow
         title.stringValue = isWindow ? (item.title?.isEmpty == false ? item.title! : (item.appName ?? "")) : ""
@@ -332,14 +346,16 @@ final class TaskbarButton: NSView {
         if let text = item.badge {
             badge.stringValue = text.count > 3 ? "…" : text
             let width = max(14, CGFloat(badge.stringValue.count) * 7 + 6)
-            badge.frame = NSRect(x: iconView.frame.maxX - width / 2, y: iconView.frame.maxY - 9, width: width, height: 14)
+            badge.frame = NSRect(
+                x: iconView.frame.maxX - width / 2, y: iconView.frame.maxY - 9, width: width, height: 14)
         }
         // Running apps get a small bar under them, the active entry a highlight.
         let running = !item.windowIDs.isEmpty
         indicator.isHidden = !running
         let barWidth: CGFloat = item.isActive ? min(bounds.width - 12, 24) : 8
         indicator.frame = NSRect(x: (bounds.width - barWidth) / 2, y: 1, width: barWidth, height: 3)
-        indicator.layer?.backgroundColor = (item.isActive ? NSColor.controlAccentColor : NSColor.secondaryLabelColor).cgColor
+        indicator.layer?.backgroundColor =
+            (item.isActive ? NSColor.controlAccentColor : NSColor.secondaryLabelColor).cgColor
         updateBackground()
         toolTip = nil  // the hover preview replaces tooltips
     }
@@ -371,7 +387,8 @@ final class BarIconButton: NSView {
         iconSide = 22
         needsLayout = true
         let config = NSImage.SymbolConfiguration(pointSize: 16, weight: .regular)
-        iconView.image = NSImage(systemSymbolName: symbol, accessibilityDescription: label)?.withSymbolConfiguration(config)
+        iconView.image = NSImage(systemSymbolName: symbol, accessibilityDescription: label)?.withSymbolConfiguration(
+            config)
     }
 
     /// A full-colour image (an app icon) instead of a symbol.
@@ -392,7 +409,8 @@ final class BarIconButton: NSView {
     override func updateTrackingAreas() {
         super.updateTrackingAreas()
         trackingAreas.forEach(removeTrackingArea)
-        addTrackingArea(NSTrackingArea(rect: .zero, options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect], owner: self))
+        addTrackingArea(
+            NSTrackingArea(rect: .zero, options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect], owner: self))
     }
 
     override func mouseEntered(with event: NSEvent) { setHover(true) }
@@ -430,16 +448,19 @@ final class WorkspaceNumbersView: NSView {
         labels = new.enumerated().map { i, item in
             // A rounded square, the digit centred in it both ways: a label
             // alone draws its text at the top of its frame.
-            let square = NSView(frame: NSRect(
-                x: CGFloat(i) * Self.side + 2, y: (TaskbarPanel.height - 22) / 2, width: Self.side - 4, height: 22))
+            let square = NSView(
+                frame: NSRect(
+                    x: CGFloat(i) * Self.side + 2, y: (TaskbarPanel.height - 22) / 2, width: Self.side - 4, height: 22))
             square.wantsLayer = true
             square.layer?.cornerRadius = 5
-            square.layer?.backgroundColor = item.isVisible ? NSColor.controlAccentColor.withAlphaComponent(0.35).cgColor : nil
+            square.layer?.backgroundColor =
+                item.isVisible ? NSColor.controlAccentColor.withAlphaComponent(0.35).cgColor : nil
             square.setAccessibilityLabel(Self.hint(item))
             let label = Self.content(for: item, fitting: square.bounds.width - 4)
             let size = label.frame.size
             label.frame.origin = NSPoint(
-                x: ((square.bounds.width - size.width) / 2).rounded(), y: ((square.bounds.height - size.height) / 2).rounded())
+                x: ((square.bounds.width - size.width) / 2).rounded(),
+                y: ((square.bounds.height - size.height) / 2).rounded())
             square.addSubview(label)
             addSubview(square)
             return square
@@ -454,12 +475,15 @@ final class WorkspaceNumbersView: NSView {
         switch item.icon {
         case .symbol(let name)?:
             let config = NSImage.SymbolConfiguration(pointSize: 12, weight: item.isVisible ? .bold : .regular)
-            if let image = NSImage(systemSymbolName: name, accessibilityDescription: nil)?.withSymbolConfiguration(config) {
+            if let image = NSImage(systemSymbolName: name, accessibilityDescription: nil)?.withSymbolConfiguration(
+                config)
+            {
                 let view = NSImageView(image: image)
                 view.contentTintColor = color
                 let size = image.size
                 let scale = min(1, width / max(size.width, 1), 16 / max(size.height, 1))
-                view.frame.size = NSSize(width: (size.width * scale).rounded(.up), height: (size.height * scale).rounded(.up))
+                view.frame.size = NSSize(
+                    width: (size.width * scale).rounded(.up), height: (size.height * scale).rounded(.up))
                 view.imageScaling = .scaleProportionallyDown
                 return view
             }
@@ -514,8 +538,10 @@ final class WorkspaceNumbersView: NSView {
     override func updateTrackingAreas() {
         super.updateTrackingAreas()
         trackingAreas.forEach(removeTrackingArea)
-        addTrackingArea(NSTrackingArea(
-            rect: .zero, options: [.mouseEnteredAndExited, .mouseMoved, .activeAlways, .inVisibleRect], owner: self))
+        addTrackingArea(
+            NSTrackingArea(
+                rect: .zero, options: [.mouseEnteredAndExited, .mouseMoved, .activeAlways, .inVisibleRect], owner: self)
+        )
     }
 
     override func mouseMoved(with event: NSEvent) { track(event) }
@@ -555,7 +581,8 @@ final class HoverLabel {
     private let text = NSTextField(labelWithString: "")
 
     init() {
-        panel = NSPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: true)
+        panel = NSPanel(
+            contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: true)
         panel.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.dockWindow)) + 1)
         panel.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle, .transient]
         panel.isOpaque = false

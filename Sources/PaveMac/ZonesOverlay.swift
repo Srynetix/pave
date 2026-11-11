@@ -78,7 +78,8 @@ final class ZonesHUD {
 
     /// `area`: the screen's usable area (AX coordinates).
     func show(_ area: Rect, _ zones: ScreenZones, lit: [Int]) {
-        let width = Self.width, height = (width * area.height / max(area.width, 1)).rounded()
+        let width = Self.width
+        let height = (width * area.height / max(area.width, 1)).rounded()
         let miniature = Rect(x: 0, y: 0, width: width, height: height)
         view.frames = zones.layout.frames(in: miniature, gaps: zones.gaps > 0 ? 4 : 0)
         view.lit = Set(lit)
@@ -87,7 +88,8 @@ final class ZonesHUD {
         view.frame = NSRect(x: p, y: p, width: width, height: height)
         // Centered, in the lower third of the screen.
         let frame = Rect(
-            x: (area.x + (area.width - width) / 2 - p).rounded(), y: (area.y + area.height * 0.7 - height / 2).rounded(),
+            x: (area.x + (area.width - width) / 2 - p).rounded(),
+            y: (area.y + area.height * 0.7 - height / 2).rounded(),
             width: width + 2 * p, height: height + 2 * p)
         panel.setFrame(Screens.appKit(frame), display: true)
         panel.alphaValue = 1
@@ -97,7 +99,10 @@ final class ZonesHUD {
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.visibleFor) { [weak self] in
             MainActor.assumeIsolated {
                 guard let self, self.generation == shown else { return }
-                NSAnimationContext.runAnimationGroup({ $0.duration = 0.25; self.panel.animator().alphaValue = 0 }) {
+                NSAnimationContext.runAnimationGroup({
+                    $0.duration = 0.25
+                    self.panel.animator().alphaValue = 0
+                }) {
                     MainActor.assumeIsolated { if self.generation == shown { self.panel.orderOut(nil) } }
                 }
             }

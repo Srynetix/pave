@@ -12,9 +12,12 @@ extension AppDelegate {
 
     func refresh() {
         let trusted = Permissions.isAccessibilityTrusted()
-        statusLine.title = !trusted ? String(localized: "Pavé is waiting for the Accessibility permission")
-            : started ? String(localized: "Pavé is running · tracked windows: \(registry.store.windows.count)")
-            : String(localized: "Pavé is starting…")
+        statusLine.title =
+            !trusted
+            ? String(localized: "Pavé is waiting for the Accessibility permission")
+            : started
+                ? String(localized: "Pavé is running · tracked windows: \(registry.store.windows.count)")
+                : String(localized: "Pavé is starting…")
         let state = workspaces.state
         // Workspaces off: no number in the menu bar, unless windows are still parked.
         let showWorkspace = started && (workspaces.isEnabled || state.hiddenCount > 0)
@@ -22,8 +25,10 @@ extension AppDelegate {
         // One number per screen, in screen order; the focused screen's first when alone.
         let shown = Screens.all().compactMap { state.visible[$0.id] }
         let numbers = shown.count > 1 ? shown.map(String.init).joined(separator: " · ") : "\(state.active)"
-        let title = shown.count > 1 ? String(localized: "Workspaces \(numbers)") : String(localized: "Workspace \(numbers)")
-        workspaceItem.title = state.hiddenCount > 0
+        let title =
+            shown.count > 1 ? String(localized: "Workspaces \(numbers)") : String(localized: "Workspace \(numbers)")
+        workspaceItem.title =
+            state.hiddenCount > 0
             ? String(localized: "\(title) · hidden windows: \(state.hiddenCount)") : title
         statusItem.button?.attributedTitle = showWorkspace ? menuBarNumbers(state) : NSAttributedString()
         let warning = currentWarning(trusted: trusted)
@@ -44,7 +49,11 @@ extension AppDelegate {
         let numbers = shown.isEmpty ? [state.active] : shown
         let title = NSMutableAttributedString(string: " ")
         for (i, n) in numbers.enumerated() {
-            if i > 0 { title.append(NSAttributedString(string: " · ", attributes: [.font: regular, .foregroundColor: NSColor.secondaryLabelColor])) }
+            if i > 0 {
+                title.append(
+                    NSAttributedString(
+                        string: " · ", attributes: [.font: regular, .foregroundColor: NSColor.secondaryLabelColor]))
+            }
             let active = n == state.active && numbers.count > 1
             title.append(NSAttributedString(string: "\(n)", attributes: [.font: active ? bold : regular]))
         }
@@ -102,7 +111,8 @@ extension AppDelegate {
                 Log.info("login item: removed")
             } else {
                 try service.register()
-                Log.info("login item: registered (\(service.status == .requiresApproval ? "needs approval" : "enabled"))")
+                Log.info(
+                    "login item: registered (\(service.status == .requiresApproval ? "needs approval" : "enabled"))")
                 if service.status == .requiresApproval { SMAppService.openSystemSettingsLoginItems() }
             }
         } catch {
@@ -117,7 +127,10 @@ extension AppDelegate {
             bundleIDsObserver = NSWorkspace.shared.notificationCenter.addObserver(
                 forName: NSWorkspace.didTerminateApplicationNotification, object: nil, queue: .main
             ) { [weak self] note in
-                guard let pid = (note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication)?.processIdentifier else { return }
+                guard
+                    let pid = (note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication)?
+                        .processIdentifier
+                else { return }
                 MainActor.assumeIsolated { _ = self?.bundleIDs.removeValue(forKey: pid) }
             }
         }
@@ -129,7 +142,9 @@ extension AppDelegate {
 
     func toggleNativeTiling() {
         if !NativeTiling.set(enabled: !NativeTiling.isEnabled) {
-            showAlert(String(localized: "macOS window tiling not changed"), String(localized: "macOS refused the write to com.apple.WindowManager."))
+            showAlert(
+                String(localized: "macOS window tiling not changed"),
+                String(localized: "macOS refused the write to com.apple.WindowManager."))
         }
         refresh()
     }

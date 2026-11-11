@@ -5,7 +5,8 @@ import PaveIPC
 /// queue; requests are handled on the main actor (where the registry lives).
 public final class IPCServer: @unchecked Sendable {
     /// Called on the main actor; must call `reply` exactly once (possibly later).
-    public typealias Handler = @MainActor @Sendable (IPCRequest, _ reply: @escaping @Sendable (IPCResponse) -> Void) -> Void
+    public typealias Handler =
+        @MainActor @Sendable (IPCRequest, _ reply: @escaping @Sendable (IPCResponse) -> Void) -> Void
 
     public let path: String
     private let handler: Handler

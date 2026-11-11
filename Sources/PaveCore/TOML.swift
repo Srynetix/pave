@@ -130,7 +130,10 @@ public enum TOML {
                 skipSpaces()
                 path.append(try key())
                 skipSpaces()
-                if current == "." { advance(); continue }
+                if current == "." {
+                    advance()
+                    continue
+                }
                 guard current == "]" else { throw fail("expected ']' to close the table header") }
                 advance()
                 break
@@ -195,10 +198,16 @@ public enum TOML {
             var items: [TOMLValue] = []
             while true {
                 skipBlank()
-                if current == "]" { advance(); return .array(items) }
+                if current == "]" {
+                    advance()
+                    return .array(items)
+                }
                 items.append(try value())
                 skipBlank()
-                if current == "," { advance(); continue }
+                if current == "," {
+                    advance()
+                    continue
+                }
                 guard current == "]" else { throw fail("expected ',' or ']' in array") }
                 advance()
                 return .array(items)
@@ -241,7 +250,10 @@ public enum TOML {
             advance()  // '
             var s = ""
             while let c = current {
-                if c == "'" { advance(); return s }
+                if c == "'" {
+                    advance()
+                    return s
+                }
                 if c == "\n" { break }
                 s.append(c)
                 advance()

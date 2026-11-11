@@ -77,7 +77,8 @@ public final class SwitcherPanel {
             panel.orderOut(nil)
             return
         }
-        let screen = NSScreen.screens.first { NSMouseInRect(NSEvent.mouseLocation, $0.frame, false) }
+        let screen =
+            NSScreen.screens.first { NSMouseInRect(NSEvent.mouseLocation, $0.frame, false) }
             ?? NSScreen.main ?? NSScreen.screens[0]
         layout(session, on: screen.visibleFrame)
         if !panel.isVisible { panel.orderFrontRegardless() }
@@ -124,7 +125,8 @@ public final class SwitcherPanel {
         searchLabel.stringValue = "🔍 " + (session.query.isEmpty ? String(localized: "Type to search…") : session.query)
         searchLabel.textColor = session.query.isEmpty ? .secondaryLabelColor : .labelColor
         searchLabel.frame = NSRect(
-            x: Metrics.padding, y: height - Metrics.padding - header + 4, width: width - 2 * Metrics.padding, height: 22)
+            x: Metrics.padding, y: height - Metrics.padding - header + 4, width: width - 2 * Metrics.padding, height: 22
+        )
         emptyLabel.isHidden = !entries.isEmpty
         emptyLabel.frame = NSRect(x: 0, y: Metrics.padding + 18, width: width, height: 24)
 
@@ -141,7 +143,8 @@ public final class SwitcherPanel {
                 continue
             }
             let entry = entries[index]
-            let column = index % columns, row = index / columns
+            let column = index % columns
+            let row = index / columns
             view.frame = NSRect(
                 x: Metrics.padding + CGFloat(column) * (card.width + spacing),
                 y: top - CGFloat(row + 1) * card.height - CGFloat(row) * spacing,
@@ -229,7 +232,9 @@ final class CardView: NSView {
         _ entry: SwitcherSession.Entry, icon: NSImage, preview image: CGImage?, selected: Bool, scale: CGFloat
     ) {
         id = entry.id
-        let w = bounds.width, h = bounds.height, inset = 10 * scale
+        let w = bounds.width
+        let h = bounds.height
+        let inset = 10 * scale
         selection.frame = bounds
         selection.layer?.backgroundColor = selected ? NSColor.controlAccentColor.withAlphaComponent(0.45).cgColor : nil
 
@@ -237,7 +242,8 @@ final class CardView: NSView {
         preview.frame = NSRect(x: inset, y: h - inset - previewHeight, width: w - 2 * inset, height: previewHeight)
         preview.layer?.backgroundColor = NSColor.quaternaryLabelColor.cgColor
         let side = min(preview.bounds.height * 0.6, 72 * scale)
-        bigIcon.frame = NSRect(x: (preview.bounds.width - side) / 2, y: (preview.bounds.height - side) / 2, width: side, height: side)
+        bigIcon.frame = NSRect(
+            x: (preview.bounds.width - side) / 2, y: (preview.bounds.height - side) / 2, width: side, height: side)
         bigIcon.image = icon
         bigIcon.alphaValue = entry.state == .normal ? 1 : 0.5
         CATransaction.begin()
@@ -247,12 +253,13 @@ final class CardView: NSView {
         CATransaction.commit()
         setPreview(image)
 
-        let badgeText: String? = switch entry.state {
-        case .normal: nil
-        case .minimized: String(localized: "minimized")
-        case .hidden: String(localized: "hidden")
-        case .fullscreen: String(localized: "full screen")
-        }
+        let badgeText: String? =
+            switch entry.state {
+            case .normal: nil
+            case .minimized: String(localized: "minimized")
+            case .hidden: String(localized: "hidden")
+            case .fullscreen: String(localized: "full screen")
+            }
         badge.isHidden = badgeText == nil
         badge.stringValue = badgeText ?? ""
         badge.sizeToFit()
@@ -263,7 +270,8 @@ final class CardView: NSView {
         smallIcon.image = icon
         title.font = .systemFont(ofSize: 12 * scale, weight: .medium)
         title.stringValue = entry.title.isEmpty ? entry.appName : entry.title
-        title.frame = NSRect(x: inset + iconSide + 5, y: inset + 14 * scale, width: w - 2 * inset - iconSide - 5, height: 18 * scale)
+        title.frame = NSRect(
+            x: inset + iconSide + 5, y: inset + 14 * scale, width: w - 2 * inset - iconSide - 5, height: 18 * scale)
         app.font = .systemFont(ofSize: 11 * scale)
         app.stringValue = entry.appName
         app.frame = NSRect(x: inset, y: inset - 3 * scale, width: w - 2 * inset, height: 15 * scale)

@@ -1,7 +1,10 @@
 import Testing
+
 @testable import PaveCore
 
-private func win(_ id: UInt32, _ app: String, pid: PID? = nil, title: String = "", state: WindowState = .normal) -> WindowSnapshot {
+private func win(_ id: UInt32, _ app: String, pid: PID? = nil, title: String = "", state: WindowState = .normal)
+    -> WindowSnapshot
+{
     WindowSnapshot(
         id: WindowID(id), pid: pid ?? PID(id), appName: app, title: title,
         frame: Rect(x: 0, y: 0, width: 100, height: 100), state: state, subrole: "AXStandardWindow")
@@ -9,7 +12,8 @@ private func win(_ id: UInt32, _ app: String, pid: PID? = nil, title: String = "
 
 /// MRU order: Slack (current), Brave, Brave (2nd window), Obsidian, Finder (minimized).
 private let mru = [
-    win(1, "Slack"), win(2, "Brave Browser", pid: 20, title: "Devis Acme"), win(3, "Brave Browser", pid: 20, title: "Docs"),
+    win(1, "Slack"), win(2, "Brave Browser", pid: 20, title: "Devis Acme"),
+    win(3, "Brave Browser", pid: 20, title: "Docs"),
     win(4, "Obsidian", title: "Réunion équipe"), win(5, "Finder", state: .minimized),
 ]
 
@@ -48,10 +52,12 @@ private func ids(_ s: SwitcherSession) -> [UInt32] { s.entries.map(\.id.rawValue
         // MRU ranks still refer to the full order (S5 logs).
         #expect(scoped.selected?.mruRank == 2)
 
-        let all = SwitcherSession(windows: mru, options: .init(scope: .all, activeWorkspace: 1, workspaceOf: workspaces))
+        let all = SwitcherSession(
+            windows: mru, options: .init(scope: .all, activeWorkspace: 1, workspaceOf: workspaces))
         #expect(ids(all) == [1, 2, 3, 4, 5])
         // Workspaces off (no active workspace): everything, whatever the scope.
-        #expect(ids(SwitcherSession(windows: mru, options: .init(scope: .workspace, workspaceOf: workspaces))).count == 5)
+        #expect(
+            ids(SwitcherSession(windows: mru, options: .init(scope: .workspace, workspaceOf: workspaces))).count == 5)
     }
 
     @Test func sameAppModeListsOneApp() {
@@ -64,7 +70,9 @@ private func ids(_ s: SwitcherSession) -> [UInt32] { s.entries.map(\.id.rawValue
 @Suite struct SwitcherNavigationTests {
     @Test func nextAndPreviousWrapAround() {
         var s = SwitcherSession(windows: mru)
-        s.next(); s.next(); s.next()
+        s.next()
+        s.next()
+        s.next()
         #expect(s.selected?.id == WindowID(5))
         s.next()
         #expect(s.selected?.id == WindowID(1))
@@ -116,7 +124,9 @@ private func ids(_ s: SwitcherSession) -> [UInt32] { s.entries.map(\.id.rawValue
         s.enterSearch()
         s.type("REUNION EQ")
         #expect(ids(s) == [4])
-        s.deleteBackward(); s.deleteBackward(); s.deleteBackward()
+        s.deleteBackward()
+        s.deleteBackward()
+        s.deleteBackward()
         #expect(s.query == "REUNION")
     }
 
@@ -127,7 +137,9 @@ private func ids(_ s: SwitcherSession) -> [UInt32] { s.entries.map(\.id.rawValue
         #expect(s.entries.isEmpty)
         #expect(s.selection == nil)
         #expect(s.commit() == .dismiss)
-        s.deleteBackward(); s.deleteBackward(); s.deleteBackward()
+        s.deleteBackward()
+        s.deleteBackward()
+        s.deleteBackward()
         #expect(ids(s).count == 5)
     }
 }
@@ -138,7 +150,8 @@ private func ids(_ s: SwitcherSession) -> [UInt32] { s.entries.map(\.id.rawValue
         #expect(s.closeSelected() == .close(WindowID(2)))
         #expect(ids(s) == [1, 3, 4, 5])
         #expect(s.selected?.id == WindowID(3))
-        s.next(); s.next()  // 5, the last one
+        s.next()
+        s.next()  // 5, the last one
         #expect(s.closeSelected() == .close(WindowID(5)))
         #expect(s.selected?.id == WindowID(4))
     }

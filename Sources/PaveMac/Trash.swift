@@ -39,8 +39,10 @@ enum Trash {
     /// freeze). Returns the output, or the AppleScript error number only:
     /// a message may name files in the Trash.
     nonisolated static func runFinderScript(_ script: String) -> (output: String?, error: Int?) {
-        guard let result = try? Shell.run("/usr/bin/osascript", ["-e", "tell application \"Finder\" to \(script)"]) else { return (nil, -1) }
-        let output = result.text, message = result.errorText
+        guard let result = try? Shell.run("/usr/bin/osascript", ["-e", "tell application \"Finder\" to \(script)"])
+        else { return (nil, -1) }
+        let output = result.text
+        let message = result.errorText
         guard result.status == 0 else {
             // "… execution error: … (-128)": keep the number.
             let code = message.range(of: #"\(-?\d+\)"#, options: [.regularExpression, .backwards])
@@ -104,9 +106,15 @@ enum Trash {
         failure.messageText = String(localized: "The Trash was not emptied")
         switch code {
         case -1743:  // errAEEventNotPermitted
-            failure.informativeText = String(localized: "Pavé is not allowed to control the Finder. Allow it in System Settings › Privacy & Security › Automation, then try again.")
+            failure.informativeText = String(
+                localized:
+                    "Pavé is not allowed to control the Finder. Allow it in System Settings › Privacy & Security › Automation, then try again."
+            )
         case -128:  // userCanceledErr
-            failure.informativeText = String(localized: "The Finder cancelled: a request (password, confirmation) was refused, or an item is locked or in use. Empty the Trash from the Finder to see which one.")
+            failure.informativeText = String(
+                localized:
+                    "The Finder cancelled: a request (password, confirmation) was refused, or an item is locked or in use. Empty the Trash from the Finder to see which one."
+            )
         case -1712:  // errAETimeout
             failure.informativeText = String(localized: "The Finder did not answer in time. Try again in a moment.")
         default:

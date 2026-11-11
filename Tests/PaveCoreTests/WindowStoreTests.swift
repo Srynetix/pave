@@ -1,4 +1,5 @@
 import Testing
+
 @testable import PaveCore
 
 private func win(
@@ -16,7 +17,8 @@ private func win(
         var store = WindowStore()
         store.apply(AppSnapshot(pid: 1, windows: [win(1)], focusedWindow: nil), isFrontmost: false)
         let moved = Rect(x: 900, y: 40, width: 900, height: 1068)
-        #expect(store.updateFrame(WindowID(1), to: moved) == [.frameChanged(WindowID(1), from: win(1).frame, to: moved)])
+        #expect(
+            store.updateFrame(WindowID(1), to: moved) == [.frameChanged(WindowID(1), from: win(1).frame, to: moved)])
         #expect(store.windows[WindowID(1)]?.frame == moved)
         #expect(store.updateFrame(WindowID(1), to: moved).isEmpty)
         #expect(store.updateFrame(WindowID(99), to: moved).isEmpty)
@@ -24,7 +26,8 @@ private func win(
 
     @Test func createsWindowsOnFirstSnapshot() {
         var store = WindowStore()
-        let changes = store.apply(AppSnapshot(pid: 1, windows: [win(2), win(1)], focusedWindow: nil), isFrontmost: false)
+        let changes = store.apply(
+            AppSnapshot(pid: 1, windows: [win(2), win(1)], focusedWindow: nil), isFrontmost: false)
         #expect(changes == [.created(win(1)), .created(win(2))])
         #expect(store.windows.count == 2)
     }
@@ -46,11 +49,12 @@ private func win(
         let changes = store.apply(
             AppSnapshot(pid: 1, windows: [win(1, title: "b", x: 50, state: .minimized)], focusedWindow: nil),
             isFrontmost: false)
-        #expect(changes == [
-            .frameChanged(WindowID(1), from: win(1).frame, to: win(1, x: 50).frame),
-            .retitled(WindowID(1), from: "w", to: "b"),
-            .stateChanged(WindowID(1), from: .normal, to: .minimized),
-        ])
+        #expect(
+            changes == [
+                .frameChanged(WindowID(1), from: win(1).frame, to: win(1, x: 50).frame),
+                .retitled(WindowID(1), from: "w", to: "b"),
+                .stateChanged(WindowID(1), from: .normal, to: .minimized),
+            ])
     }
 
     @Test func noChangeForIdenticalSnapshot() {
@@ -70,7 +74,8 @@ private func win(
         store.apply(AppSnapshot(pid: 2, windows: [win(2, pid: 2)], focusedWindow: WindowID(2)), isFrontmost: false)
         #expect(store.mru == [WindowID(1), WindowID(2)])
 
-        let changes = store.apply(AppSnapshot(pid: 2, windows: [win(2, pid: 2)], focusedWindow: WindowID(2)), isFrontmost: true)
+        let changes = store.apply(
+            AppSnapshot(pid: 2, windows: [win(2, pid: 2)], focusedWindow: WindowID(2)), isFrontmost: true)
         #expect(changes == [.focused(WindowID(2))])
         #expect(store.mru == [WindowID(2), WindowID(1)])
     }
@@ -122,14 +127,16 @@ private func win(
         #expect(changes.isEmpty)
         #expect(store.windows[WindowID(1)] != nil)
         // Back on its Space: no "created", it never left.
-        let back = store.apply(AppSnapshot(pid: 7, windows: [window(1), window(2)], focusedWindow: nil), isFrontmost: false)
+        let back = store.apply(
+            AppSnapshot(pid: 7, windows: [window(1), window(2)], focusedWindow: nil), isFrontmost: false)
         #expect(back.isEmpty)
     }
 
     @Test func aMissingWindowNobodyKeepsIsDestroyed() {
         var store = WindowStore()
         store.apply(AppSnapshot(pid: 7, windows: [window(1)], focusedWindow: nil), isFrontmost: false)
-        let changes = store.apply(AppSnapshot(pid: 7, windows: [], focusedWindow: nil), isFrontmost: false, keep: { _ in false })
+        let changes = store.apply(
+            AppSnapshot(pid: 7, windows: [], focusedWindow: nil), isFrontmost: false, keep: { _ in false })
         #expect(changes == [.destroyed(window(1))])
     }
 }

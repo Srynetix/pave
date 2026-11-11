@@ -288,10 +288,9 @@ final class AppConnection: @unchecked Sendable {
             }
 
             let state: WindowState =
-                if element.bool(kAXMinimizedAttribute) == true { .minimized }
-                else if hidden { .hidden }
-                else if element.bool("AXFullScreen") == true { .fullscreen }
-                else { .normal }
+                if element.bool(kAXMinimizedAttribute) == true { .minimized } else if hidden {
+                    .hidden
+                } else if element.bool("AXFullScreen") == true { .fullscreen } else { .normal }
 
             windows.append(
                 WindowSnapshot(

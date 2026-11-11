@@ -52,18 +52,24 @@ public enum Updates {
     /// `owner/repo`.
     public static func isValidSource(_ source: String) -> Bool {
         let parts = source.split(separator: "/", omittingEmptySubsequences: false)
-        return parts.count == 2 && parts.allSatisfy { part in
-            // At least a letter or digit: never "." or "..".
-            part.contains { $0.isLetter || $0.isNumber } && part.allSatisfy { $0.isLetter || $0.isNumber || "-_.".contains($0) }
-        }
+        return parts.count == 2
+            && parts.allSatisfy { part in
+                // At least a letter or digit: never "." or "..".
+                part.contains { $0.isLetter || $0.isNumber }
+                    && part.allSatisfy { $0.isLetter || $0.isNumber || "-_.".contains($0) }
+            }
     }
 
     /// Pavé's releases in GitHub's answer to `repos/<repo>/releases`: tagged
     /// `pave-v<version>`, drafts and pre-releases left out, newest first.
     public static func releases(fromGitHub json: Data) throws -> [Release] {
         struct R: Decodable {
+            // swift-format-ignore: AlwaysUseLowerCamelCase
+            // GitHub's own key, decoded as is.
             var tag_name: String
             var body: String?
+            // swift-format-ignore: AlwaysUseLowerCamelCase
+            // GitHub's own key, decoded as is.
             var html_url: String?
             var draft: Bool?
             var prerelease: Bool?
@@ -106,7 +112,8 @@ public struct Version: Comparable, Sendable, CustomStringConvertible {
 
     public static func < (a: Version, b: Version) -> Bool {
         for i in 0..<max(a.parts.count, b.parts.count) {
-            let x = i < a.parts.count ? a.parts[i] : 0, y = i < b.parts.count ? b.parts[i] : 0
+            let x = i < a.parts.count ? a.parts[i] : 0
+            let y = i < b.parts.count ? b.parts[i] : 0
             if x != y { return x < y }
         }
         return false

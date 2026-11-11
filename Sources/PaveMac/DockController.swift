@@ -24,8 +24,11 @@ public final class DockController {
     /// The smallest icons the Dock accepts.
     static let hiddenTileSize = 16.0
     static var hiddenValues: [String: CFPropertyList] {
-        ["autohide": true as CFBoolean, "autohide-delay": hiddenDelay as CFNumber,
-         "tilesize": hiddenTileSize as CFNumber, "magnification": false as CFBoolean, "orientation": "left" as CFString]
+        [
+            "autohide": true as CFBoolean, "autohide-delay": hiddenDelay as CFNumber,
+            "tilesize": hiddenTileSize as CFNumber, "magnification": false as CFBoolean,
+            "orientation": "left" as CFString,
+        ]
     }
 
     public static var stateURL: URL { StateFiles.url("dock.json") }
@@ -70,7 +73,9 @@ public final class DockController {
         CFPreferencesAppSynchronize(Self.domain as CFString)
         let changed = Self.changedKeys()
         guard !changed.isEmpty else { return }
-        Log.info("dock: settings changed outside Pavé (\(changed.map { "\($0)=\(Self.value($0).map { "\($0)" } ?? "none")" }.joined(separator: ", "))), hidden again")
+        Log.info(
+            "dock: settings changed outside Pavé (\(changed.map { "\($0)=\(Self.value($0).map { "\($0)" } ?? "none")" }.joined(separator: ", "))), hidden again"
+        )
         hide()
         onHiddenAgain()
     }
@@ -93,7 +98,9 @@ public final class DockController {
         guard isHiddenByPave, !rehiding else { return }
         if !force {
             guard failedRehides < Self.maxAutomaticRehides else {
-                return Log.info("dock: \(reason), \(failedRehides) restarts already failed, left alone (Reset Taskbar to try again)")
+                return Log.info(
+                    "dock: \(reason), \(failedRehides) restarts already failed, left alone (Reset Taskbar to try again)"
+                )
             }
             let wait = 60 - Date().timeIntervalSince(lastHardRehide)
             guard wait <= 0 else {
@@ -159,7 +166,8 @@ public final class DockController {
 
     private static func writeState(saved: [String: Any], keys: [String]) throws {
         let data = try JSONSerialization.data(
-            withJSONObject: ["saved": saved, "keys": keys, "note": "Dock settings before Pavé hid it"], options: [.prettyPrinted, .sortedKeys])
+            withJSONObject: ["saved": saved, "keys": keys, "note": "Dock settings before Pavé hid it"],
+            options: [.prettyPrinted, .sortedKeys])
         try StateFiles.write(data, to: stateURL)
     }
 
@@ -177,13 +185,17 @@ public final class DockController {
             } catch {
                 return Log.info("dock: NOT hidden, cannot save its settings (\(error.localizedDescription))")
             }
-            Log.info("dock: settings saved (\(missing.map { "\($0)=\(saved[$0].map { "\($0)" } ?? "none")" }.joined(separator: ", ")))")
+            Log.info(
+                "dock: settings saved (\(missing.map { "\($0)=\(saved[$0].map { "\($0)" } ?? "none")" }.joined(separator: ", ")))"
+            )
         }
         let changed = Self.changedKeys()
         guard !changed.isEmpty else { return }  // already hidden
         for key in changed { set(key, Self.hiddenValues[key]) }
         restartDock()
-        Log.info("dock: hidden (autohide, delay \(Int(Self.hiddenDelay)) s, icons \(Int(Self.hiddenTileSize)) pt, on the left)")
+        Log.info(
+            "dock: hidden (autohide, delay \(Int(Self.hiddenDelay)) s, icons \(Int(Self.hiddenTileSize)) pt, on the left)"
+        )
     }
 
     /// Puts the user's values back and forgets the saved state.

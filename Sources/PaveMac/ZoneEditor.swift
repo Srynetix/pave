@@ -55,7 +55,9 @@ public final class ZoneEditor {
         NSApp.activate()
         window.makeKeyAndOrderFront(nil)
         window.makeFirstResponder(window.editor)
-        Log.info("zones: editor opened on \(request.screenName), from \(request.layout.name) (\(request.layout.zones.count) zones)")
+        Log.info(
+            "zones: editor opened on \(request.screenName), from \(request.layout.name) (\(request.layout.zones.count) zones)"
+        )
     }
 
     private func close(restoreFocus: Bool) {
@@ -72,7 +74,9 @@ private final class EditorWindow: NSWindow {
 
     init(request: ZoneEditor.Request) {
         editor = EditorView(request: request)
-        super.init(contentRect: Screens.appKit(request.screen.frame), styleMask: [.borderless], backing: .buffered, defer: false)
+        super.init(
+            contentRect: Screens.appKit(request.screen.frame), styleMask: [.borderless], backing: .buffered,
+            defer: false)
         isOpaque = false
         backgroundColor = .clear
         hasShadow = false
@@ -111,7 +115,8 @@ private final class EditorView: NSView, NSTextFieldDelegate {
 
     /// The usable area, in this view's (flipped) coordinates.
     private var area: Rect {
-        let f = request.screen.frame, v = request.screen.visibleFrame
+        let f = request.screen.frame
+        let v = request.screen.visibleFrame
         return Rect(x: v.x - f.x, y: v.y - f.y, width: v.width, height: v.height)
     }
 
@@ -119,7 +124,9 @@ private final class EditorView: NSView, NSTextFieldDelegate {
         self.request = request
         draft = ZoneDraft(request.layout)
         gaps = request.gaps
-        super.init(frame: NSRect(origin: .zero, size: NSSize(width: request.screen.frame.width, height: request.screen.frame.height)))
+        super.init(
+            frame: NSRect(
+                origin: .zero, size: NSSize(width: request.screen.frame.width, height: request.screen.frame.height)))
         buildToolbar()
         updateControls()
     }
@@ -191,7 +198,9 @@ private final class EditorView: NSView, NSTextFieldDelegate {
         ])
         addSubview(toolbar)
         let size = row.fittingSize
-        toolbar.frame = NSRect(x: (area.x + (area.width - size.width) / 2).rounded(), y: area.y + 16, width: size.width, height: size.height)
+        toolbar.frame = NSRect(
+            x: (area.x + (area.width - size.width) / 2).rounded(), y: area.y + 16, width: size.width,
+            height: size.height)
 
         hint.textColor = .white.withAlphaComponent(0.75)
         hint.font = .systemFont(ofSize: 12)
@@ -214,11 +223,16 @@ private final class EditorView: NSView, NSTextFieldDelegate {
         buttons["undo"]?.isEnabled = draft.canUndo
         buttons["save"]?.isEnabled = ZoneLayout.isValidName(nameField.stringValue.trimmedForName)
         gapsLabel.stringValue = String(localized: "Gaps \(gaps)")
-        hint.stringValue = message
-            ?? String(localized: "Click a zone · ⇧-click a neighbour, then Merge · drag the lines (⇧: 1 %) · V / H split · ⌫ delete · ⌘Z undo · esc cancel")
+        hint.stringValue =
+            message
+            ?? String(
+                localized:
+                    "Click a zone · ⇧-click a neighbour, then Merge · drag the lines (⇧: 1 %) · V / H split · ⌫ delete · ⌘Z undo · esc cancel"
+            )
         hint.textColor = message == nil ? .white.withAlphaComponent(0.75) : .systemOrange
         hint.sizeToFit()
-        hint.frame.origin = NSPoint(x: (area.x + (area.width - hint.frame.width) / 2).rounded(), y: toolbar.frame.maxY + 8)
+        hint.frame.origin = NSPoint(
+            x: (area.x + (area.width - hint.frame.width) / 2).rounded(), y: toolbar.frame.maxY + 8)
         needsDisplay = true
     }
 
@@ -243,9 +257,10 @@ private final class EditorView: NSView, NSTextFieldDelegate {
         if let first = draft.split(i, columns: columns) {
             select(first)
         } else {
-            flash(draft.zones.count >= ZoneLayout.maxZones
-                ? String(localized: "At most \(ZoneLayout.maxZones) zones")
-                : String(localized: "This zone is too small to split"))
+            flash(
+                draft.zones.count >= ZoneLayout.maxZones
+                    ? String(localized: "At most \(ZoneLayout.maxZones) zones")
+                    : String(localized: "This zone is too small to split"))
         }
     }
 
@@ -344,7 +359,8 @@ private final class EditorView: NSView, NSTextFieldDelegate {
     override func updateTrackingAreas() {
         super.updateTrackingAreas()
         trackingAreas.forEach(removeTrackingArea)
-        addTrackingArea(NSTrackingArea(rect: bounds, options: [.mouseMoved, .activeAlways, .inVisibleRect], owner: self))
+        addTrackingArea(
+            NSTrackingArea(rect: bounds, options: [.mouseMoved, .activeAlways, .inVisibleRect], owner: self))
     }
 
     override func mouseMoved(with event: NSEvent) {
@@ -402,14 +418,18 @@ private final class EditorView: NSView, NSTextFieldDelegate {
         for (i, f) in frames.enumerated() {
             let rect = NSRect(x: f.x, y: f.y, width: f.width, height: f.height)
             let path = NSBezierPath(roundedRect: rect, xRadius: 12, yRadius: 12)
-            let isSelected = i == selected, isSecondary = i == secondary
-            (isSelected ? accent.withAlphaComponent(0.45) : isSecondary ? accent.withAlphaComponent(0.25) : NSColor.white.withAlphaComponent(0.12)).setFill()
+            let isSelected = i == selected
+            let isSecondary = i == secondary
+            (isSelected
+                ? accent.withAlphaComponent(0.45)
+                : isSecondary ? accent.withAlphaComponent(0.25) : NSColor.white.withAlphaComponent(0.12)).setFill()
             path.fill()
             (isSelected || isSecondary ? accent : NSColor.white.withAlphaComponent(0.5)).setStroke()
             path.lineWidth = isSelected ? 3 : 1.5
             if isSecondary { path.setLineDash([8, 5], count: 2, phase: 0) }
             path.stroke()
-            let number = NSAttributedString(string: "\(i + 1)", attributes: [.font: big, .foregroundColor: NSColor.white.withAlphaComponent(0.85)])
+            let number = NSAttributedString(
+                string: "\(i + 1)", attributes: [.font: big, .foregroundColor: NSColor.white.withAlphaComponent(0.85)])
             let size = number.size()
             if rect.width > size.width + 8, rect.height > size.height + 40 {
                 number.draw(at: NSPoint(x: rect.midX - size.width / 2, y: rect.midY - size.height / 2 - 10))
@@ -427,10 +447,14 @@ private final class EditorView: NSView, NSTextFieldDelegate {
         // The line under the pointer (or dragged): a handle along it.
         if let line = dragging ?? hovered {
             let a = area
-            let pos = line.vertical ? a.x + a.width * Double(line.position) / 100 : a.y + a.height * Double(line.position) / 100
+            let pos =
+                line.vertical
+                ? a.x + a.width * Double(line.position) / 100 : a.y + a.height * Double(line.position) / 100
             let s = line.vertical ? a.y + a.height * Double(line.start) / 100 : a.x + a.width * Double(line.start) / 100
             let e = line.vertical ? a.y + a.height * Double(line.end) / 100 : a.x + a.width * Double(line.end) / 100
-            let bar = line.vertical ? NSRect(x: pos - 2, y: s, width: 4, height: e - s) : NSRect(x: s, y: pos - 2, width: e - s, height: 4)
+            let bar =
+                line.vertical
+                ? NSRect(x: pos - 2, y: s, width: 4, height: e - s) : NSRect(x: s, y: pos - 2, width: e - s, height: 4)
             accent.setFill()
             NSBezierPath(roundedRect: bar, xRadius: 2, yRadius: 2).fill()
             let tag = NSAttributedString(
@@ -442,6 +466,6 @@ private final class EditorView: NSView, NSTextFieldDelegate {
     }
 }
 
-private extension String {
-    var trimmedForName: String { trimmingCharacters(in: .whitespaces) }
+extension String {
+    fileprivate var trimmedForName: String { trimmingCharacters(in: .whitespaces) }
 }

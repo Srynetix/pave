@@ -26,7 +26,9 @@ public enum Placement: String, Sendable, CaseIterable, Codable {
         let left = Rect(x: area.x, y: area.y, width: leftWidth, height: area.height)
         let right = Rect(x: area.x + leftWidth, y: area.y, width: area.width - leftWidth, height: area.height)
         func top(_ r: Rect) -> Rect { Rect(x: r.x, y: r.y, width: r.width, height: topHeight) }
-        func bottom(_ r: Rect) -> Rect { Rect(x: r.x, y: r.y + topHeight, width: r.width, height: area.height - topHeight) }
+        func bottom(_ r: Rect) -> Rect {
+            Rect(x: r.x, y: r.y + topHeight, width: r.width, height: area.height - topHeight)
+        }
         switch self {
         case .left: return left
         case .right: return right
@@ -100,11 +102,14 @@ public struct LayoutEngine: Sendable {
 
     /// `zones`: the layout of a screen, nil for halves and quarters.
     public mutating func handle(
-        _ command: LayoutCommand, window: WindowSnapshot, screens: [Screen], zones: (Screen) -> ScreenZones? = { _ in nil }
+        _ command: LayoutCommand, window: WindowSnapshot, screens: [Screen],
+        zones: (Screen) -> ScreenZones? = { _ in nil }
     ) -> LayoutAction {
         guard window.state == .normal else { return .none(reason: "window is \(window.state.rawValue)") }
         guard let screen = Self.screen(for: window.frame, among: screens) else { return .none(reason: "no screen") }
-        if let layout = zones(screen), let action = handleInZones(command, window: window, screen: screen, layout, screens, zones) {
+        if let layout = zones(screen),
+            let action = handleInZones(command, window: window, screen: screen, layout, screens, zones)
+        {
             return action
         }
         let current = placement(of: window, on: screen)
@@ -121,7 +126,9 @@ public struct LayoutEngine: Sendable {
                 guard let next = Self.neighbour(of: screen, toLeft: toLeft, among: screens) else {
                     return .none(reason: "already \(p.rawValue), no screen on the \(toLeft ? "left" : "right")")
                 }
-                if let layout = zones(next) { return enterZones(window, from: toLeft ? .trailing : .leading, of: next, layout) }
+                if let layout = zones(next) {
+                    return enterZones(window, from: toLeft ? .trailing : .leading, of: next, layout)
+                }
                 return place(window, p.mirrored, on: next)
             case let p? where p != .maximized:
                 // On the other side: quarters slide across, halves go back to floating.
@@ -170,7 +177,9 @@ public struct LayoutEngine: Sendable {
     public func zoneTarget(of window: WindowSnapshot) -> Rect? {
         guard let target = zoneTargets[window.id] else { return nil }
         let f = window.frame
-        if f.isClose(to: target) || f.isClose(to: Self.centered(width: f.width, height: f.height, in: target)) { return target }
+        if f.isClose(to: target) || f.isClose(to: Self.centered(width: f.width, height: f.height, in: target)) {
+            return target
+        }
         if let settled = zoneSettled[window.id], f.isClose(to: settled) { return target }
         return nil
     }
@@ -221,7 +230,9 @@ public struct LayoutEngine: Sendable {
             guard let next = Self.neighbour(of: screen, toLeft: !forward, among: screens) else {
                 return .none(reason: "last zone, no screen on the \(forward ? "right" : "left")")
             }
-            if let other = zones(next) { return enterZones(window, from: forward ? .leading : .trailing, of: next, other) }
+            if let other = zones(next) {
+                return enterZones(window, from: forward ? .leading : .trailing, of: next, other)
+            }
             return place(window, forward ? .left : .right, on: next)
 
         case .maximize:
@@ -234,7 +245,8 @@ public struct LayoutEngine: Sendable {
             return .minimize
 
         case .moveToScreenLeft, .moveToScreenRight:
-            guard let current, let next = Self.neighbour(of: screen, toLeft: command == .moveToScreenLeft, among: screens)
+            guard let current,
+                let next = Self.neighbour(of: screen, toLeft: command == .moveToScreenLeft, among: screens)
             else { return nil }
             if let other = zones(next) {
                 // Same zone numbers there, else its last zone (as when switching layouts).
@@ -250,14 +262,18 @@ public struct LayoutEngine: Sendable {
 
     /// Arriving on a screen with a layout from a neighbour: its first zone
     /// from the left, its last from the right.
-    private mutating func enterZones(_ window: WindowSnapshot, from side: Side, of screen: Screen, _ layout: ScreenZones) -> LayoutAction {
+    private mutating func enterZones(
+        _ window: WindowSnapshot, from side: Side, of screen: Screen, _ layout: ScreenZones
+    ) -> LayoutAction {
         let index = side == .leading ? 0 : layout.layout.zones.count - 1
         return placeInZones(window, layout.layout.frame(of: [index], in: screen.visibleFrame, gaps: layout.gaps))
     }
 
     /// The screen switched layouts (⌃⇧Z): where a window in zones of `old`
     /// goes in `new`, same zone numbers when they exist. Nil: it stays.
-    public mutating func reflow(_ window: WindowSnapshot, from old: ScreenZones, to new: ScreenZones, on screen: Screen) -> LayoutAction? {
+    public mutating func reflow(_ window: WindowSnapshot, from old: ScreenZones, to new: ScreenZones, on screen: Screen)
+        -> LayoutAction?
+    {
         let reference = zoneTarget(of: window) ?? window.frame
         let area = screen.visibleFrame
         // Matched with the old gaps, placed with the new ones (the editor may change them).
@@ -271,7 +287,9 @@ public struct LayoutEngine: Sendable {
     /// A window goes into zone `index` (app rule `zone = N` for a new one,
     /// the zone picker): its floating frame is remembered, so dragging it out
     /// gives its size back. One already in zones keeps the frame from before.
-    public mutating func place(_ window: WindowSnapshot, inZone index: Int, of zones: ScreenZones, on screen: Screen) -> LayoutAction? {
+    public mutating func place(_ window: WindowSnapshot, inZone index: Int, of zones: ScreenZones, on screen: Screen)
+        -> LayoutAction?
+    {
         guard window.state == .normal, zones.layout.zones.indices.contains(index) else { return nil }
         let target = zones.layout.frame(of: [index], in: screen.visibleFrame, gaps: zones.gaps)
         guard !window.frame.isClose(to: target) else { return nil }
@@ -296,7 +314,9 @@ public struct LayoutEngine: Sendable {
 
     /// The window was dropped in a zone: same bookkeeping as a hotkey
     /// placement (its floating frame is remembered for `restore`).
-    public mutating func drop(_ window: WindowSnapshot, at placement: Placement, on screen: Screen, screens: [Screen]) -> LayoutAction {
+    public mutating func drop(_ window: WindowSnapshot, at placement: Placement, on screen: Screen, screens: [Screen])
+        -> LayoutAction
+    {
         guard window.state == .normal else { return .none(reason: "window is \(window.state.rawValue)") }
         if let origin = Self.screen(for: window.frame, among: screens), self.placement(of: window, on: origin) != nil {
             // Already placed: keep the floating frame from before.
@@ -333,7 +353,9 @@ public struct LayoutEngine: Sendable {
     /// frame is known, the frame to give it back, positioned so
     /// the cursor keeps the same relative spot along the title bar. Remembers
     /// the floating frame of a window that was not placed.
-    public mutating func dragStarted(_ window: WindowSnapshot, cursorX: Double, cursorY: Double, screens: [Screen]) -> Rect? {
+    public mutating func dragStarted(_ window: WindowSnapshot, cursorX: Double, cursorY: Double, screens: [Screen])
+        -> Rect?
+    {
         guard isPlaced(window, screens: screens), let floating = restoreFrames[window.id] else {
             dragStartFrames[window.id] = window.frame
             return nil
@@ -357,11 +379,13 @@ public struct LayoutEngine: Sendable {
     /// The placement the window is at on `screen`, if any (exact frame, or
     /// centered in the target Pavé gave it when the app refused the size).
     public func placement(of window: WindowSnapshot, on screen: Screen) -> Placement? {
-        if let exact = Placement.allCases.first(where: { window.frame.isClose(to: $0.frame(in: screen.visibleFrame)) }) {
+        if let exact = Placement.allCases.first(where: { window.frame.isClose(to: $0.frame(in: screen.visibleFrame)) })
+        {
             return exact
         }
         if let last = placed[window.id], last.target == last.placement.frame(in: screen.visibleFrame),
-            window.frame.isClose(to: Self.centered(width: window.frame.width, height: window.frame.height, in: last.target))
+            window.frame.isClose(
+                to: Self.centered(width: window.frame.width, height: window.frame.height, in: last.target))
         {
             return last.placement
         }
@@ -446,7 +470,8 @@ public struct LayoutEngine: Sendable {
         let rx = relative(frame.x - source.x, source.width - frame.width)
         let ry = relative(frame.y - source.y, source.height - frame.height)
         return Rect(
-            x: (target.x + rx * (target.width - width)).rounded(), y: (target.y + ry * (target.height - height)).rounded(),
+            x: (target.x + rx * (target.width - width)).rounded(),
+            y: (target.y + ry * (target.height - height)).rounded(),
             width: width, height: height)
     }
 

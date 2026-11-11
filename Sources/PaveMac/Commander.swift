@@ -100,7 +100,10 @@ public final class Commander {
                 let total = Int(Date().timeIntervalSince(received) * 1000)
                 let verdict = result.ok ? (result.constrained ? "ok (constrained, centered)" : "ok") : "MISS"
                 let detail = result.error ?? "actual \(result.actual.map(\.description) ?? "?")"
-                let place = zoned.map { " (zone \($0.indices.map { "\($0 + 1)" }.joined(separator: "+")) of \($0.layout.layout.name))" } ?? ""
+                let place =
+                    zoned.map {
+                        " (zone \($0.indices.map { "\($0 + 1)" }.joined(separator: "+")) of \($0.layout.layout.name))"
+                    } ?? ""
                 Log.info(
                     "\(tag): \(window.frame) → target \(target)\(place), \(detail), \(verdict), ax \(Int(result.durationMs)) ms, total \(total) ms"
                 )
@@ -132,7 +135,9 @@ public final class Commander {
     public func drop(
         _ window: WindowSnapshot, in zone: SnapZones.Zone, completion: @escaping @MainActor (MoveResult?) -> Void
     ) {
-        guard case .setFrame(let target) = engine.drop(window, at: zone.placement, on: zone.screen, screens: Screens.all())
+        guard
+            case .setFrame(let target) = engine.drop(
+                window, at: zone.placement, on: zone.screen, screens: Screens.all())
         else { return completion(nil) }
         registry.setFrame(of: window, to: target) { result in completion(result) }
     }
@@ -182,7 +187,9 @@ public final class Commander {
             let returning = zoneHomes.filter { $0.value.screen == screen.id }
             guard !returning.isEmpty else { continue }
             guard let zones = ruleZones(screen) else {
-                Log.info("zones: \(returning.count) window(s) had zones on a screen back without a layout, left where they are")
+                Log.info(
+                    "zones: \(returning.count) window(s) had zones on a screen back without a layout, left where they are"
+                )
                 continue
             }
             var moved = 0
@@ -196,7 +203,9 @@ public final class Commander {
                 moved += 1
                 registry.setFrame(of: window, to: frame) { [weak self] result in
                     self?.settle(window, result, screens: screens)
-                    Log.info("zones \(id) [\(window.appName)]: back in zone \(kept.map { "\($0 + 1)" }.joined(separator: "+")) of \(zones.layout.name) (Z3), \(result.ok ? "ok" : "MISS")")
+                    Log.info(
+                        "zones \(id) [\(window.appName)]: back in zone \(kept.map { "\($0 + 1)" }.joined(separator: "+")) of \(zones.layout.name) (Z3), \(result.ok ? "ok" : "MISS")"
+                    )
                 }
             }
             Log.info("zones (Z3): screen back, \(moved) window(s) returned to their zones")
@@ -210,10 +219,14 @@ public final class Commander {
         for window in windows {
             guard case .setFrame(let target)? = engine.reflow(window, from: old, to: new, on: screen) else { continue }
             moved += 1
-            remember(window.id, new.layout.zones(matching: target, in: screen.visibleFrame, gaps: new.gaps).map { (screen.id, $0) })
+            remember(
+                window.id,
+                new.layout.zones(matching: target, in: screen.visibleFrame, gaps: new.gaps).map { (screen.id, $0) })
             registry.setFrame(of: window, to: target) { [weak self] result in
                 self?.settle(window, result, screens: screens)
-                Log.info("zones \(window.id) [\(window.appName)]: \(old.layout.name) → \(new.layout.name), \(result.ok ? "ok" : "MISS")")
+                Log.info(
+                    "zones \(window.id) [\(window.appName)]: \(old.layout.name) → \(new.layout.name), \(result.ok ? "ok" : "MISS")"
+                )
             }
         }
         if moved == 0 { Log.info("zones: \(old.layout.name) → \(new.layout.name), no window in zones") }
@@ -230,13 +243,19 @@ public final class Commander {
     /// App rule `zone = N`: a new standard window goes into zone N of its
     /// screen, when that screen has a layout.
     private func newWindow(_ created: WindowSnapshot) {
-        guard registry.isReady, let n = rule(created).zone, rule(created).refusal(for: created, via: .hotkey) == nil else { return }
+        guard registry.isReady, let n = rule(created).zone, rule(created).refusal(for: created, via: .hotkey) == nil
+        else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.newWindowDelay) { [weak self] in
             MainActor.assumeIsolated {
-                guard let self, let window = self.registry.store.windows[created.id], !self.isParked(window.id) else { return }
+                guard let self, let window = self.registry.store.windows[created.id], !self.isParked(window.id) else {
+                    return
+                }
                 let screens = Screens.all()
-                guard let screen = LayoutEngine.screen(for: window.frame, among: screens), let zones = self.ruleZones(screen) else {
-                    return Log.info("\(window.id) [\(window.appName)]: zone \(n) (app rule) skipped, no layout on its screen")
+                guard let screen = LayoutEngine.screen(for: window.frame, among: screens),
+                    let zones = self.ruleZones(screen)
+                else {
+                    return Log.info(
+                        "\(window.id) [\(window.appName)]: zone \(n) (app rule) skipped, no layout on its screen")
                 }
                 self.place(window, inZone: n, of: zones, on: screen, source: "app rule", showZones: false)
             }
@@ -246,10 +265,13 @@ public final class Commander {
     /// Puts `window` into zone `n` (from 1) of `zones` on `screen`;
     /// `showZones`: the layout flashes with that zone lit, as for the arrows.
     public func place(
-        _ window: WindowSnapshot, inZone n: Int, of zones: ScreenZones, on screen: Screen, source: String, showZones: Bool = true
+        _ window: WindowSnapshot, inZone n: Int, of zones: ScreenZones, on screen: Screen, source: String,
+        showZones: Bool = true
     ) {
         guard case .setFrame(let target)? = engine.place(window, inZone: n - 1, of: zones, on: screen) else {
-            let why = n > zones.layout.zones.count ? "\(zones.layout.name) has \(zones.layout.zones.count) zones" : "already there"
+            let why =
+                n > zones.layout.zones.count
+                ? "\(zones.layout.name) has \(zones.layout.zones.count) zones" : "already there"
             return Log.info("\(window.id) [\(window.appName)]: zone \(n) (\(source)) skipped, \(why)")
         }
         let screens = Screens.all()
@@ -257,7 +279,9 @@ public final class Commander {
         if showZones { hud.show(screen.visibleFrame, zones, lit: [n - 1]) }
         registry.setFrame(of: window, to: target) { [weak self] result in
             self?.settle(window, result, screens: screens)
-            Log.info("\(window.id) [\(window.appName)] → zone \(n) of \(zones.layout.name) (\(source)), \(result.ok ? "ok" : "MISS")")
+            Log.info(
+                "\(window.id) [\(window.appName)] → zone \(n) of \(zones.layout.name) (\(source)), \(result.ok ? "ok" : "MISS")"
+            )
         }
     }
 
@@ -278,7 +302,9 @@ public final class Commander {
         registry.setFrame(of: moved, to: kept) { [weak self] second in
             let final = second.actual ?? kept
             self?.engine.settled(window.id, at: final)
-            Log.info("zones \(window.id) [\(window.appName)]: refused \(Int(result.target.width))×\(Int(result.target.height)), kept on screen at \(final)")
+            Log.info(
+                "zones \(window.id) [\(window.appName)]: refused \(Int(result.target.width))×\(Int(result.target.height)), kept on screen at \(final)"
+            )
         }
     }
 }

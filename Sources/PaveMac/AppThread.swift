@@ -21,7 +21,8 @@ final class AppThread: Thread, @unchecked Sendable {
         runLoop = CFRunLoopGetCurrent()
         // A run loop with no source returns immediately: keep it alive with a far-future timer.
         let keepAlive = CFRunLoopTimerCreateWithHandler(
-            nil, CFAbsoluteTimeGetCurrent() + 1e9, 1e9, 0, 0) { _ in }
+            nil, CFAbsoluteTimeGetCurrent() + 1e9, 1e9, 0, 0
+        ) { _ in }
         CFRunLoopAddTimer(runLoop, keepAlive, .defaultMode)
         ready.signal()
         while !isCancelled {
@@ -38,7 +39,8 @@ final class AppThread: Thread, @unchecked Sendable {
     /// Runs `block` on this thread after `delay` seconds.
     func after(_ delay: TimeInterval, _ block: @escaping () -> Void) {
         let timer = CFRunLoopTimerCreateWithHandler(
-            nil, CFAbsoluteTimeGetCurrent() + delay, 0, 0, 0) { _ in block() }
+            nil, CFAbsoluteTimeGetCurrent() + delay, 0, 0, 0
+        ) { _ in block() }
         CFRunLoopAddTimer(runLoop, timer, .defaultMode)
         CFRunLoopWakeUp(runLoop)
     }

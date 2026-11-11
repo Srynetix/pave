@@ -30,18 +30,23 @@ public struct SnapZones: Sendable {
         {
             return kept
         }
-        guard let screen = screens.first(where: { $0.frame.contains(x: x, y: y) })
-            ?? screens.min(by: { distance(x, y, $0.frame) < distance(x, y, $1.frame) })
+        guard
+            let screen = screens.first(where: { $0.frame.contains(x: x, y: y) })
+                ?? screens.min(by: { distance(x, y, $0.frame) < distance(x, y, $1.frame) })
         else { return nil }
         return zone(x: x, y: y, on: screen, margin: enter)
     }
 
     private func zone(x: Double, y: Double, on screen: Screen, margin: Double) -> Zone? {
         let f = screen.frame
-        let nearLeft = x <= f.x + margin, nearRight = x >= f.maxX - 1 - margin
-        let nearTop = y <= f.y + margin, nearBottom = y >= f.maxY - 1 - margin
-        let topEnd = y <= f.y + corner, bottomEnd = y >= f.maxY - corner
-        let leftEnd = x <= f.x + corner, rightEnd = x >= f.maxX - corner
+        let nearLeft = x <= f.x + margin
+        let nearRight = x >= f.maxX - 1 - margin
+        let nearTop = y <= f.y + margin
+        let nearBottom = y >= f.maxY - 1 - margin
+        let topEnd = y <= f.y + corner
+        let bottomEnd = y >= f.maxY - corner
+        let leftEnd = x <= f.x + corner
+        let rightEnd = x >= f.maxX - corner
         // The point must be on (or just off) this screen.
         guard x >= f.x - margin, x <= f.maxX + margin, y >= f.y - margin, y <= f.maxY + margin else { return nil }
         let placement: Placement?

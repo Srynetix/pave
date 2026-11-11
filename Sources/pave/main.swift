@@ -182,7 +182,9 @@ case "focus":
 case "workspace":
     var screen: String?
     if let i = args.firstIndex(of: "--screen") {
-        guard i + 1 < args.count else { fail("--screen needs a screen: its number (0 = main), part of its name, or builtin", code: 2) }
+        guard i + 1 < args.count else {
+            fail("--screen needs a screen: its number (0 = main), part of its name, or builtin", code: 2)
+        }
         screen = args[i + 1]
         args.removeSubrange(i...(i + 1))
     }

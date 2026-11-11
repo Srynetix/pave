@@ -39,7 +39,8 @@ public final class UpdateService {
     public private(set) var newer: [Updates.Release] = []
     public var source = Updates.defaultSource
 
-    public let current: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
+    public let current: String =
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
     private var timer: Timer?
     static let interval: TimeInterval = 24 * 3600
 
@@ -76,11 +77,15 @@ public final class UpdateService {
     /// another certificate than the releases (built from source).
     public static let notUpdatable: String? = {
         guard let url = Bundle.main.url(forResource: "update-cert", withExtension: "sha256"),
-            let expected = try? String(contentsOf: url, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            let expected = try? String(contentsOf: url, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines)
+                .lowercased()
         else { return "this copy carries no release certificate: it updates from your own builds" }
-        guard let mine = signingCertificateSHA256() else { return "this copy is not signed with a certificate: it updates from your own builds" }
+        guard let mine = signingCertificateSHA256() else {
+            return "this copy is not signed with a certificate: it updates from your own builds"
+        }
         return mine == expected
-            ? nil : "this copy is signed with another certificate than Pavé's releases (built from source): it updates from your own builds"
+            ? nil
+            : "this copy is signed with another certificate than Pavé's releases (built from source): it updates from your own builds"
     }()
 
     /// SHA-256 of the leaf certificate this app is signed with.
@@ -90,7 +95,8 @@ public final class UpdateService {
         var info: CFDictionary?
         guard SecCodeCopySelf([], &code) == errSecSuccess, let code,
             SecCodeCopyStaticCode(code, [], &staticCode) == errSecSuccess, let staticCode,
-            SecCodeCopySigningInformation(staticCode, SecCSFlags(rawValue: kSecCSSigningInformation), &info) == errSecSuccess,
+            SecCodeCopySigningInformation(staticCode, SecCSFlags(rawValue: kSecCSSigningInformation), &info)
+                == errSecSuccess,
             let certificates = (info as? [String: Any])?[kSecCodeInfoCertificates as String] as? [SecCertificate],
             let leaf = certificates.first
         else { return nil }
@@ -111,7 +117,8 @@ public final class UpdateService {
         }
         let previous = status
         status = .checking
-        let source = source, current = current
+        let source = source
+        let current = current
         Task.detached {
             let result: Result<[Updates.Release], Error>
             do {
@@ -125,7 +132,8 @@ public final class UpdateService {
                 case .success(let releases):
                     self.newer = Updates.newer(releases, than: current)
                     if let latest = self.newer.first {
-                        if case .available(let shown) = previous, shown == latest {} else {
+                        if case .available(let shown) = previous, shown == latest {
+                        } else {
                             Log.info("update: Pavé \(latest.version) available (this one: \(current))")
                         }
                         self.status = .available(latest)
@@ -146,7 +154,9 @@ public final class UpdateService {
 
     public func install(_ release: Updates.Release, then: (@MainActor (String?) -> Void)? = nil) {
         guard Self.isInstalledCopy else {
-            return fail("this is a development build (\(Bundle.main.bundlePath)): updates install over the copy in Applications", then)
+            return fail(
+                "this is a development build (\(Bundle.main.bundlePath)): updates install over the copy in Applications",
+                then)
         }
         guard let archive = release.archive else { return fail("Pavé \(release.version) has no signed archive", then) }
         guard let keyURL = Bundle.main.url(forResource: "update-key", withExtension: "pub"),
@@ -154,13 +164,18 @@ public final class UpdateService {
         else { return fail("this Pavé has no update key: install from the release page", then) }
         status = .installing(release.version)
         Log.info("update: installing Pavé \(release.version)")
-        let source = source, app = URL(fileURLWithPath: Bundle.main.bundlePath)
+        let source = source
+        let app = URL(fileURLWithPath: Bundle.main.bundlePath)
         Task.detached {
             do {
                 let key = try Minisign.PublicKey(keyText)
                 let bytes = try await Self.github("repos/\(source)/releases/assets/\(archive.file.id)", binary: true)
-                let sigText = String(decoding: try await Self.github("repos/\(source)/releases/assets/\(archive.signature.id)", binary: true), as: UTF8.self)
-                try Minisign.verify(bytes, signature: try Minisign.Signature(sigText), key: key, trustedComment: "file:\(archive.file.name)")
+                let sigText = String(
+                    decoding: try await Self.github(
+                        "repos/\(source)/releases/assets/\(archive.signature.id)", binary: true), as: UTF8.self)
+                try Minisign.verify(
+                    bytes, signature: try Minisign.Signature(sigText), key: key,
+                    trustedComment: "file:\(archive.file.name)")
                 try Self.replace(app, with: bytes)
                 await MainActor.run {
                     Log.info("update: Pavé \(release.version) installed, restarting")
@@ -229,7 +244,8 @@ public final class UpdateService {
             } catch {
                 // Neither in place: the old app stays where it is, never deleted.
                 keepWork = true
-                throw Failure(description: "cannot put the new app in place, nor the old one back: it is in \(old.path)")
+                throw Failure(
+                    description: "cannot put the new app in place, nor the old one back: it is in \(old.path)")
             }
             throw Failure(description: "cannot put the new app in place (\(error.localizedDescription))")
         }
@@ -262,7 +278,8 @@ public final class UpdateService {
     /// access). `binary`: a release asset's bytes.
     nonisolated static func github(_ path: String, binary: Bool = false) async throws -> Data {
         var request = URLRequest(url: URL(string: "https://api.github.com/\(path)")!, timeoutInterval: 120)
-        request.setValue(binary ? "application/octet-stream" : "application/vnd.github+json", forHTTPHeaderField: "Accept")
+        request.setValue(
+            binary ? "application/octet-stream" : "application/vnd.github+json", forHTTPHeaderField: "Accept")
         request.setValue("Pave-updater", forHTTPHeaderField: "User-Agent")
         var publicError = "no answer"
         do {
@@ -277,7 +294,9 @@ public final class UpdateService {
         do {
             return try gh(binary ? ["api", "-H", "Accept: application/octet-stream", path] : ["api", path])
         } catch let error as Failure where error.description.hasPrefix("the GitHub CLI") {
-            throw Failure(description: "\(publicError); a private repository needs the GitHub CLI: brew install gh, then gh auth login")
+            throw Failure(
+                description:
+                    "\(publicError); a private repository needs the GitHub CLI: brew install gh, then gh auth login")
         }
     }
 
@@ -298,7 +317,8 @@ public final class UpdateService {
         let result = try Shell.run(path, args, environment: env)
         guard result.status == 0 else {
             let name = URL(fileURLWithPath: path).lastPathComponent
-            throw Failure(description: "\(name): \(result.errorText.trimmingCharacters(in: .whitespacesAndNewlines).prefix(300))")
+            throw Failure(
+                description: "\(name): \(result.errorText.trimmingCharacters(in: .whitespacesAndNewlines).prefix(300))")
         }
         return result.output
     }

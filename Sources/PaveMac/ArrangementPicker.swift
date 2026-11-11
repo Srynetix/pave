@@ -27,7 +27,8 @@ public final class ArrangementPicker {
     public var isOpen: Bool { session != nil }
 
     public init() {
-        panel = NSPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: true)
+        panel = NSPanel(
+            contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: true)
         panel.isOpaque = false
         panel.backgroundColor = .clear
         panel.hasShadow = true
@@ -54,9 +55,11 @@ public final class ArrangementPicker {
         let size = view.fittingSize
         view.frame = NSRect(origin: .zero, size: size)
         panel.setFrame(
-            Screens.appKit(Rect(
-                x: (area.x + (area.width - size.width) / 2).rounded(), y: (area.y + (area.height - size.height) / 2).rounded(),
-                width: size.width, height: size.height)),
+            Screens.appKit(
+                Rect(
+                    x: (area.x + (area.width - size.width) / 2).rounded(),
+                    y: (area.y + (area.height - size.height) / 2).rounded(),
+                    width: size.width, height: size.height)),
             display: true)
         view.needsDisplay = true
         panel.orderFrontRegardless()
@@ -104,37 +107,59 @@ private final class ListView: NSView {
 
     override var fittingSize: NSSize {
         let count = max(rows.count, 1)
-        return NSSize(width: Self.width, height: Self.padding * 2 + Self.titleHeight + Double(count) * Self.rowHeight + Self.footerHeight)
+        return NSSize(
+            width: Self.width,
+            height: Self.padding * 2 + Self.titleHeight + Double(count) * Self.rowHeight + Self.footerHeight)
     }
 
     override func draw(_ dirtyRect: NSRect) {
-        let title: [NSAttributedString.Key: Any] = [.font: NSFont.systemFont(ofSize: 15, weight: .semibold), .foregroundColor: NSColor.labelColor]
-        NSAttributedString(string: String(localized: "Window arrangements"), attributes: title).draw(at: NSPoint(x: Self.padding, y: Self.padding))
+        let title: [NSAttributedString.Key: Any] = [
+            .font: NSFont.systemFont(ofSize: 15, weight: .semibold), .foregroundColor: NSColor.labelColor,
+        ]
+        NSAttributedString(string: String(localized: "Window arrangements"), attributes: title).draw(
+            at: NSPoint(x: Self.padding, y: Self.padding))
         var y = Self.padding + Self.titleHeight
         if rows.isEmpty {
-            let empty: [NSAttributedString.Key: Any] = [.font: NSFont.systemFont(ofSize: 13), .foregroundColor: NSColor.secondaryLabelColor]
-            NSAttributedString(string: String(localized: "None yet: S saves the windows as they are now."), attributes: empty)
-                .draw(at: NSPoint(x: Self.padding, y: y + 11))
+            let empty: [NSAttributedString.Key: Any] = [
+                .font: NSFont.systemFont(ofSize: 13), .foregroundColor: NSColor.secondaryLabelColor,
+            ]
+            NSAttributedString(
+                string: String(localized: "None yet: S saves the windows as they are now."), attributes: empty
+            )
+            .draw(at: NSPoint(x: Self.padding, y: y + 11))
         }
         for (i, row) in rows.enumerated() {
-            let rect = NSRect(x: Self.padding - 6, y: y, width: Self.width - 2 * Self.padding + 12, height: Self.rowHeight - 4)
+            let rect = NSRect(
+                x: Self.padding - 6, y: y, width: Self.width - 2 * Self.padding + 12, height: Self.rowHeight - 4)
             if i == selected {
                 NSColor.controlAccentColor.withAlphaComponent(0.35).setFill()
                 NSBezierPath(roundedRect: rect, xRadius: 8, yRadius: 8).fill()
             }
             let number: [NSAttributedString.Key: Any] = [
-                .font: NSFont.monospacedDigitSystemFont(ofSize: 13, weight: .semibold), .foregroundColor: NSColor.secondaryLabelColor,
+                .font: NSFont.monospacedDigitSystemFont(ofSize: 13, weight: .semibold),
+                .foregroundColor: NSColor.secondaryLabelColor,
             ]
-            if i < 9 { NSAttributedString(string: "\(i + 1)", attributes: number).draw(at: NSPoint(x: Self.padding, y: y + 10)) }
-            let name: [NSAttributedString.Key: Any] = [.font: NSFont.systemFont(ofSize: 14, weight: i == selected ? .semibold : .regular), .foregroundColor: NSColor.labelColor]
+            if i < 9 {
+                NSAttributedString(string: "\(i + 1)", attributes: number).draw(at: NSPoint(x: Self.padding, y: y + 10))
+            }
+            let name: [NSAttributedString.Key: Any] = [
+                .font: NSFont.systemFont(ofSize: 14, weight: i == selected ? .semibold : .regular),
+                .foregroundColor: NSColor.labelColor,
+            ]
             NSAttributedString(string: row.name, attributes: name).draw(at: NSPoint(x: Self.padding + 22, y: y + 9))
-            let detail: [NSAttributedString.Key: Any] = [.font: NSFont.systemFont(ofSize: 12), .foregroundColor: NSColor.secondaryLabelColor]
+            let detail: [NSAttributedString.Key: Any] = [
+                .font: NSFont.systemFont(ofSize: 12), .foregroundColor: NSColor.secondaryLabelColor,
+            ]
             let text = NSAttributedString(string: row.detail, attributes: detail)
             text.draw(at: NSPoint(x: Self.width - Self.padding - text.size().width, y: y + 11))
             y += Self.rowHeight
         }
-        let hint: [NSAttributedString.Key: Any] = [.font: NSFont.systemFont(ofSize: 12), .foregroundColor: NSColor.tertiaryLabelColor]
-        NSAttributedString(string: String(localized: "1–9 restore · ↩ restore · S save current · esc cancel"), attributes: hint)
-            .draw(at: NSPoint(x: Self.padding, y: bounds.height - Self.padding - 16))
+        let hint: [NSAttributedString.Key: Any] = [
+            .font: NSFont.systemFont(ofSize: 12), .foregroundColor: NSColor.tertiaryLabelColor,
+        ]
+        NSAttributedString(
+            string: String(localized: "1–9 restore · ↩ restore · S save current · esc cancel"), attributes: hint
+        )
+        .draw(at: NSPoint(x: Self.padding, y: bounds.height - Self.padding - 16))
     }
 }

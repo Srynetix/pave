@@ -5,7 +5,6 @@ import PaveCore
 extension TaskbarController {
     // MARK: - Hover previews
 
-
     func hover(_ item: TaskbarItem, view: NSView, inside: Bool) {
         guard let button = view as? TaskbarButton else { return }
         if inside {
@@ -14,7 +13,8 @@ extension TaskbarController {
             guard !item.windowIDs.isEmpty else { return scheduleHide() }
             // Already showing one: follow the cursor at once, as Windows does.
             if preview.isVisible { return showPreview(item, anchor: button) }
-            showTimer = Timer.scheduledTimer(withTimeInterval: Self.hoverDelay, repeats: false) { [weak self, weak button] _ in
+            showTimer = Timer.scheduledTimer(withTimeInterval: Self.hoverDelay, repeats: false) {
+                [weak self, weak button] _ in
                 MainActor.assumeIsolated {
                     guard let self, let button, let current = button.item else { return }
                     self.showPreview(current, anchor: button)
@@ -31,7 +31,9 @@ extension TaskbarController {
         let windows = item.windowIDs.compactMap { registry.store.windows[$0] }
         guard !windows.isEmpty else { return hidePreview() }
         let switching = preview.windowIDs != windows.map(\.id)
-        let icon = item.pid.flatMap { NSRunningApplication(processIdentifier: $0)?.icon } ?? NSImage(named: NSImage.applicationIconName)!
+        let icon =
+            item.pid.flatMap { NSRunningApplication(processIdentifier: $0)?.icon } ?? NSImage(
+                named: NSImage.applicationIconName)!
         preview.show(windows, images: { [thumbnails] in thumbnails.cached($0) }, icon: icon, above: anchor)
         previewAnchor = anchor
         guard switching else { return }

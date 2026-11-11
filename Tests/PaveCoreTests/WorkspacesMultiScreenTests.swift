@@ -1,25 +1,31 @@
 import Foundation
 import Testing
+
 @testable import PaveCore
 
 // A measured arrangement: LG on the left, primary built-in screen first.
 private let a = Screen(
-    frame: Rect(x: 0, y: 0, width: 1800, height: 1169), visibleFrame: Rect(x: 0, y: 40, width: 1800, height: 1089), id: "A")
+    frame: Rect(x: 0, y: 0, width: 1800, height: 1169), visibleFrame: Rect(x: 0, y: 40, width: 1800, height: 1089),
+    id: "A")
 private let b = Screen(
-    frame: Rect(x: -2560, y: 0, width: 2560, height: 1440), visibleFrame: Rect(x: -2560, y: 31, width: 2560, height: 1409), id: "B")
+    frame: Rect(x: -2560, y: 0, width: 2560, height: 1440),
+    visibleFrame: Rect(x: -2560, y: 31, width: 2560, height: 1409), id: "B")
 private let screens = [a, b]
 
 private func win(_ id: UInt32, on screen: Screen, state: WindowState = .normal) -> WindowSnapshot {
     WindowSnapshot(
         id: WindowID(id), pid: 1, appName: "App", title: "",
-        frame: Rect(x: screen.visibleFrame.x + 100, y: 100, width: 600, height: 400), state: state, subrole: "AXStandardWindow")
+        frame: Rect(x: screen.visibleFrame.x + 100, y: 100, width: 600, height: 400), state: state,
+        subrole: "AXStandardWindow")
 }
 
 /// Start-up with two screens and windows 1 (on A) and 2 (on B) adopted.
 private func started() -> (Workspaces, WindowSnapshot, WindowSnapshot) {
     var ws = Workspaces()
-    let w1 = win(1, on: a), w2 = win(2, on: b)
-    let started = ws.screensChanged(screens, windows: []) + ws.adopt(w1, screens: screens) + ws.adopt(w2, screens: screens)
+    let w1 = win(1, on: a)
+    let w2 = win(2, on: b)
+    let started =
+        ws.screensChanged(screens, windows: []) + ws.adopt(w1, screens: screens) + ws.adopt(w2, screens: screens)
     #expect(started.isEmpty)
     return (ws, w1, w2)
 }
@@ -82,7 +88,10 @@ private func frames(_ actions: [Workspaces.Action]) -> [WindowID: Rect] {
         #expect(ws.visible == ["A": 3, "B": 2] && ws.home[3] == "A")
         #expect(frames(actions)[w1.id].map { a.frame.intersectionArea(with: $0) > 0 } == true)
         #expect(frames(actions)[w2.id] == w2.frame)  // back from its parking spot
-        #expect(ws.display(3, on: a, screens: screens, windows: [w1OnB]).allSatisfy { if case .setFrame = $0 { false } else { true } })
+        #expect(
+            ws.display(3, on: a, screens: screens, windows: [w1OnB]).allSatisfy {
+                if case .setFrame = $0 { false } else { true }
+            })
     }
 
     @Test func switchingOnOneScreenLeavesTheOtherAlone() {
@@ -126,7 +135,8 @@ private func frames(_ actions: [Workspaces.Action]) -> [WindowID: Rect] {
         let w3 = win(3, on: a)
         _ = ws.adopt(w3, screens: screens)
         let actions = ws.move(w1, to: 5, windows: [w1, w3, w2], screens: screens)
-        #expect(actions == [.setFrame(w1.id, ParkingSpot.frame(for: w1.frame, at: .bottomRight, of: a)), .focus(w3.id)])
+        #expect(
+            actions == [.setFrame(w1.id, ParkingSpot.frame(for: w1.frame, at: .bottomRight, of: a)), .focus(w3.id)])
         #expect(ws.home[5] == "A")
         let back = ws.switchTo(5, focusedScreen: b, screens: screens, windows: [w3, w2, w1])
         #expect(frames(back)[w1.id] == w1.frame)  // on A, its home, not on the focused B
@@ -182,7 +192,9 @@ private func frames(_ actions: [Workspaces.Action]) -> [WindowID: Rect] {
 
     @Test func aNewScreenGetsAnEmptyWorkspace() {
         var (ws, w1, w2) = started()
-        let c = Screen(frame: Rect(x: 1800, y: 0, width: 1920, height: 1080), visibleFrame: Rect(x: 1800, y: 25, width: 1920, height: 1055), id: "C")
+        let c = Screen(
+            frame: Rect(x: 1800, y: 0, width: 1920, height: 1080),
+            visibleFrame: Rect(x: 1800, y: 25, width: 1920, height: 1055), id: "C")
         _ = ws.screensChanged(screens + [c], windows: [w1, w2])
         #expect(ws.visible["C"] == 3)
     }
@@ -227,8 +239,9 @@ private func frames(_ actions: [Workspaces.Action]) -> [WindowID: Rect] {
         var (ws, _, _) = started()
         let hiddenTarget = win(10, on: a)
         let parkedAtOnce = ws.adopt(hiddenTarget, screens: screens, preferred: 4)
-        #expect(parkedAtOnce
-            == [.setFrame(hiddenTarget.id, ParkingSpot.frame(for: hiddenTarget.frame, at: .bottomRight, of: a))])
+        #expect(
+            parkedAtOnce
+                == [.setFrame(hiddenTarget.id, ParkingSpot.frame(for: hiddenTarget.frame, at: .bottomRight, of: a))])
         #expect(ws.workspace(of: hiddenTarget.id) == 4)
         let shownTarget = win(11, on: a)
         let actions = ws.adopt(shownTarget, screens: screens, preferred: 2)
@@ -297,8 +310,10 @@ private func frames(_ actions: [Workspaces.Action]) -> [WindowID: Rect] {
         _ = ws.move(w3, to: 5, windows: [w3, w1, w2], screens: screens)  // 5 lives on A, hidden
         _ = ws.switchTo(7, focusedScreen: b, screens: screens, windows: [w2, w1, w3])  // B shows an empty 7
         let windows = [w1, w2, w3]
-        let onA = WorkspaceIndicator.items(for: "A", primaryID: "A", state: ws, windows: windows, names: ["Web", "", "", "", "Mail"])
-        #expect(onA == [.init(number: 1, isVisible: true, name: "Web"), .init(number: 5, isVisible: false, name: "Mail")])
+        let onA = WorkspaceIndicator.items(
+            for: "A", primaryID: "A", state: ws, windows: windows, names: ["Web", "", "", "", "Mail"])
+        #expect(
+            onA == [.init(number: 1, isVisible: true, name: "Web"), .init(number: 5, isVisible: false, name: "Mail")])
         let onB = WorkspaceIndicator.items(for: "B", primaryID: "A", state: ws, windows: windows)
         #expect(onB.map(\.number) == [2, 7])
         #expect(onB.map(\.isVisible) == [false, true])

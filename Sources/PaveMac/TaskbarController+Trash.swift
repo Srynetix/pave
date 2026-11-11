@@ -12,7 +12,6 @@ extension TaskbarController {
         }
     }
 
-
     /// Asking the Finder costs an `osascript` process (≈ 130 ms, ~/.Trash is
     /// protected): every 5 s while the Finder is in front, where files get
     /// deleted, else every minute (polling every 5 s was the main

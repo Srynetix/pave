@@ -50,7 +50,8 @@ extension AppDelegate {
             case .accessibility: self.openAccessibilitySettings()
             case .screenRecording:
                 self.thumbnails.requestPermissionIfNeeded()
-                NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")!)
+                NSWorkspace.shared.open(
+                    URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")!)
             case .onboarding: self.windows.showOnboarding()
             case .checkUpdates: self.updateFromMenu()
             case .stageManager:
@@ -73,7 +74,8 @@ extension AppDelegate {
         model.editZones = { [weak self] index, name in
             guard let self else { return }
             let screens = Screens.all()
-            let screen = index.flatMap { screens.indices.contains($0) ? screens[$0] : nil }
+            let screen =
+                index.flatMap { screens.indices.contains($0) ? screens[$0] : nil }
                 ?? Screens.underMouse(among: screens) ?? screens.first
             if let screen { self.openZoneEditor(on: screen, layoutName: name, assign: index != nil) }
         }
@@ -104,24 +106,34 @@ extension AppDelegate {
                 visible: workspaces.isEnabled && state.isVisible(n),
                 windows: windowsByWorkspace[n]?.count ?? 0)
         }
-        var keyboards: [SettingsModel.KeyboardRow] = (remap?.keyboards.values.map { entry in
-            let text: String = switch entry.state {
-            case .pending: String(localized: "In progress…")
-            case .applied: String(localized: "Remapped")
-            case .stock: String(localized: "Left as is (None preset)")
-            case .skipped: String(localized: "Left alone")
-            case .failed(let why): String(localized: "Failed: \(why)")
-            }
-            return SettingsModel.KeyboardRow(
-                id: entry.keyboard.configID, name: entry.keyboard.name, state: text,
-                remapped: { if case .applied = entry.state { true } else { false } }())
-        } ?? []).sorted { $0.name < $1.name }
+        var keyboards: [SettingsModel.KeyboardRow] =
+            (remap?.keyboards.values.map { entry in
+                let text: String =
+                    switch entry.state {
+                    case .pending: String(localized: "In progress…")
+                    case .applied: String(localized: "Remapped")
+                    case .stock: String(localized: "Left as is (None preset)")
+                    case .skipped: String(localized: "Left alone")
+                    case .failed(let why): String(localized: "Failed: \(why)")
+                    }
+                return SettingsModel.KeyboardRow(
+                    id: entry.keyboard.configID, name: entry.keyboard.name, state: text,
+                    remapped: { if case .applied = entry.state { true } else { false } }())
+            } ?? []).sorted { $0.name < $1.name }
         for id in c.keyboardSkip.sorted() where !keyboards.contains(where: { $0.id == id }) {
-            keyboards.append(.init(id: id, name: id == "built-in" ? String(localized: "Built-in keyboard") : id, state: String(localized: "Not connected"), remapped: false))
+            keyboards.append(
+                .init(
+                    id: id, name: id == "built-in" ? String(localized: "Built-in keyboard") : id,
+                    state: String(localized: "Not connected"), remapped: false))
         }
         let apps = NSWorkspace.shared.runningApplications
-            .filter { $0.activationPolicy == .regular && $0.bundleIdentifier != nil && $0.bundleIdentifier != Bundle.main.bundleIdentifier }
-            .map { SettingsModel.RunningApp(bundleID: $0.bundleIdentifier!, name: $0.localizedName ?? $0.bundleIdentifier!) }
+            .filter {
+                $0.activationPolicy == .regular && $0.bundleIdentifier != nil
+                    && $0.bundleIdentifier != Bundle.main.bundleIdentifier
+            }
+            .map {
+                SettingsModel.RunningApp(bundleID: $0.bundleIdentifier!, name: $0.localizedName ?? $0.bundleIdentifier!)
+            }
             .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         var status = SettingsModel.Status()
         status.trusted = Permissions.isAccessibilityTrusted()
@@ -129,17 +141,25 @@ extension AppDelegate {
         status.windows = registry.store.windows.count
         status.apps = registry.appCount
         status.hung = registry.unresponsive.values.sorted()
-        status.screens = names.enumerated().map { $0.offset == 0 ? String(localized: "\($0.element) (main)") : $0.element }
+        status.screens = names.enumerated().map {
+            $0.offset == 0 ? String(localized: "\($0.element) (main)") : $0.element
+        }
         let remapped = keyboards.filter(\.remapped).count
         status.pcKeys = remap?.settings.enabled == true && c.keyboardPreset == .pc && remap?.karabinerRunning != true
-        status.keyboard = !(remap?.settings.enabled ?? false) ? String(localized: "Remap off")
-            : remap?.karabinerRunning == true ? String(localized: "Remap paused (Karabiner running)")
-            : String(localized: "Remapped keyboards: \(remapped)")
-        status.configPath = config.url.path.replacingOccurrences(of: FileManager.default.homeDirectoryForCurrentUser.path, with: "~")
+        status.keyboard =
+            !(remap?.settings.enabled ?? false)
+            ? String(localized: "Remap off")
+            : remap?.karabinerRunning == true
+                ? String(localized: "Remap paused (Karabiner running)")
+                : String(localized: "Remapped keyboards: \(remapped)")
+        status.configPath = config.url.path.replacingOccurrences(
+            of: FileManager.default.homeDirectoryForCurrentUser.path, with: "~")
         switch config.status {
         case .defaults: status.configState = String(localized: "no file, defaults")
         case .loaded(let warnings):
-            status.configState = warnings.isEmpty ? String(localized: "loaded without errors") : String(localized: "warnings: \(warnings.count)")
+            status.configState =
+                warnings.isEmpty
+                ? String(localized: "loaded without errors") : String(localized: "warnings: \(warnings.count)")
         case .invalid(let problem):
             status.configState = String(localized: "invalid")
             status.configError = "\(problem)"
@@ -149,17 +169,22 @@ extension AppDelegate {
         status.login = loginState
         status.update = updateStatusText
         if case .available(let release) = updates.status { status.updateAvailable = release.version }
-        status.updateBusy = [.checking].contains(updates.status) || { if case .installing = updates.status { true } else { false } }()
+        status.updateBusy =
+            [.checking].contains(updates.status) || { if case .installing = updates.status { true } else { false } }()
         status.canUpdate = UpdateService.isInstalledCopy
         let zoneSettings = c.zones
-        settingsModel.updateZones(Screens.all().enumerated().compactMap { i, screen in
-            guard let identity = Screens.identity(of: screen.id) else { return nil }
-            let key = zoneSettings.screenKey(screenID: screen.id, screenName: identity.name, isBuiltIn: identity.isBuiltIn)
-            return .init(
-                id: i, name: identity.name,
-                key: key ?? ZoneSettings.newScreenKey(screenID: screen.id, screenName: identity.name, isBuiltIn: identity.isBuiltIn),
-                layout: key.flatMap { zoneSettings.screens[$0] } ?? ZoneSettings.none)
-        })
+        settingsModel.updateZones(
+            Screens.all().enumerated().compactMap { i, screen in
+                guard let identity = Screens.identity(of: screen.id) else { return nil }
+                let key = zoneSettings.screenKey(
+                    screenID: screen.id, screenName: identity.name, isBuiltIn: identity.isBuiltIn)
+                return .init(
+                    id: i, name: identity.name,
+                    key: key
+                        ?? ZoneSettings.newScreenKey(
+                            screenID: screen.id, screenName: identity.name, isBuiltIn: identity.isBuiltIn),
+                    layout: key.flatMap { zoneSettings.screens[$0] } ?? ZoneSettings.none)
+            })
         settingsModel.update(
             config: c, status: status, workspaces: rows,
             screens: names.enumerated().map { .init(id: $0.offset, name: $0.element) },

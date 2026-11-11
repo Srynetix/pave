@@ -159,11 +159,18 @@ public final class DragSnapController {
         }
         if current.detectedAt == nil {
             adoptNewWindow(&current, x: x, y: y, at: at)
-            guard let id = current.window, let start = current.startBounds, let now = Self.bounds(of: id) else { return }
+            guard let id = current.window, let start = current.startBounds, let now = Self.bounds(of: id) else {
+                return
+            }
             if abs(now.width - start.width) > 1 || abs(now.height - start.height) > 1 {
                 // A resize by an edge: not ours. (A window adopted mid-press may
                 // still be settling its size: only the clicked one counts.)
-                if current.adopted { current.startBounds = now } else { current.resize = true; followResize(&current, at: at) }
+                if current.adopted {
+                    current.startBounds = now
+                } else {
+                    current.resize = true
+                    followResize(&current, at: at)
+                }
                 return
             }
             guard abs(now.x - start.x) >= 2 || abs(now.y - start.y) >= 2 else { return }
@@ -174,7 +181,9 @@ public final class DragSnapController {
             }
             current.base = start
             if !current.adopted {
-                if let restored = unsnapIfPlaced(id, cursorX: x, cursorY: y, downX: current.downX, downY: current.downY, start: start) {
+                if let restored = unsnapIfPlaced(
+                    id, cursorX: x, cursorY: y, downX: current.downX, downY: current.downY, start: start)
+                {
                     current.base = restored
                 }
             }
@@ -200,13 +209,17 @@ public final class DragSnapController {
             }
             let area = screen.visibleFrame
             let hovered = zones.layout.zone(atX: x, y: y, in: area)
-            let previous = current.zoneTarget.flatMap { $0.screen == screen && $0.layoutName == zones.layout.name ? $0 : nil }
+            let previous = current.zoneTarget.flatMap {
+                $0.screen == screen && $0.layoutName == zones.layout.name ? $0 : nil
+            }
             let anchor = shift ? previous?.anchor ?? hovered : hovered
             let span = zones.layout.span(anchor, hovered, in: area, gaps: zones.gaps)
             current.zoneTarget = ZoneTarget(
                 screen: screen, layoutName: zones.layout.name, anchor: anchor, zones: span.zones, frame: span.frame)
             let key = "\(screen.id) \(zones.layout.name)"
-            if current.zoneFrames?.key != key { current.zoneFrames = (key, zones.layout.frames(in: area, gaps: zones.gaps)) }
+            if current.zoneFrames?.key != key {
+                current.zoneFrames = (key, zones.layout.frames(in: area, gaps: zones.gaps))
+            }
             overlay.show(area: area, frames: current.zoneFrames!.frames, lit: Set(span.zones), below: id)
             return
         }
@@ -246,7 +259,9 @@ public final class DragSnapController {
 
     /// A placed window gets its floating size back when dragged away: that
     /// frame, at the click's place, is returned.
-    private func unsnapIfPlaced(_ id: WindowID, cursorX: Double, cursorY: Double, downX: Double, downY: Double, start: Rect) -> Rect? {
+    private func unsnapIfPlaced(
+        _ id: WindowID, cursorX: Double, cursorY: Double, downX: Double, downY: Double, start: Rect
+    ) -> Rect? {
         guard var window = registry.store.windows[id] else { return nil }
         window.frame = start  // the live bounds at the click, not the lagging AX frame
         guard let restored = commander.dragStarted(window, cursorX: downX, cursorY: downY) else { return nil }
@@ -255,7 +270,8 @@ public final class DragSnapController {
             x: restored.x + (cursorX - downX), y: restored.y + (cursorY - downY),
             width: restored.width, height: restored.height)
         registry.setFrame(of: window, to: target) { result in
-            Log.info("drag \(id) [\(window.appName)]: size given back \(start) → \(target), \(result.ok ? "ok" : "MISS")")
+            Log.info(
+                "drag \(id) [\(window.appName)]: size given back \(start) → \(target), \(result.ok ? "ok" : "MISS")")
         }
         return restored
     }
@@ -266,7 +282,8 @@ public final class DragSnapController {
         let app = registry.store.windows[id]?.appName ?? "?"
         let held = Double(clock_gettime_nsec_np(CLOCK_UPTIME_RAW) - done.downAt) / 1_000_000
         let sorted = detectionDelays.sorted()
-        let detection = "detected \(Int(Double(detectedAt - (done.firstDragAt ?? detectedAt)) / 1_000_000)) ms after the drag start "
+        let detection =
+            "detected \(Int(Double(detectedAt - (done.firstDragAt ?? detectedAt)) / 1_000_000)) ms after the drag start "
             + "(D1 so far: n=\(sorted.count), p50 \(Int(sorted[sorted.count / 2])), max \(Int(sorted.last!)) ms)"
         let detail = detection + (done.adopted ? ", window created during the drag" : "")
         if let target = done.zoneTarget {
@@ -286,7 +303,8 @@ public final class DragSnapController {
         var label: String {
             switch self {
             case .edge(let zone): zone.placement.rawValue
-            case .zones(let target): "zone " + target.zones.map { "\($0 + 1)" }.joined(separator: "+") + " of \(target.layoutName)"
+            case .zones(let target):
+                "zone " + target.zones.map { "\($0 + 1)" }.joined(separator: "+") + " of \(target.layoutName)"
             }
         }
     }
@@ -297,7 +315,9 @@ public final class DragSnapController {
         guard var window = registry.store.windows[id] else {
             if attempt < 5, Self.bounds(of: id) != nil {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                    MainActor.assumeIsolated { self?.drop(id, in: zone, detection: detection, held: held, attempt: attempt + 1) }
+                    MainActor.assumeIsolated {
+                        self?.drop(id, in: zone, detection: detection, held: held, attempt: attempt + 1)
+                    }
                 }
             } else {
                 Log.info("drag \(id): dropped in \(zone.label) but the window is unknown or gone")
@@ -306,7 +326,8 @@ public final class DragSnapController {
         }
         let app = window.appName
         guard commander.rule(window).refusal(for: window, via: .drag) == nil else {
-            return Log.info("drag \(id) [\(app)]: not placed (\(commander.rule(window).refusal(for: window, via: .drag)!))")
+            return Log.info(
+                "drag \(id) [\(app)]: not placed (\(commander.rule(window).refusal(for: window, via: .drag)!))")
         }
         if let live = Self.bounds(of: id) { window.frame = live }
         let started = Date()
@@ -329,14 +350,19 @@ public final class DragSnapController {
     private func verify(_ id: WindowID, app: String, target: Rect, retried: Bool) {
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.verifyDelay) { [weak self] in
             MainActor.assumeIsolated {
-                guard let self, let live = Self.bounds(of: id), var window = self.registry.store.windows[id] else { return }
+                guard let self, let live = Self.bounds(of: id), var window = self.registry.store.windows[id] else {
+                    return
+                }
                 let centered = LayoutEngine.centered(width: live.width, height: live.height, in: target)
                 var seen = window
                 seen.frame = live
                 if live.isClose(to: target) || live.isClose(to: centered) || self.commander.isInItsZones(seen) {
                     if retried { self.drops.retried += 1 } else { self.drops.ok += 1 }
-                    if retried { Log.info("drag (D2) \(id) [\(app)]: ok after retry · \(self.summary)") }
-                    else { Log.info("drag (D2) \(id) [\(app)]: held at +500 ms · \(self.summary)") }
+                    if retried {
+                        Log.info("drag (D2) \(id) [\(app)]: ok after retry · \(self.summary)")
+                    } else {
+                        Log.info("drag (D2) \(id) [\(app)]: held at +500 ms · \(self.summary)")
+                    }
                     return
                 }
                 if retried {
@@ -362,7 +388,8 @@ public final class DragSnapController {
     /// Frontmost normal-level window of another app containing the point.
     private static func windowUnder(x: Double, y: Double) -> (WindowID, Int32, Rect)? {
         let me = ProcessInfo.processInfo.processIdentifier
-        let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID)
+        let list =
+            CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID)
             as? [[String: Any]] ?? []
         for info in list {  // front to back
             guard (info[kCGWindowLayer as String] as? Int) == 0,

@@ -20,7 +20,9 @@ public enum Relaunch {
         let task = Process()
         task.executableURL = URL(fileURLWithPath: "/bin/sh")
         // The path goes as $0: never interpolated into the script.
-        task.arguments = ["-c", "while kill -0 \(getpid()) 2>/dev/null; do sleep 0.2; done; /usr/bin/open \"$0\"", app.path]
+        task.arguments = [
+            "-c", "while kill -0 \(getpid()) 2>/dev/null; do sleep 0.2; done; /usr/bin/open \"$0\"", app.path,
+        ]
         do {
             try task.run()
         } catch {

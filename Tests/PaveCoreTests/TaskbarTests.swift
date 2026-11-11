@@ -1,4 +1,5 @@
 import Testing
+
 @testable import PaveCore
 
 private let main = Screen(
@@ -8,17 +9,22 @@ private let external = Screen(
 
 private func ids(_ raw: [UInt32]) -> [WindowID] { raw.map { WindowID($0) } }
 
-private func w(_ id: UInt32, pid: PID, _ app: String, state: WindowState = .normal, x: Double = 100,
-               subrole: String = "AXStandardWindow") -> WindowSnapshot {
-    WindowSnapshot(id: WindowID(id), pid: pid, appName: app, title: "t\(id)",
-                   frame: Rect(x: x, y: 100, width: 800, height: 600), state: state, subrole: subrole)
+private func w(
+    _ id: UInt32, pid: PID, _ app: String, state: WindowState = .normal, x: Double = 100,
+    subrole: String = "AXStandardWindow"
+) -> WindowSnapshot {
+    WindowSnapshot(
+        id: WindowID(id), pid: pid, appName: app, title: "t\(id)",
+        frame: Rect(x: x, y: 100, width: 800, height: 600), state: state, subrole: subrole)
 }
 
 private let bundles: [PID: String] = [1: "com.brave.Browser", 2: "com.tinyspeck.slackmacgap", 3: "com.apple.finder"]
 
 @Suite struct TaskbarModelTests {
     /// Opened in this order: Slack #10, Brave #20, Finder #30, Brave #40.
-    private let windows = [w(40, pid: 1, "Brave"), w(10, pid: 2, "Slack"), w(30, pid: 3, "Finder"), w(20, pid: 1, "Brave")]
+    private let windows = [
+        w(40, pid: 1, "Brave"), w(10, pid: 2, "Slack"), w(30, pid: 3, "Finder"), w(20, pid: 1, "Brave"),
+    ]
 
     private func model(_ ws: [WindowSnapshot]) -> TaskbarModel {
         var m = TaskbarModel()
@@ -26,11 +32,14 @@ private let bundles: [PID: String] = [1: "com.brave.Browser", 2: "com.tinyspeck.
         return m
     }
 
-    private func items(_ ws: [WindowSnapshot], pinned: [String] = [], grouping: TaskbarGrouping = .never,
-                       width: Double = 1500, active: WindowID? = nil, screen: Screen = main,
-                       hidden: Set<WindowID> = []) -> (items: [TaskbarItem], overflow: Int) {
-        model(ws).items(windows: ws, on: screen, screens: [main, external], active: active, bundleIDs: bundles,
-                        pinned: pinned, grouping: grouping, width: width, hidden: hidden)
+    private func items(
+        _ ws: [WindowSnapshot], pinned: [String] = [], grouping: TaskbarGrouping = .never,
+        width: Double = 1500, active: WindowID? = nil, screen: Screen = main,
+        hidden: Set<WindowID> = []
+    ) -> (items: [TaskbarItem], overflow: Int) {
+        model(ws).items(
+            windows: ws, on: screen, screens: [main, external], active: active, bundleIDs: bundles,
+            pinned: pinned, grouping: grouping, width: width, hidden: hidden)
     }
 
     @Test func windowsOfOneAppSitTogetherInOpeningOrder() {
@@ -52,9 +61,11 @@ private let bundles: [PID: String] = [1: "com.brave.Browser", 2: "com.tinyspeck.
 
     @Test func pinnedAppsComeFirstAndTheirWindowsTakeTheSlot() {
         let result = items(windows, pinned: ["com.apple.finder", "com.apple.Safari"]).items
-        #expect(result.map(\.app) == [
-            "com.apple.finder", "com.apple.Safari", "com.tinyspeck.slackmacgap", "com.brave.Browser", "com.brave.Browser",
-        ])
+        #expect(
+            result.map(\.app) == [
+                "com.apple.finder", "com.apple.Safari", "com.tinyspeck.slackmacgap", "com.brave.Browser",
+                "com.brave.Browser",
+            ])
         #expect(result[0].kind == .window(WindowID(30)) && result[0].isPinned)
         #expect(result[1].kind == .pinned && result[1].appName == nil)
     }
@@ -102,7 +113,8 @@ private let bundles: [PID: String] = [1: "com.brave.Browser", 2: "com.tinyspeck.
 @Suite struct TaskbarConfigTests {
     @Test func taskbarSettingsParse() throws {
         let (config, warnings) = try PaveConfig.parse(
-            "[taskbar]\ngrouping = \"when_full\"\npinned = [\"com.apple.finder\", \"com.brave.Browser\", \"com.apple.finder\"]")
+            "[taskbar]\ngrouping = \"when_full\"\npinned = [\"com.apple.finder\", \"com.brave.Browser\", \"com.apple.finder\"]"
+        )
         #expect(warnings.isEmpty)
         #expect(config.taskbarGrouping == .whenFull)
         #expect(config.taskbarPinned == ["com.apple.finder", "com.brave.Browser"])
@@ -118,22 +130,26 @@ private let bundles: [PID: String] = [1: "com.brave.Browser", 2: "com.tinyspeck.
 
     @Test func zoomedWindowsStopAtTheBar() {
         // Native zoom down to the screen edge.
-        #expect(TaskbarOverlap.fix(Rect(x: 0, y: 40, width: 1800, height: 1129), usable: usable)
-            == Rect(x: 0, y: 40, width: 1800, height: 1089))
+        #expect(
+            TaskbarOverlap.fix(Rect(x: 0, y: 40, width: 1800, height: 1129), usable: usable)
+                == Rect(x: 0, y: 40, width: 1800, height: 1089))
         // Already above the bar (or within 1 pt): left alone.
         #expect(TaskbarOverlap.fix(Rect(x: 0, y: 40, width: 1800, height: 1089), usable: usable) == nil)
         #expect(TaskbarOverlap.fix(Rect(x: 0, y: 40, width: 1800, height: 1090), usable: usable) == nil)
     }
 
     @Test func aWindowMostlyInTheBarIsMovedUp() {
-        #expect(TaskbarOverlap.fix(Rect(x: 100, y: 1100, width: 600, height: 400), usable: usable)
-            == Rect(x: 100, y: 729, width: 600, height: 400))
+        #expect(
+            TaskbarOverlap.fix(Rect(x: 100, y: 1100, width: 600, height: 400), usable: usable)
+                == Rect(x: 100, y: 729, width: 600, height: 400))
         // Another screen's window is not this bar's business.
         #expect(TaskbarOverlap.fix(Rect(x: 2000, y: 900, width: 600, height: 400), usable: usable) == nil)
     }
 
     @Test func overlapRuleParses() throws {
-        let config = try PaveConfig.parse("[apps.\"com.example\"]\ntaskbar-overlap = \"allow\"\n[taskbar]\nhide-dock = true").config
+        let config = try PaveConfig.parse(
+            "[apps.\"com.example\"]\ntaskbar-overlap = \"allow\"\n[taskbar]\nhide-dock = true"
+        ).config
         #expect(config.rule(for: "com.example").taskbarOverlap)
         #expect(config.taskbarHideDock)
         #expect(throws: PaveConfig.Problem.self) { try PaveConfig.parse("[apps.\"x\"]\ntaskbar-overlap = \"maybe\"") }

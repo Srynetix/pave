@@ -18,16 +18,19 @@ struct TaskbarPane: View {
                     Text("Its settings come back when you turn the taskbar off or quit Pavé.")
                 }
                 .disabled(!c.taskbarEnabled)
-                Picker("Group the windows of an app", selection: Binding(
-                    get: { c.taskbarGrouping }, set: { model.set("taskbar", "grouping", string: $0.rawValue) })
+                Picker(
+                    "Group the windows of an app",
+                    selection: Binding(
+                        get: { c.taskbarGrouping }, set: { model.set("taskbar", "grouping", string: $0.rawValue) })
                 ) {
                     Text("Never (one entry per window)").tag(TaskbarGrouping.never)
                     Text("Always (one entry per app)").tag(TaskbarGrouping.always)
                     Text("When the taskbar is full").tag(TaskbarGrouping.whenFull)
                 }
-                Toggle(isOn: Binding(
-                    get: { c.taskbarOptionOpensLauncher },
-                    set: { model.set("taskbar", "start-key", string: $0 ? "option" : "none") })
+                Toggle(
+                    isOn: Binding(
+                        get: { c.taskbarOptionOpensLauncher },
+                        set: { model.set("taskbar", "start-key", string: $0 ? "option" : "none") })
                 ) {
                     Text("⌥ alone opens the launcher")
                     Text("Like the Windows key.")

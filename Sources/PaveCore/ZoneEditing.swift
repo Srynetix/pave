@@ -59,8 +59,11 @@ public struct ZoneDraft: Equatable, Sendable {
         var cut = start + size / 2
         let snapped = Int((Double(cut) / Double(Self.step)).rounded()) * Self.step
         if snapped - start >= Self.minSize, start + size - snapped >= Self.minSize { cut = snapped }
-        let first = columns ? ZoneLayout.Zone(z.x, z.y, cut - z.x, z.height) : ZoneLayout.Zone(z.x, z.y, z.width, cut - z.y)
-        let second = columns ? ZoneLayout.Zone(cut, z.y, z.maxX - cut, z.height) : ZoneLayout.Zone(z.x, cut, z.width, z.maxY - cut)
+        let first =
+            columns ? ZoneLayout.Zone(z.x, z.y, cut - z.x, z.height) : ZoneLayout.Zone(z.x, z.y, z.width, cut - z.y)
+        let second =
+            columns
+            ? ZoneLayout.Zone(cut, z.y, z.maxX - cut, z.height) : ZoneLayout.Zone(z.x, cut, z.width, z.maxY - cut)
         guard zones.count < ZoneLayout.maxZones else { return nil }
         record()
         zones.remove(at: i)
@@ -73,8 +76,10 @@ public struct ZoneDraft: Equatable, Sendable {
     /// index, or nil when they do not.
     public mutating func merge(_ i: Int, _ j: Int) -> Int? {
         guard i != j, zones.indices.contains(i), zones.indices.contains(j) else { return nil }
-        let a = zones[i], b = zones[j]
-        let x = min(a.x, b.x), y = min(a.y, b.y)
+        let a = zones[i]
+        let b = zones[j]
+        let x = min(a.x, b.x)
+        let y = min(a.y, b.y)
         let merged = ZoneLayout.Zone(x, y, max(a.maxX, b.maxX) - x, max(a.maxY, b.maxY) - y)
         // They do not overlap: the box is theirs alone when its area is the sum of theirs.
         guard merged.width * merged.height == a.width * a.height + b.width * b.height else { return nil }
@@ -108,7 +113,9 @@ public struct ZoneDraft: Equatable, Sendable {
     /// either side whose spans along the line touch or overlap.
     public var separators: [Separator] {
         [true, false].flatMap { vertical in
-            let positions = Set(zones.flatMap { z in vertical ? [z.x, z.maxX] : [z.y, z.maxY] }).filter { $0 > 0 && $0 < 100 }
+            let positions = Set(zones.flatMap { z in vertical ? [z.x, z.maxX] : [z.y, z.maxY] }).filter {
+                $0 > 0 && $0 < 100
+            }
             return positions.sorted().flatMap { separators(vertical: vertical, at: $0) }
         }
     }
@@ -118,7 +125,9 @@ public struct ZoneDraft: Equatable, Sendable {
         let before = zones.filter { (vertical ? $0.maxX : $0.maxY) == p }
         let after = zones.filter { (vertical ? $0.x : $0.y) == p }
         var pieces: [Separator] = []
-        for (z, isBefore) in (before.map { ($0, true) } + after.map { ($0, false) }).sorted(by: { span($0.0).0 < span($1.0).0 }) {
+        for (z, isBefore) in (before.map { ($0, true) } + after.map { ($0, false) }).sorted(by: {
+            span($0.0).0 < span($1.0).0
+        }) {
             let (s, e) = span(z)
             // Spans that overlap move together; ones that only touch (a grid's
             // top and bottom rows) are separate pieces.
@@ -127,7 +136,10 @@ public struct ZoneDraft: Equatable, Sendable {
                 if isBefore { last.before.append(z) } else { last.after.append(z) }
                 pieces[pieces.count - 1] = last
             } else {
-                pieces.append(Separator(vertical: vertical, position: p, start: s, end: e, before: isBefore ? [z] : [], after: isBefore ? [] : [z]))
+                pieces.append(
+                    Separator(
+                        vertical: vertical, position: p, start: s, end: e, before: isBefore ? [z] : [],
+                        after: isBefore ? [] : [z]))
             }
         }
         return pieces

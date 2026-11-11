@@ -93,7 +93,8 @@ public struct SwitcherSession: Equatable, Sendable {
         if options.scope == .screen { return options.onScreen.contains(window.id) }
         if options.scope == .workspace, let active = options.activeWorkspace {
             let workspace = options.workspaceOf[window.id] ?? active
-            return options.visibleWorkspaces.isEmpty ? workspace == active : options.visibleWorkspaces.contains(workspace)
+            return options.visibleWorkspaces.isEmpty
+                ? workspace == active : options.visibleWorkspaces.contains(workspace)
         }
         return true
     }
@@ -210,8 +211,9 @@ public struct SwitcherSession: Equatable, Sendable {
         let known = Set(all.map(\.id))
         for (rank, window) in windows.enumerated() where !known.contains(window.id) && Self.isListed(window, options) {
             all.append(
-                Entry(id: window.id, pid: window.pid, appName: window.appName, title: window.title,
-                      state: window.state, mruRank: rank))
+                Entry(
+                    id: window.id, pid: window.pid, appName: window.appName, title: window.title,
+                    state: window.state, mruRank: rank))
         }
         refilter(keeping: current)
     }
@@ -247,7 +249,8 @@ enum Search {
         let app = fold(name)
         if app.starts(with: needle) { return 3 }
         let haystack = app + [" "] + fold(extra)
-        for start in haystack.indices where start == 0 || !haystack[start - 1].isLetter && !haystack[start - 1].isNumber {
+        for start in haystack.indices where start == 0 || !haystack[start - 1].isLetter && !haystack[start - 1].isNumber
+        {
             if haystack[start...].starts(with: needle) { return 2 }
         }
         var rest = needle[...]

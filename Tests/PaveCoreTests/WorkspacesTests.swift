@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import PaveCore
 
 private let screen = Screen(
@@ -24,7 +25,8 @@ private func hidden(_ w: WindowSnapshot) -> Rect { Workspaces.hiddenFrame(for: w
 
     @Test func switchHidesOutgoingAndFocusesMostRecentIncoming() {
         var ws = Workspaces()
-        let a = win(1), b = win(2, x: 300)
+        let a = win(1)
+        let b = win(2, x: 300)
         let actions = ws.switchTo(2, windows: [a, b], screen: screen)
         #expect(actions == [.setFrame(a.id, hidden(a)), .setFrame(b.id, hidden(b))])
         #expect(ws.active == 2)
@@ -34,8 +36,10 @@ private func hidden(_ w: WindowSnapshot) -> Rect { Workspaces.hiddenFrame(for: w
         // focus goes to the most recently used window of workspace 1.
         let c = win(3, x: 500)
         ws.adopt(c.id)
-        let parkedA = WindowSnapshot(id: a.id, pid: 1, appName: "App", title: "", frame: hidden(a), state: .normal, subrole: "AXStandardWindow")
-        let parkedB = WindowSnapshot(id: b.id, pid: 1, appName: "App", title: "", frame: hidden(b), state: .normal, subrole: "AXStandardWindow")
+        let parkedA = WindowSnapshot(
+            id: a.id, pid: 1, appName: "App", title: "", frame: hidden(a), state: .normal, subrole: "AXStandardWindow")
+        let parkedB = WindowSnapshot(
+            id: b.id, pid: 1, appName: "App", title: "", frame: hidden(b), state: .normal, subrole: "AXStandardWindow")
         let back = ws.switchTo(1, windows: [c, parkedB, parkedA], screen: screen)
         #expect(back == [.setFrame(c.id, hidden(c)), .setFrame(b.id, b.frame), .setFrame(a.id, a.frame), .focus(b.id)])
         #expect(!ws.isHidden(a.id) && ws.isHidden(c.id))
@@ -58,7 +62,8 @@ private func hidden(_ w: WindowSnapshot) -> Rect { Workspaces.hiddenFrame(for: w
 
     @Test func moveParksWindowAndFocusesNextOne() {
         var ws = Workspaces()
-        let a = win(1), b = win(2)
+        let a = win(1)
+        let b = win(2)
         let actions = ws.move(a, to: 3, windows: [a, b], screen: screen)
         #expect(actions == [.setFrame(a.id, hidden(a)), .focus(b.id)])
         #expect(ws.workspace(of: a.id) == 3)
@@ -70,7 +75,8 @@ private func hidden(_ w: WindowSnapshot) -> Rect { Workspaces.hiddenFrame(for: w
 
     @Test func focusingAHiddenWindowFollowsItToItsWorkspace() {
         var ws = Workspaces()
-        let a = win(1), b = win(2)
+        let a = win(1)
+        let b = win(2)
         _ = ws.move(a, to: 2, windows: [a, b], screen: screen)
         let actions = ws.focused(a.id, windows: [a, b], screen: screen)
         #expect(ws.active == 2)
@@ -81,7 +87,8 @@ private func hidden(_ w: WindowSnapshot) -> Rect { Workspaces.hiddenFrame(for: w
 
     @Test func restoreAllBringsEverythingBack() {
         var ws = Workspaces()
-        let a = win(1), b = win(2)
+        let a = win(1)
+        let b = win(2)
         _ = ws.switchTo(2, windows: [a, b], screen: screen)
         let actions = ws.restoreAll()
         #expect(actions == [.setFrame(a.id, a.frame), .setFrame(b.id, b.frame)])
@@ -125,7 +132,10 @@ private func hidden(_ w: WindowSnapshot) -> Rect { Workspaces.hiddenFrame(for: w
             frame: Rect(x: 1799, y: 40, width: 1800, height: 1089), state: .normal, subrole: "AXStandardWindow")
         _ = ws.adopt(lost, screens: [screen], preferred: 4)
         let actions = ws.switchTo(4, focusedScreen: screen, screens: [screen], windows: [lost])
-        guard case .setFrame(_, let frame) = actions.first else { Issue.record("no frame"); return }
+        guard case .setFrame(_, let frame) = actions.first else {
+            Issue.record("no frame")
+            return
+        }
         #expect(frame.x == 0 && frame.maxX <= screen.frame.maxX)
     }
 }
@@ -142,23 +152,29 @@ private func hidden(_ w: WindowSnapshot) -> Rect { Workspaces.hiddenFrame(for: w
     @Test func inFrontTheWorkspaceFollows() {
         var ws = Workspaces()
         _ = ws.screensChanged([screen], windows: [])
-        let other = win(1, x: 300), brave = win(2)
+        let other = win(1, x: 300)
+        let brave = win(2)
         _ = ws.adopt(other, screens: [screen])
         _ = ws.adopt(brave, screens: [screen])
-        let actions = ws.ruleResolved(brave, to: 3, follow: true, focusedScreen: screen, screens: [screen], windows: [brave, other])
+        let actions = ws.ruleResolved(
+            brave, to: 3, follow: true, focusedScreen: screen, screens: [screen], windows: [brave, other])
         #expect(ws.active == 3 && ws.workspace(of: brave.id) == 3)
         #expect(!ws.isHidden(brave.id) && ws.isHidden(other.id))
         // Parked, then shown back where it was: the last move puts it in place.
-        #expect(actions.last(where: { if case .setFrame(brave.id, _) = $0 { true } else { false } }) == .setFrame(brave.id, brave.frame))
+        #expect(
+            actions.last(where: { if case .setFrame(brave.id, _) = $0 { true } else { false } })
+                == .setFrame(brave.id, brave.frame))
     }
 
     @Test func inTheBackItIsSentAway() {
         var ws = Workspaces()
         _ = ws.screensChanged([screen], windows: [])
-        let other = win(1, x: 300), brave = win(2)
+        let other = win(1, x: 300)
+        let brave = win(2)
         _ = ws.adopt(other, screens: [screen])
         _ = ws.adopt(brave, screens: [screen])
-        _ = ws.ruleResolved(brave, to: 3, follow: false, focusedScreen: screen, screens: [screen], windows: [other, brave])
+        _ = ws.ruleResolved(
+            brave, to: 3, follow: false, focusedScreen: screen, screens: [screen], windows: [other, brave])
         #expect(ws.active == 1 && ws.workspace(of: brave.id) == 3 && ws.isHidden(brave.id))
     }
 }
@@ -166,7 +182,8 @@ private func hidden(_ w: WindowSnapshot) -> Rect { Workspaces.hiddenFrame(for: w
 @Suite struct OutOfSightTests {
     @Test func minimizedWindowsAreSeenOnTheirWorkspaceOnly() {
         let screen = Screen(
-            frame: Rect(x: 0, y: 0, width: 1800, height: 1169), visibleFrame: Rect(x: 0, y: 40, width: 1800, height: 1069))
+            frame: Rect(x: 0, y: 0, width: 1800, height: 1169),
+            visibleFrame: Rect(x: 0, y: 40, width: 1800, height: 1069))
         var ws = Workspaces()
         _ = ws.screensChanged([screen], windows: [])
         let minimized = WindowSnapshot(

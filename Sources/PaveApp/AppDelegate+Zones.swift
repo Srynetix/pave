@@ -11,16 +11,23 @@ extension AppDelegate {
     /// `keyboard`: for the arrows (needs `zones.keyboard`); `quiet`: no log line.
     func zones(on screen: Screen, keyboard: Bool = false, quiet: Bool = false) -> ScreenZones? {
         let settings = config.config.zones
-        guard settings.enabled, !keyboard || settings.keyboard, let identity = Screens.identity(of: screen.id) else { return nil }
+        guard settings.enabled, !keyboard || settings.keyboard, let identity = Screens.identity(of: screen.id) else {
+            return nil
+        }
         let workspace = workspaces.isEnabled ? workspaces.state.visible[screen.id] : nil
         // Drags log why (once per screen per press); key presses stay quiet.
-        let log: (String) -> Void = { if !keyboard, !quiet { Log.info("zones: \($0) on \(identity.name), workspace \(workspace.map(String.init) ?? "-")") } }
+        let log: (String) -> Void = {
+            if !keyboard, !quiet {
+                Log.info("zones: \($0) on \(identity.name), workspace \(workspace.map(String.init) ?? "-")")
+            }
+        }
         if let workspace, tiling.isTiledWorkspace(workspace) {
             log("none (tiled workspace)")
             return nil
         }
-        guard let layout = settings.layout(
-            screenID: screen.id, screenName: identity.name, isBuiltIn: identity.isBuiltIn, workspace: workspace)
+        guard
+            let layout = settings.layout(
+                screenID: screen.id, screenName: identity.name, isBuiltIn: identity.isBuiltIn, workspace: workspace)
         else {
             log("none (no layout for this screen)")
             return nil
@@ -38,7 +45,8 @@ extension AppDelegate {
         if action == .arrangementPicker { return openArrangementPicker(id) }
         let settings = config.config.zones
         let screens = Screens.all()
-        let screen = registry.focusedWindow.flatMap { LayoutEngine.screen(for: $0.frame, among: screens) }
+        let screen =
+            registry.focusedWindow.flatMap { LayoutEngine.screen(for: $0.frame, among: screens) }
             ?? Screens.underMouse(among: screens) ?? screens.first
         guard settings.enabled, let screen, let identity = Screens.identity(of: screen.id) else {
             hotkeys?.endSession(id)
@@ -58,7 +66,9 @@ extension AppDelegate {
                 && LayoutEngine.screen(for: window.frame, among: screens) == screen
                 && commander.rule(window).refusal(for: window, via: .hotkey) == nil ? window.id : nil
         }
-        Log.info("zones: picker opened on \(identity.name), current \(current?.name ?? ZoneSettings.none)\(pickerWindow == nil ? ", no window to place" : "")")
+        Log.info(
+            "zones: picker opened on \(identity.name), current \(current?.name ?? ZoneSettings.none)\(pickerWindow == nil ? ", no window to place" : "")"
+        )
         zonePicker.open(
             id: id, area: screen.visibleFrame, screenName: identity.name,
             choices: settings.choices.map { .init(name: $0, layout: settings.layout(named: $0)) },
@@ -93,8 +103,10 @@ extension AppDelegate {
         if let workspace, settings.workspaces[workspace] != nil {
             setConfig("zones.workspaces", "\(workspace)", to: ConfigEdit.string(name))
         } else {
-            let key = settings.screenKey(screenID: screen.id, screenName: identity.name, isBuiltIn: identity.isBuiltIn)
-                ?? ZoneSettings.newScreenKey(screenID: screen.id, screenName: identity.name, isBuiltIn: identity.isBuiltIn)
+            let key =
+                settings.screenKey(screenID: screen.id, screenName: identity.name, isBuiltIn: identity.isBuiltIn)
+                ?? ZoneSettings.newScreenKey(
+                    screenID: screen.id, screenName: identity.name, isBuiltIn: identity.isBuiltIn)
             setConfig("zones.screens", key, to: ConfigEdit.string(name))
         }
         Log.info("zones: \(name) for \(identity.name)")
@@ -114,7 +126,6 @@ extension AppDelegate {
         }
     }
 
-
     // MARK: - Zones CLI
 
     /// `pave zones …`: a report, or a change through the same paths as the UI.
@@ -129,19 +140,28 @@ extension AppDelegate {
         }
         switch command {
         case .report:
-            var lines = ["zones: \(settings.enabled ? "on" : "off"), gaps \(settings.gaps), show \(settings.show.rawValue), keyboard \(settings.keyboard ? "on" : "off")"]
+            var lines = [
+                "zones: \(settings.enabled ? "on" : "off"), gaps \(settings.gaps), show \(settings.show.rawValue), keyboard \(settings.keyboard ? "on" : "off")"
+            ]
             lines.append("screens:")
             for (i, s) in screens.enumerated() {
                 guard let identity = Screens.identity(of: s.id) else { continue }
                 let key = settings.screenKey(screenID: s.id, screenName: identity.name, isBuiltIn: identity.isBuiltIn)
                 let layout = key.flatMap { settings.screens[$0] } ?? ZoneSettings.none
                 let now = zones(on: s, keyboard: true)?.layout.name ?? ZoneSettings.none
-                lines.append("  \(i) \(identity.name): \(layout)" + (key.map { " (key \"\($0)\")" } ?? "") + (now != layout ? ", now \(now)" : ""))
+                lines.append(
+                    "  \(i) \(identity.name): \(layout)" + (key.map { " (key \"\($0)\")" } ?? "")
+                        + (now != layout ? ", now \(now)" : ""))
             }
             if !settings.workspaces.isEmpty {
-                lines.append("workspaces: " + settings.workspaces.sorted { $0.key < $1.key }.map { "\($0.key) → \($0.value)" }.joined(separator: ", "))
+                lines.append(
+                    "workspaces: "
+                        + settings.workspaces.sorted { $0.key < $1.key }.map { "\($0.key) → \($0.value)" }.joined(
+                            separator: ", "))
             }
-            let mine = settings.layouts.values.sorted { $0.name < $1.name }.map { "\($0.name) (\($0.zones.count) zones)" }
+            let mine = settings.layouts.values.sorted { $0.name < $1.name }.map {
+                "\($0.name) (\($0.zones.count) zones)"
+            }
             lines.append("layouts: " + (ZoneLayout.builtIn.map(\.name) + mine).joined(separator: ", "))
             return (true, lines.joined(separator: "\n"))
         case .enable(let on):
@@ -178,14 +198,17 @@ extension AppDelegate {
         guard let identity = Screens.identity(of: screen.id) else { return }
         let settings = config.config.zones
         let workspace = workspaces.isEnabled ? workspaces.state.visible[screen.id] : nil
-        let current = layoutName.flatMap { settings.layout(named: $0) }
-            ?? settings.layout(screenID: screen.id, screenName: identity.name, isBuiltIn: identity.isBuiltIn, workspace: workspace)
+        let current =
+            layoutName.flatMap { settings.layout(named: $0) }
+            ?? settings.layout(
+                screenID: screen.id, screenName: identity.name, isBuiltIn: identity.isBuiltIn, workspace: workspace)
             ?? ZoneLayout.builtIn[0]
         editorScreen = screen
         editorAssigns = assign
-        zoneEditor.open(.init(
-            screen: screen, screenName: identity.name, layout: current,
-            name: settings.layouts[current.name] != nil ? current.name : "", gaps: settings.gaps))
+        zoneEditor.open(
+            .init(
+                screen: screen, screenName: identity.name, layout: current,
+                name: settings.layouts[current.name] != nil ? current.name : "", gaps: settings.gaps))
     }
 
     /// The editor saved `layout`: written as `[layouts."<name>"]`, with the
@@ -194,8 +217,12 @@ extension AppDelegate {
         guard let screen = editorScreen else { return "the screen went away" }
         let old = zones(on: screen)
         // Screens already using this layout: their windows follow the new version.
-        let users = Screens.all().compactMap { s in zones(on: s, keyboard: true).flatMap { $0.layout.name == layout.name ? (s, $0) : nil } }
-        if let problem = config.replaceTable("layouts.\"\(layout.name)\"", "zones", to: layout.tomlZones) { return problem }
+        let users = Screens.all().compactMap { s in
+            zones(on: s, keyboard: true).flatMap { $0.layout.name == layout.name ? (s, $0) : nil }
+        }
+        if let problem = config.replaceTable("layouts.\"\(layout.name)\"", "zones", to: layout.tomlZones) {
+            return problem
+        }
         if gaps != config.config.zones.gaps, let problem = config.set("zones", "gaps", to: "\(gaps)") { return problem }
         if !config.config.zones.enabled, let problem = config.set("zones", "enabled", to: "true") { return problem }
         Log.info("zones: layout \(layout.name) saved, \(layout.zones.count) zones, gaps \(gaps)")
@@ -204,7 +231,9 @@ extension AppDelegate {
         let zones = config.config.zones
         for (s, before) in users where !(editorAssigns && s == screen) {
             guard let saved = zones.layout(named: layout.name) else { continue }
-            commander.reflow(windowsInZones(on: s), on: s, from: before, to: ScreenZones(layout: saved, gaps: Double(zones.gaps), needsControl: before.needsControl))
+            commander.reflow(
+                windowsInZones(on: s), on: s, from: before,
+                to: ScreenZones(layout: saved, gaps: Double(zones.gaps), needsControl: before.needsControl))
         }
         return nil
     }
@@ -215,20 +244,24 @@ extension AppDelegate {
             started = true
             _ = commander  // installs its registry hooks
             commander.rule = { [unowned self] window in self.config.config.rule(for: self.bundleID(window.pid)) }
-            workspaces.workspaceRule = { [unowned self] window in self.commander.rule(window).workspaceChoice(title: window.title) }
+            workspaces.workspaceRule = { [unowned self] window in
+                self.commander.rule(window).workspaceChoice(title: window.title)
+            }
             workspaces.paveRequestedFocus = { [unowned self] id in self.focus.requestedAt[id] }
             workspaces.refocus = { [unowned self] window in self.focus.focus(window, source: "W3 refocus") }
             tiling.rule = { [unowned self] window in self.commander.rule(window) }
             tiling.update(settings: Self.tilingSettings(config.config))
             drags.isTiled = { [unowned self] id in self.tiling.isTiled(id) }
-            drags.isShown = { [unowned self] id in !self.workspaces.isEnabled || !self.workspaces.state.isOutOfSight(id) }
+            drags.isShown = { [unowned self] id in !self.workspaces.isEnabled || !self.workspaces.state.isOutOfSight(id)
+            }
             Self.applyDragSettings(config.config, to: drags)
             drags.screenZones = { [unowned self] screen in self.zones(on: screen) }
             commander.screenZones = { [unowned self] screen in self.zones(on: screen, keyboard: true) }
             commander.isParked = { [unowned self] id in self.workspaces.state.isHidden(id) }
             commander.ruleZones = { [unowned self] screen in self.zones(on: screen, quiet: true) }
             arrangements.bundleID = { [unowned self] pid in self.bundleID(pid) }
-            arrangements.isPlaceable = { [unowned self] w in self.commander.rule(w).refusal(for: w, via: .hotkey) == nil }
+            arrangements.isPlaceable = { [unowned self] w in self.commander.rule(w).refusal(for: w, via: .hotkey) == nil
+            }
             arrangements.screenZones = { [unowned self] screen in self.zones(on: screen, quiet: true) }
             arrangements.zonesOf = { [unowned self] window, screen in
                 guard let z = self.zones(on: screen, quiet: true) else { return nil }

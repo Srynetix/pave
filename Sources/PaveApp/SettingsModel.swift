@@ -110,7 +110,10 @@ final class SettingsModel: ObservableObject {
     /// Opens the zone editor on a screen (nil: under the mouse), from a layout (nil: the screen's).
     var editZones: (_ screen: Int?, _ layout: String?) -> Void = { _, _ in }
 
-    enum Action { case openConfig, revealConfig, showLogs, reapplyRemap, restoreAll, accessibility, screenRecording, stageManager, onboarding, checkUpdates }
+    enum Action {
+        case openConfig, revealConfig, showLogs, reapplyRemap, restoreAll, accessibility, screenRecording, stageManager,
+            onboarding, checkUpdates
+    }
 
     func update(
         config: PaveConfig, status: Status, workspaces: [WorkspaceRow], screens: [ScreenChoice],
@@ -182,7 +185,9 @@ final class SettingsModel: ObservableObject {
         names[n - 1] = name.trimmingCharacters(in: .whitespaces)
         while names.last?.isEmpty == true { names.removeLast() }
         guard names != config.workspaceNames else { return }
-        apply(names.isEmpty ? removeValue("workspaces", "names") : setValue("workspaces", "names", ConfigEdit.list(names), false))
+        apply(
+            names.isEmpty
+                ? removeValue("workspaces", "names") : setValue("workspaces", "names", ConfigEdit.list(names), false))
     }
 
     /// Icons may hint at a customer, as names: never logged. An invalid one
@@ -196,7 +201,9 @@ final class SettingsModel: ObservableObject {
         icons[n - 1] = icon
         while icons.last?.isEmpty == true { icons.removeLast() }
         guard icons != config.workspaceIcons else { return true }
-        apply(icons.isEmpty ? removeValue("workspaces", "icons") : setValue("workspaces", "icons", ConfigEdit.list(icons), false))
+        apply(
+            icons.isEmpty
+                ? removeValue("workspaces", "icons") : setValue("workspaces", "icons", ConfigEdit.list(icons), false))
         return true
     }
 
@@ -207,7 +214,9 @@ final class SettingsModel: ObservableObject {
     func setSkipped(_ keyboard: String, _ skipped: Bool) {
         var list = config.keyboardSkip
         if skipped { list.insert(keyboard) } else { list.remove(keyboard) }
-        apply(list.isEmpty ? removeValue("keyboard", "skip") : setValue("keyboard", "skip", ConfigEdit.list(list.sorted()), true))
+        apply(
+            list.isEmpty
+                ? removeValue("keyboard", "skip") : setValue("keyboard", "skip", ConfigEdit.list(list.sorted()), true))
     }
 
     // MARK: App rules
@@ -249,7 +258,11 @@ final class SettingsModel: ObservableObject {
 
     /// The interface language: macOS's (the default), or one chosen here. It
     /// is Pavé's own `AppleLanguages` default, read once at launch.
-    enum Language: String { case system, english = "en", french = "fr" }
+    enum Language: String {
+        case system
+        case english = "en"
+        case french = "fr"
+    }
 
     private static let launchLanguage = Language.current
     @Published private(set) var language = Language.current
@@ -365,8 +378,10 @@ extension HotkeyAction {
 
 extension SettingsModel.Language {
     static var current: Self {
-        guard UserDefaults.standard.persistentDomain(forName: Bundle.main.bundleIdentifier ?? "")?["AppleLanguages"] != nil,
-              let first = UserDefaults.standard.stringArray(forKey: "AppleLanguages")?.first
+        guard
+            UserDefaults.standard.persistentDomain(forName: Bundle.main.bundleIdentifier ?? "")?["AppleLanguages"]
+                != nil,
+            let first = UserDefaults.standard.stringArray(forKey: "AppleLanguages")?.first
         else { return .system }
         return first.hasPrefix("fr") ? .french : .english
     }

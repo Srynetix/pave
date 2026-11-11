@@ -8,7 +8,8 @@ import PaveCore
 /// A non-activating panel that may become key: it gets the keyboard without
 /// activating Pavé, so the app the user was in stays the "previous" one.
 @MainActor
-final class LauncherPanel: NSObject, NSSearchFieldDelegate, NSTableViewDataSource, NSTableViewDelegate, NSWindowDelegate {
+final class LauncherPanel: NSObject, NSSearchFieldDelegate, NSTableViewDataSource, NSTableViewDelegate, NSWindowDelegate
+{
     static let size = NSSize(width: 420, height: 360)
     static let rowHeight: CGFloat = 30
 
@@ -93,7 +94,9 @@ final class LauncherPanel: NSObject, NSSearchFieldDelegate, NSTableViewDataSourc
 
     private func launch(_ app: Launcher.App) {
         hide()
-        NSWorkspace.shared.openApplication(at: URL(fileURLWithPath: app.path), configuration: NSWorkspace.OpenConfiguration()) {
+        NSWorkspace.shared.openApplication(
+            at: URL(fileURLWithPath: app.path), configuration: NSWorkspace.OpenConfiguration()
+        ) {
             _, error in
             // App names are not confidential; still, the path is enough.
             Log.info("launcher: open \(app.path) " + (error.map { "FAILED (\($0.localizedDescription))" } ?? "ok"))
@@ -138,29 +141,32 @@ final class LauncherPanel: NSObject, NSSearchFieldDelegate, NSTableViewDataSourc
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         let app = results[row]
-        let cell = tableView.makeView(withIdentifier: .init("cell"), owner: nil) as? NSTableCellView ?? {
-            let cell = NSTableCellView()
-            cell.identifier = .init("cell")
-            let image = NSImageView()
-            let text = NSTextField(labelWithString: "")
-            text.font = .systemFont(ofSize: 13)
-            text.lineBreakMode = .byTruncatingTail
-            for view in [image, text] {
-                view.translatesAutoresizingMaskIntoConstraints = false
-                cell.addSubview(view)
-            }
-            NSLayoutConstraint.activate([
-                image.leadingAnchor.constraint(equalTo: cell.leadingAnchor, constant: 6),
-                image.centerYAnchor.constraint(equalTo: cell.centerYAnchor),
-                image.widthAnchor.constraint(equalToConstant: 22), image.heightAnchor.constraint(equalToConstant: 22),
-                text.leadingAnchor.constraint(equalTo: image.trailingAnchor, constant: 8),
-                text.trailingAnchor.constraint(equalTo: cell.trailingAnchor, constant: -6),
-                text.centerYAnchor.constraint(equalTo: cell.centerYAnchor),
-            ])
-            cell.imageView = image
-            cell.textField = text
-            return cell
-        }()
+        let cell =
+            tableView.makeView(withIdentifier: .init("cell"), owner: nil) as? NSTableCellView
+            ?? {
+                let cell = NSTableCellView()
+                cell.identifier = .init("cell")
+                let image = NSImageView()
+                let text = NSTextField(labelWithString: "")
+                text.font = .systemFont(ofSize: 13)
+                text.lineBreakMode = .byTruncatingTail
+                for view in [image, text] {
+                    view.translatesAutoresizingMaskIntoConstraints = false
+                    cell.addSubview(view)
+                }
+                NSLayoutConstraint.activate([
+                    image.leadingAnchor.constraint(equalTo: cell.leadingAnchor, constant: 6),
+                    image.centerYAnchor.constraint(equalTo: cell.centerYAnchor),
+                    image.widthAnchor.constraint(equalToConstant: 22),
+                    image.heightAnchor.constraint(equalToConstant: 22),
+                    text.leadingAnchor.constraint(equalTo: image.trailingAnchor, constant: 8),
+                    text.trailingAnchor.constraint(equalTo: cell.trailingAnchor, constant: -6),
+                    text.centerYAnchor.constraint(equalTo: cell.centerYAnchor),
+                ])
+                cell.imageView = image
+                cell.textField = text
+                return cell
+            }()
         cell.textField?.stringValue = app.name
         cell.imageView?.image = icon(app.path)
         return cell
@@ -187,7 +193,8 @@ final class LauncherPanel: NSObject, NSSearchFieldDelegate, NSTableViewDataSourc
         var seen: Set<String> = []
         var apps: [Launcher.App] = []
         for folder in folders {
-            for entry in (try? FileManager.default.contentsOfDirectory(atPath: folder)) ?? [] where entry.hasSuffix(".app") {
+            for entry in (try? FileManager.default.contentsOfDirectory(atPath: folder)) ?? []
+            where entry.hasSuffix(".app") {
                 let path = (folder as NSString).appendingPathComponent(entry)
                 guard seen.insert(path).inserted else { continue }
                 var name = FileManager.default.displayName(atPath: path)
@@ -196,7 +203,10 @@ final class LauncherPanel: NSObject, NSSearchFieldDelegate, NSTableViewDataSourc
             }
         }
         for path in extras where FileManager.default.fileExists(atPath: path) && seen.insert(path).inserted {
-            apps.append(Launcher.App(name: FileManager.default.displayName(atPath: path).replacingOccurrences(of: ".app", with: ""), path: path))
+            apps.append(
+                Launcher.App(
+                    name: FileManager.default.displayName(atPath: path).replacingOccurrences(of: ".app", with: ""),
+                    path: path))
         }
         return apps
     }

@@ -12,12 +12,14 @@ public enum Shell {
         public var errorText: String { String(decoding: error, as: UTF8.self) }
     }
 
-    public static func run(_ path: String, _ arguments: [String], environment: [String: String]? = nil) throws -> Result {
+    public static func run(_ path: String, _ arguments: [String], environment: [String: String]? = nil) throws -> Result
+    {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: path)
         process.arguments = arguments
         if let environment { process.environment = environment }
-        let out = Pipe(), err = Pipe()
+        let out = Pipe()
+        let err = Pipe()
         process.standardOutput = out
         process.standardError = err
         process.standardInput = FileHandle.nullDevice

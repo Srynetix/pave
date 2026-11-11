@@ -1,11 +1,15 @@
 import Testing
+
 @testable import PaveCore
 
 // Arrangements measured on real screens (AX coordinates).
 private let builtIn = Screen(
-    frame: Rect(x: 0, y: 0, width: 1800, height: 1169), visibleFrame: Rect(x: 0, y: 40, width: 1800, height: 1089), id: "A")
+    frame: Rect(x: 0, y: 0, width: 1800, height: 1169), visibleFrame: Rect(x: 0, y: 40, width: 1800, height: 1089),
+    id: "A")
 private func lg(x: Double, y: Double) -> Screen {
-    Screen(frame: Rect(x: x, y: y, width: 2560, height: 1440), visibleFrame: Rect(x: x, y: y + 31, width: 2560, height: 1409), id: "B")
+    Screen(
+        frame: Rect(x: x, y: y, width: 2560, height: 1440),
+        visibleFrame: Rect(x: x, y: y + 31, width: 2560, height: 1409), id: "B")
 }
 private let lgLeft = lg(x: -2560, y: 0)  // the measured arrangement: left, 271 pt lower
 private let lgAbove = lg(x: -380, y: -1440)
@@ -44,7 +48,8 @@ private let big = Rect(x: 0, y: 0, width: 1800, height: 1089)
     }
 
     @Test func middleScreenParksOnANeighbour() {
-        let left = Screen(frame: Rect(x: -1800, y: 0, width: 1800, height: 1169), visibleFrame: builtIn.visibleFrame, id: "L")
+        let left = Screen(
+            frame: Rect(x: -1800, y: 0, width: 1800, height: 1169), visibleFrame: builtIn.visibleFrame, id: "L")
         let screens = [builtIn, left, lgRight]
         #expect(!ParkingSpot.isSafe(.bottomRight, of: builtIn, among: screens, windowSize: small))
         #expect(!ParkingSpot.isSafe(.bottomLeft, of: builtIn, among: screens, windowSize: small))
@@ -56,6 +61,7 @@ private let big = Rect(x: 0, y: 0, width: 1800, height: 1089)
     }
 
     @Test func singleScreenMatchesTheM0Corner() {
-        #expect(ParkingSpot.park(small, on: builtIn, among: [builtIn]) == Workspaces.hiddenFrame(for: small, on: builtIn))
+        #expect(
+            ParkingSpot.park(small, on: builtIn, among: [builtIn]) == Workspaces.hiddenFrame(for: small, on: builtIn))
     }
 }

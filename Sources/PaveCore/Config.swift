@@ -144,11 +144,16 @@ public struct PaveConfig: Equatable, Sendable {
             switch root[name] {
             case nil: return [:]
             case .table(let t): return t
-            case let other?: throw Problem(line: line(name), message: "'\(name)' must be a [\(name)] table, not a \(other.typeName)")
+            case let other?:
+                throw Problem(line: line(name), message: "'\(name)' must be a [\(name)] table, not a \(other.typeName)")
             }
         }
 
-        for key in root.keys.sorted() where !["workspaces", "switcher", "keyboard", "taskbar", "zones", "layouts", "apps", "bindings", "updates", "windows"].contains(key) {
+        for key in root.keys.sorted()
+        where ![
+            "workspaces", "switcher", "keyboard", "taskbar", "zones", "layouts", "apps", "bindings", "updates",
+            "windows",
+        ].contains(key) {
             warnings.append(Problem(line: line(key), message: "unknown setting '\(key)', ignored"))
         }
 
@@ -168,7 +173,8 @@ public struct PaveConfig: Equatable, Sendable {
             switch key {
             case "enabled": config.workspacesEnabled = try field.bool()
             case "tiling":
-                let numbers = try field.list("\(field.path) must be a list of workspace numbers like [2, 3] (1 to 9)") { item -> Int? in
+                let numbers = try field.list("\(field.path) must be a list of workspace numbers like [2, 3] (1 to 9)") {
+                    item -> Int? in
                     guard case .integer(let n) = item, Workspaces.range.contains(n) else { return nil }
                     return n
                 }
@@ -176,7 +182,8 @@ public struct PaveConfig: Equatable, Sendable {
             case "gaps": config.tilingGaps = try field.integer(in: 0...64, points)
             case "names":
                 config.workspaceNames = try field.list(
-                    "\(field.path) must be a list of names like [\"Web\", \"Code\"] (workspaces 1, 2…)", maxCount: Workspaces.range.count
+                    "\(field.path) must be a list of names like [\"Web\", \"Code\"] (workspaces 1, 2…)",
+                    maxCount: Workspaces.range.count
                 ) { item -> String? in
                     guard case .string(let name) = item else { return nil }
                     return name
@@ -197,16 +204,20 @@ public struct PaveConfig: Equatable, Sendable {
 
         try section("switcher") { key, field throws(Problem) in
             guard key == "scope" else { return false }
-            config.switcherScope = try field.choice(SwitcherScope.self, allowed: SwitcherScope.allCases.map(\.rawValue).quotedChoices)
+            config.switcherScope = try field.choice(
+                SwitcherScope.self, allowed: SwitcherScope.allCases.map(\.rawValue).quotedChoices)
             return true
         }
 
         try section("keyboard") { key, field throws(Problem) in
             switch key {
             case "remap": config.keyboardRemap = try field.bool()
-            case "preset": config.keyboardPreset = try field.choice(KeyRemap.Preset.self, allowed: KeyRemap.Preset.allCases.map(\.rawValue).quotedChoices)
+            case "preset":
+                config.keyboardPreset = try field.choice(
+                    KeyRemap.Preset.self, allowed: KeyRemap.Preset.allCases.map(\.rawValue).quotedChoices)
             case "skip":
-                let ids = try field.list("\(field.path) must be a list like [\"built-in\", \"1133:45944\"]") { item -> String? in
+                let ids = try field.list("\(field.path) must be a list like [\"built-in\", \"1133:45944\"]") {
+                    item -> String? in
                     guard case .string(let id) = item, id == "built-in" || Self.isVendorProduct(id) else { return nil }
                     return id
                 }
@@ -220,16 +231,22 @@ public struct PaveConfig: Equatable, Sendable {
             switch key {
             case "enabled": config.taskbarEnabled = try field.bool()
             case "hide-dock": config.taskbarHideDock = try field.bool()
-            case "start-key": config.taskbarOptionOpensLauncher = try field.string(oneOf: ["option", "none"], allowed: "\"option\" or \"none\"") == "option"
+            case "start-key":
+                config.taskbarOptionOpensLauncher =
+                    try field.string(oneOf: ["option", "none"], allowed: "\"option\" or \"none\"") == "option"
             case "grouping":
                 config.taskbarGrouping = try field.choice(
-                    TaskbarGrouping.self, allowed: "one of " + TaskbarGrouping.allCases.map { "\"\($0.rawValue)\"" }.joined(separator: ", "))
+                    TaskbarGrouping.self,
+                    allowed: "one of " + TaskbarGrouping.allCases.map { "\"\($0.rawValue)\"" }.joined(separator: ", "))
             case "pinned":
                 var ids: [String] = []
-                for id in try field.list("\(field.path) must be a list of bundle IDs like [\"com.apple.finder\"]", { item -> String? in
-                    guard case .string(let id) = item, !id.isEmpty else { return nil }
-                    return id
-                }) where !ids.contains(id) { ids.append(id) }
+                for id in try field.list(
+                    "\(field.path) must be a list of bundle IDs like [\"com.apple.finder\"]",
+                    { item -> String? in
+                        guard case .string(let id) = item, !id.isEmpty else { return nil }
+                        return id
+                    }) where !ids.contains(id)
+                { ids.append(id) }
                 config.taskbarPinned = ids
             default: return false
             }
@@ -239,25 +256,34 @@ public struct PaveConfig: Equatable, Sendable {
         // [layouts."<name>"], before [zones] which names them.
         for (name, value) in try table("layouts").sorted(by: { $0.key < $1.key }) {
             let path = "layouts.\(name)"
-            let usage = "layouts.\"\(name)\".zones must be a list of [x, y, width, height] in percent, like [[0, 0, 50, 100], [50, 0, 50, 100]]"
+            let usage =
+                "layouts.\"\(name)\".zones must be a list of [x, y, width, height] in percent, like [[0, 0, 50, 100], [50, 0, 50, 100]]"
             guard case .table(let settings) = value else {
-                throw Problem(line: line(path), message: "layouts.\"\(name)\" must be a [layouts.\"\(name)\"] table, not \(value.shown)")
+                throw Problem(
+                    line: line(path),
+                    message: "layouts.\"\(name)\" must be a [layouts.\"\(name)\"] table, not \(value.shown)")
             }
             guard name != ZoneSettings.none, !name.isEmpty else {
                 throw Problem(line: line(path), message: "\"\(name)\" cannot be a layout name")
             }
             for key in settings.keys.sorted() where key != "zones" {
-                warnings.append(Problem(line: line("\(path).\(key)"), message: "unknown setting '\(key)' for layout \(name), ignored"))
+                warnings.append(
+                    Problem(
+                        line: line("\(path).\(key)"), message: "unknown setting '\(key)' for layout \(name), ignored"))
             }
             guard case .array(let items)? = settings["zones"] else {
                 throw Problem(line: line(settings["zones"] == nil ? path : "\(path).zones"), message: usage)
             }
             var zones: [ZoneLayout.Zone] = []
             for item in items {
-                guard case .array(let numbers) = item, numbers.count == 4 else { throw Problem(line: line("\(path).zones"), message: usage) }
+                guard case .array(let numbers) = item, numbers.count == 4 else {
+                    throw Problem(line: line("\(path).zones"), message: usage)
+                }
                 var n: [Int] = []
                 for number in numbers {
-                    guard case .integer(let i) = number else { throw Problem(line: line("\(path).zones"), message: usage) }
+                    guard case .integer(let i) = number else {
+                        throw Problem(line: line("\(path).zones"), message: usage)
+                    }
                     n.append(i)
                 }
                 zones.append(.init(n[0], n[1], n[2], n[3]))
@@ -272,7 +298,8 @@ public struct PaveConfig: Equatable, Sendable {
         // [zones]
         let layoutNames = (ZoneLayout.builtIn.map(\.name) + config.zones.layouts.keys).sorted()
         func layoutName(_ value: TOMLValue, _ path: String) throws(Problem) -> String {
-            guard case .string(let name) = value, name == ZoneSettings.none || config.zones.layout(named: name) != nil else {
+            guard case .string(let name) = value, name == ZoneSettings.none || config.zones.layout(named: name) != nil
+            else {
                 let allowed = (layoutNames + [ZoneSettings.none]).map { "\"\($0)\"" }.joined(separator: ", ")
                 throw Problem(line: line(path), message: "\(path) must be a layout: \(allowed), not \(value.shown)")
             }
@@ -283,7 +310,9 @@ public struct PaveConfig: Equatable, Sendable {
             case "enabled": config.zones.enabled = try field.bool()
             case "keyboard": config.zones.keyboard = try field.bool()
             case "gaps": config.zones.gaps = try field.integer(in: 0...64, points)
-            case "show": config.zones.show = try field.choice(ZoneSettings.Show.self, allowed: ZoneSettings.Show.allCases.map(\.rawValue).quotedChoices)
+            case "show":
+                config.zones.show = try field.choice(
+                    ZoneSettings.Show.self, allowed: ZoneSettings.Show.allCases.map(\.rawValue).quotedChoices)
             case "screens":
                 guard case .table(let screens) = field.value else {
                     throw field.problem("\(field.path) must be a [zones.screens] table, like builtin = \"none\"")
@@ -297,7 +326,9 @@ public struct PaveConfig: Equatable, Sendable {
                 }
                 for (number, name) in workspaces.sorted(by: { $0.key < $1.key }) {
                     guard let n = Int(number), Workspaces.range.contains(n) else {
-                        throw Problem(line: line("\(field.path).\(number)"), message: "\(field.path): '\(number)' is not a workspace number from 1 to 9")
+                        throw Problem(
+                            line: line("\(field.path).\(number)"),
+                            message: "\(field.path): '\(number)' is not a workspace number from 1 to 9")
                     }
                     config.zones.workspaces[n] = try layoutName(name, "\(field.path).\(number)")
                 }
@@ -310,33 +341,50 @@ public struct PaveConfig: Equatable, Sendable {
         for (bundleID, value) in try table("apps").sorted(by: { $0.key < $1.key }) {
             let path = "apps.\(bundleID)"
             guard case .table(let settings) = value else {
-                throw Problem(line: line(path), message: "apps.\"\(bundleID)\" must be a [apps.\"\(bundleID)\"] table, not \(value.shown)")
+                throw Problem(
+                    line: line(path),
+                    message: "apps.\"\(bundleID)\" must be a [apps.\"\(bundleID)\"] table, not \(value.shown)")
             }
             var rule = AppRule()
             for (key, value) in settings.sorted(by: { $0.key < $1.key }) {
                 let keyPath = "\(path).\(key)"
                 if key == "taskbar-overlap" {
                     guard case .string(let mode) = value, ["allow", "fix"].contains(mode) else {
-                        throw Problem(line: line(keyPath), message: "apps.\"\(bundleID)\".taskbar-overlap must be \"allow\" or \"fix\", not \(value.shown)")
+                        throw Problem(
+                            line: line(keyPath),
+                            message:
+                                "apps.\"\(bundleID)\".taskbar-overlap must be \"allow\" or \"fix\", not \(value.shown)")
                     }
                     rule.taskbarOverlap = mode == "allow"
                     continue
                 }
                 if key == "zone" {
                     guard case .integer(let n) = value, (1...ZoneLayout.maxZones).contains(n) else {
-                        throw Problem(line: line(keyPath), message: "apps.\"\(bundleID)\".zone must be a zone number from 1 to \(ZoneLayout.maxZones), not \(value.shown)")
+                        throw Problem(
+                            line: line(keyPath),
+                            message:
+                                "apps.\"\(bundleID)\".zone must be a zone number from 1 to \(ZoneLayout.maxZones), not \(value.shown)"
+                        )
                     }
                     rule.zone = n
                     continue
                 }
                 if key == "profiles" {
                     guard case .table(let profiles) = value else {
-                        throw Problem(line: line(keyPath), message: "apps.\"\(bundleID)\".profiles must be a [apps.\"\(bundleID)\".profiles] table, not \(value.shown)")
+                        throw Problem(
+                            line: line(keyPath),
+                            message:
+                                "apps.\"\(bundleID)\".profiles must be a [apps.\"\(bundleID)\".profiles] table, not \(value.shown)"
+                        )
                     }
                     for (profile, value) in profiles {
                         // The profile's name is not shown: the line is enough.
                         guard !profile.isEmpty, case .integer(let n) = value, Workspaces.range.contains(n) else {
-                            throw Problem(line: line("\(keyPath).\(profile)"), message: "apps.\"\(bundleID)\".profiles: each profile needs a workspace number from 1 to 9, not \(value.shown)")
+                            throw Problem(
+                                line: line("\(keyPath).\(profile)"),
+                                message:
+                                    "apps.\"\(bundleID)\".profiles: each profile needs a workspace number from 1 to 9, not \(value.shown)"
+                            )
                         }
                         rule.profiles[profile] = n
                     }
@@ -344,16 +392,21 @@ public struct PaveConfig: Equatable, Sendable {
                 }
                 if key == "workspace" {
                     guard case .integer(let n) = value, Workspaces.range.contains(n) else {
-                        throw Problem(line: line(keyPath), message: "apps.\"\(bundleID)\".workspace must be a number from 1 to 9, not \(value.shown)")
+                        throw Problem(
+                            line: line(keyPath),
+                            message: "apps.\"\(bundleID)\".workspace must be a number from 1 to 9, not \(value.shown)")
                     }
                     rule.workspace = n
                     continue
                 }
                 guard case .bool(let b) = value, ["ignore", "drag-snap", "tile"].contains(key) else {
                     if ["ignore", "drag-snap", "tile"].contains(key) {
-                        throw Problem(line: line(keyPath), message: "apps.\"\(bundleID)\".\(key) must be true or false, not \(value.shown)")
+                        throw Problem(
+                            line: line(keyPath),
+                            message: "apps.\"\(bundleID)\".\(key) must be true or false, not \(value.shown)")
                     }
-                    warnings.append(Problem(line: line(keyPath), message: "unknown setting '\(key)' for app \(bundleID), ignored"))
+                    warnings.append(
+                        Problem(line: line(keyPath), message: "unknown setting '\(key)' for app \(bundleID), ignored"))
                     continue
                 }
                 switch key {
@@ -382,7 +435,8 @@ public struct PaveConfig: Equatable, Sendable {
             case "check": config.updatesCheck = try field.bool()
             case "source":
                 guard case .string(let source) = field.value, Updates.isValidSource(source) else {
-                    throw field.problem("\(field.path) must be a GitHub repository like \"owner/repo\", not \(field.value.shown)")
+                    throw field.problem(
+                        "\(field.path) must be a GitHub repository like \"owner/repo\", not \(field.value.shown)")
                 }
                 config.updatesSource = source
             default: return false
@@ -398,7 +452,9 @@ public struct PaveConfig: Equatable, Sendable {
                 continue
             }
             guard case .string(let text) = value else {
-                throw Problem(line: line(path), message: "\(path) must be a string like \"ctrl+left\" or \"none\", not \(value.shown)")
+                throw Problem(
+                    line: line(path),
+                    message: "\(path) must be a string like \"ctrl+left\" or \"none\", not \(value.shown)")
             }
             do {
                 config.bindings[action] = .some(try Hotkey.parse(text))
@@ -661,11 +717,12 @@ public struct AppRule: Equatable, Sendable {
     /// Short form for `pave dump` / `pave apps`; nil = no rule.
     public var summary: String? {
         let parts = [
-            ignore ? "ignore" : nil, !ignore && !dragSnap ? "no drag-snap" : nil, taskbarOverlap ? "taskbar-overlap allow" : nil,
+            ignore ? "ignore" : nil, !ignore && !dragSnap ? "no drag-snap" : nil,
+            taskbarOverlap ? "taskbar-overlap allow" : nil,
             workspace.map { "workspace \($0)" }, profiles.isEmpty ? nil : "workspace by profile (\(profiles.count))",
             tile ? nil : "no tiling", zone.map { "zone \($0)" },
         ]
-            .compactMap { $0 }
+        .compactMap { $0 }
         return parts.isEmpty ? nil : parts.joined(separator: ", ")
     }
 }

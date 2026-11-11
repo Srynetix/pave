@@ -14,8 +14,7 @@ public struct StateStore: Sendable {
 
     public let url: URL
 
-    public init(url: URL = StateFiles.url("state.json"))
-    {
+    public init(url: URL = StateFiles.url("state.json")) {
         self.url = url
     }
 

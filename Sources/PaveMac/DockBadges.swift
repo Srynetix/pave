@@ -31,7 +31,9 @@ final class DockBadges {
     }
 
     private func poll() {
-        guard let dock = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.dock").first else { return }
+        guard let dock = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.dock").first else {
+            return
+        }
         let pid = dock.processIdentifier
         queue.async {
             let found = Self.read(pid: pid)
@@ -52,7 +54,9 @@ final class DockBadges {
         AXUIElementSetMessagingTimeout(app, 0.5)
         func children(_ element: AXUIElement) -> [AXUIElement] {
             var value: CFTypeRef?
-            guard AXUIElementCopyAttributeValue(element, kAXChildrenAttribute as CFString, &value) == .success else { return [] }
+            guard AXUIElementCopyAttributeValue(element, kAXChildrenAttribute as CFString, &value) == .success else {
+                return []
+            }
             return value as? [AXUIElement] ?? []
         }
         func attribute(_ element: AXUIElement, _ name: String) -> CFTypeRef? {

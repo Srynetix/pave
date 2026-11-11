@@ -36,7 +36,10 @@ extension AppDelegate {
             let trees = tiling.summary
             dump.tiling = trees.isEmpty ? nil : trees
             if config.config.zones.enabled {
-                dump.zones = Dictionary(uniqueKeysWithValues: Screens.all().map { ($0.id, zones(on: $0, keyboard: true)?.layout.name ?? ZoneSettings.none) })
+                dump.zones = Dictionary(
+                    uniqueKeysWithValues: Screens.all().map {
+                        ($0.id, zones(on: $0, keyboard: true)?.layout.name ?? ZoneSettings.none)
+                    })
             }
             reply(.success(dump: dump))
         case .restoreAll:
@@ -65,10 +68,13 @@ extension AppDelegate {
         case .config:
             reply(IPCResponse(ok: true, message: configReport()))
         case .keyboards:
-            let lines = remap.map { r in
-                ["remap: " + (r.settings.enabled ? "on, preset \(r.settings.preset.rawValue)" : "off")
-                    + (r.karabinerRunning ? " (Karabiner-Elements running: keyboards left to it)" : "")] + r.report
-            } ?? ["remap: not started"]
+            let lines =
+                remap.map { r in
+                    [
+                        "remap: " + (r.settings.enabled ? "on, preset \(r.settings.preset.rawValue)" : "off")
+                            + (r.karabinerRunning ? " (Karabiner-Elements running: keyboards left to it)" : "")
+                    ] + r.report
+                } ?? ["remap: not started"]
             reply(IPCResponse(ok: true, message: lines.joined(separator: "\n")))
         case .focus:
             guard let id = windowID, let window = registry.store.windows[id] else {
@@ -97,37 +103,47 @@ extension AppDelegate {
             // Development tools (screenshots of Pavé's own windows, the update
             // signature check): not in release builds, whose socket answers less.
             #if DEBUG
-            switch request.args?.first {
-            case "update-signature":
-                // pave spike update-signature PATH: would an update to this app be accepted?
-                guard let path = request.args?.dropFirst().first else { return reply(.failure("usage: pave spike update-signature PATH.app")) }
-                do {
-                    try UpdateService.checkSignature(of: URL(fileURLWithPath: path))
-                    reply(IPCResponse(ok: true, message: "accepted: signed like this app"))
-                } catch {
-                    reply(.failure("refused: \(error)"))
-                }
-            case "shot":
-                // pave spike shot settings|about [section] light|dark PATH
-                let args = Array(request.args?.dropFirst() ?? [])
-                guard args.count >= 3 else { return reply(.failure("usage: pave spike shot settings|about|onboarding [section|page] light|dark PATH")) }
-                switch args[0] {
-                case "about": windows.showAbout()
-                case "onboarding": windows.showOnboarding(page: args.count == 4 ? Int(args[1]) ?? 0 : 0)
-                default: windows.showSettings()
-                }
-                if args.count == 4, let section = SettingsView.Section(rawValue: args[1]) { settingsModel.section = section }
-                let dark = args[args.count - 2] == "dark", path = args[args.count - 1]
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
-                    MainActor.assumeIsolated {
-                        reply(IPCResponse(ok: true, message: self?.windows.snapshot(args[0], dark: dark, to: path) ?? "?"))
+                switch request.args?.first {
+                case "update-signature":
+                    // pave spike update-signature PATH: would an update to this app be accepted?
+                    guard let path = request.args?.dropFirst().first else {
+                        return reply(.failure("usage: pave spike update-signature PATH.app"))
                     }
+                    do {
+                        try UpdateService.checkSignature(of: URL(fileURLWithPath: path))
+                        reply(IPCResponse(ok: true, message: "accepted: signed like this app"))
+                    } catch {
+                        reply(.failure("refused: \(error)"))
+                    }
+                case "shot":
+                    // pave spike shot settings|about [section] light|dark PATH
+                    let args = Array(request.args?.dropFirst() ?? [])
+                    guard args.count >= 3 else {
+                        return reply(
+                            .failure("usage: pave spike shot settings|about|onboarding [section|page] light|dark PATH"))
+                    }
+                    switch args[0] {
+                    case "about": windows.showAbout()
+                    case "onboarding": windows.showOnboarding(page: args.count == 4 ? Int(args[1]) ?? 0 : 0)
+                    default: windows.showSettings()
+                    }
+                    if args.count == 4, let section = SettingsView.Section(rawValue: args[1]) {
+                        settingsModel.section = section
+                    }
+                    let dark = args[args.count - 2] == "dark"
+                    let path = args[args.count - 1]
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
+                        MainActor.assumeIsolated {
+                            reply(
+                                IPCResponse(
+                                    ok: true, message: self?.windows.snapshot(args[0], dark: dark, to: path) ?? "?"))
+                        }
+                    }
+                default:
+                    reply(.failure("usage: pave spike shot settings|about|onboarding … | update-signature PATH"))
                 }
-            default:
-                reply(.failure("usage: pave spike shot settings|about|onboarding … | update-signature PATH"))
-            }
             #else
-            reply(.failure("pave spike: development builds only"))
+                reply(.failure("pave spike: development builds only"))
             #endif
         }
     }

@@ -54,7 +54,10 @@ public enum ConfigEdit {
     /// Comments right above the header stay: they may introduce something else.
     public static func removeTable(_ table: String, in text: String) -> String {
         var lines = text.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
-        guard let start = lines.firstIndex(where: { $0.trimmedSpaces.hasPrefix("[") && tableName($0.trimmedSpaces) == table })
+        guard
+            let start = lines.firstIndex(where: {
+                $0.trimmedSpaces.hasPrefix("[") && tableName($0.trimmedSpaces) == table
+            })
         else { return text }
         var end = start + 1
         while end < lines.count, !lines[end].trimmedSpaces.hasPrefix("[") { end += 1 }

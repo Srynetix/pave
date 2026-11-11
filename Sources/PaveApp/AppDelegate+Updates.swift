@@ -24,7 +24,10 @@ extension AppDelegate {
             guard let self else { return }
             switch status {
             case .available(let release): self.confirmUpdate(release)
-            case .upToDate: self.showAlert(String(localized: "Pavé is up to date"), String(localized: "Version \(self.updates.current) is the latest."))
+            case .upToDate:
+                self.showAlert(
+                    String(localized: "Pavé is up to date"),
+                    String(localized: "Version \(self.updates.current) is the latest."))
             case .failed(let message): self.showAlert(String(localized: "Could not look for updates"), message)
             default: break
             }
@@ -35,9 +38,12 @@ extension AppDelegate {
     func confirmUpdate(_ release: Updates.Release) {
         let alert = NSAlert()
         alert.messageText = String(localized: "Install Pavé \(release.version)?")
-        var notes = updates.newer.map { "\($0.version)\n\($0.notes.trimmingCharacters(in: .whitespacesAndNewlines))" }.joined(separator: "\n\n")
+        var notes = updates.newer.map { "\($0.version)\n\($0.notes.trimmingCharacters(in: .whitespacesAndNewlines))" }
+            .joined(separator: "\n\n")
         if notes.count > 1500 { notes = String(notes.prefix(1500)) + "…" }
-        alert.informativeText = String(localized: "You have version \(updates.current). Pavé restarts once it is installed.") + "\n\n" + notes
+        alert.informativeText =
+            String(localized: "You have version \(updates.current). Pavé restarts once it is installed.") + "\n\n"
+            + notes
         alert.addButton(withTitle: String(localized: "Install and Restart"))
         alert.addButton(withTitle: String(localized: "Later"))
         NSApp.activate()
@@ -50,9 +56,13 @@ extension AppDelegate {
     /// One line for Settings and `pave update`.
     var updateStatusText: String {
         switch updates.status {
-        case .idle: return UpdateService.isInstalledCopy ? String(localized: "Not checked yet") : String(localized: "Development build: updates go to the copy in Applications")
+        case .idle:
+            return UpdateService.isInstalledCopy
+                ? String(localized: "Not checked yet")
+                : String(localized: "Development build: updates go to the copy in Applications")
         case .checking: return String(localized: "Checking…")
-        case .upToDate(let date): return String(localized: "Up to date (checked \(date.formatted(date: .omitted, time: .shortened)))")
+        case .upToDate(let date):
+            return String(localized: "Up to date (checked \(date.formatted(date: .omitted, time: .shortened)))")
         case .available(let release): return String(localized: "Pavé \(release.version) is available")
         case .installing(let version): return String(localized: "Installing Pavé \(version)…")
         case .failed(let message): return String(localized: "Failed: \(message)")
@@ -78,7 +88,9 @@ extension AppDelegate {
                 guard let self else { return }
                 guard case .available(let release) = status else { return reply(.failure(self.updateStatusText)) }
                 self.updates.install(release) { error in
-                    reply(error.map { IPCResponse.failure($0) } ?? IPCResponse(ok: true, message: "Pavé \(release.version) installed, Pavé restarts"))
+                    reply(
+                        error.map { IPCResponse.failure($0) }
+                            ?? IPCResponse(ok: true, message: "Pavé \(release.version) installed, Pavé restarts"))
                 }
             }
         }

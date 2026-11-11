@@ -76,7 +76,8 @@ public final class ZonePicker {
         let size = view.fittingSize
         view.frame = NSRect(origin: .zero, size: size)
         let frame = Rect(
-            x: (area.x + (area.width - size.width) / 2).rounded(), y: (area.y + (area.height - size.height) / 2).rounded(),
+            x: (area.x + (area.width - size.width) / 2).rounded(),
+            y: (area.y + (area.height - size.height) / 2).rounded(),
             width: size.width, height: size.height)
         panel.setFrame(Screens.appKit(frame), display: true)
         view.needsDisplay = true
@@ -99,7 +100,9 @@ public final class ZonePicker {
                 return close(chosen: choices[picked].name, zone: n)
             }
             guard n <= choices.count else { return close(chosen: nil) }
-            guard canPlace, choices[n - 1].layout?.zones.isEmpty == false else { return close(chosen: choices[n - 1].name) }
+            guard canPlace, choices[n - 1].layout?.zones.isEmpty == false else {
+                return close(chosen: choices[n - 1].name)
+            }
             picked = n - 1
             view.selected = n - 1
             view.picking = n - 1
@@ -163,7 +166,8 @@ private final class PickerView: NSView {
 
     override var fittingSize: NSSize {
         let width = Self.padding * 2 + Double(columns) * Self.cardWidth + Double(columns - 1) * Self.gap
-        let height = Self.padding * 2 + Self.titleHeight + Double(rows) * cardHeight + Double(rows - 1) * Self.gap
+        let height =
+            Self.padding * 2 + Self.titleHeight + Double(rows) * cardHeight + Double(rows - 1) * Self.gap
             + Self.footerHeight
         return NSSize(width: width, height: height)
     }
@@ -177,7 +181,8 @@ private final class PickerView: NSView {
             .draw(at: NSPoint(x: Self.padding, y: Self.padding))
 
         for (i, choice) in choices.enumerated() {
-            let column = i % columns, row = i / columns
+            let column = i % columns
+            let row = i / columns
             let x = Self.padding + Double(column) * (Self.cardWidth + Self.gap)
             let y = Self.padding + Self.titleHeight + Double(row) * (cardHeight + Self.gap)
             let miniature = NSRect(x: x, y: y, width: Self.cardWidth, height: miniatureHeight)
@@ -207,9 +212,15 @@ private final class PickerView: NSView {
 
         let hint: String =
             if let picking, let count = choices[picking].layout?.zones.count {
-                String(localized: "1–\(min(count, 9)) put the window in that zone · ↩ apply the layout only · arrows back · esc cancel")
+                String(
+                    localized:
+                        "1–\(min(count, 9)) put the window in that zone · ↩ apply the layout only · arrows back · esc cancel"
+                )
             } else if canPlace {
-                String(localized: "1–9 choose, then a zone's number puts the window there · arrows move · ↩ apply · E edit · esc cancel")
+                String(
+                    localized:
+                        "1–9 choose, then a zone's number puts the window there · arrows move · ↩ apply · E edit · esc cancel"
+                )
             } else {
                 String(localized: "1–9 choose · arrows move · ↩ apply · E edit · esc cancel")
             }
@@ -232,11 +243,15 @@ private final class PickerView: NSView {
             frames = layout.frames(in: area, gaps: 4)
         } else {
             let halves: [Rect] = [Placement.left.frame(in: area), Placement.right.frame(in: area)]
-            frames = halves.map { (r: Rect) -> Rect in Rect(x: r.x + 4, y: r.y + 4, width: r.width - 8, height: r.height - 8) }
+            frames = halves.map { (r: Rect) -> Rect in
+                Rect(x: r.x + 4, y: r.y + 4, width: r.width - 8, height: r.height - 8)
+            }
         }
         for (i, f) in frames.enumerated() {
-            let zone = NSBezierPath(roundedRect: NSRect(x: f.x, y: f.y, width: f.width, height: f.height), xRadius: 4, yRadius: 4)
-            (lit && layout != nil ? NSColor.controlAccentColor.withAlphaComponent(0.4) : NSColor.white.withAlphaComponent(0.12)).setFill()
+            let zone = NSBezierPath(
+                roundedRect: NSRect(x: f.x, y: f.y, width: f.width, height: f.height), xRadius: 4, yRadius: 4)
+            (lit && layout != nil
+                ? NSColor.controlAccentColor.withAlphaComponent(0.4) : NSColor.white.withAlphaComponent(0.12)).setFill()
             zone.fill()
             NSColor.white.withAlphaComponent(0.5).setStroke()
             zone.lineWidth = 1

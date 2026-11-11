@@ -8,37 +8,54 @@ extension TaskbarController {
         let windows = item.windowIDs.compactMap { registry.store.windows[$0] }
         let name = item.appName ?? appURL(item).map { FileManager.default.displayName(atPath: $0.path) } ?? item.app
         if windows.isEmpty {
-            menu.addItem(ClosureMenuItem(NSMenuItem(title: String(localized: "Open \(name)"), action: nil, keyEquivalent: "")) { [weak self] in
-                self?.launch(item)
-            })
+            menu.addItem(
+                ClosureMenuItem(NSMenuItem(title: String(localized: "Open \(name)"), action: nil, keyEquivalent: "")) {
+                    [weak self] in
+                    self?.launch(item)
+                })
         }
         for window in windows.prefix(1) where windows.count == 1 {
-            menu.addItem(ClosureMenuItem(NSMenuItem(title: String(localized: "Close Window"), action: nil, keyEquivalent: "")) { [weak self] in
-                self?.registry.close(window) { ok in Log.info("taskbar: close \(window.id) [\(window.appName)] \(ok ? "requested" : "FAILED")") }
-            })
+            menu.addItem(
+                ClosureMenuItem(NSMenuItem(title: String(localized: "Close Window"), action: nil, keyEquivalent: "")) {
+                    [weak self] in
+                    self?.registry.close(window) { ok in
+                        Log.info("taskbar: close \(window.id) [\(window.appName)] \(ok ? "requested" : "FAILED")")
+                    }
+                })
         }
         if windows.count > 1 {
-            menu.addItem(ClosureMenuItem(NSMenuItem(title: String(localized: "Close All Windows (\(windows.count))"), action: nil, keyEquivalent: "")) { [weak self] in
-                for window in windows { self?.registry.close(window) }
-                Log.info("taskbar: close \(windows.count) window(s) of \(item.app)")
-            })
+            menu.addItem(
+                ClosureMenuItem(
+                    NSMenuItem(
+                        title: String(localized: "Close All Windows (\(windows.count))"), action: nil, keyEquivalent: ""
+                    )
+                ) { [weak self] in
+                    for window in windows { self?.registry.close(window) }
+                    Log.info("taskbar: close \(windows.count) window(s) of \(item.app)")
+                })
         }
         if let move = workspaceMenu(windows) { menu.addItem(move) }
         if let pid = item.pid, let app = NSRunningApplication(processIdentifier: pid) {
-            menu.addItem(ClosureMenuItem(NSMenuItem(title: String(localized: "Quit \(name)"), action: nil, keyEquivalent: "")) {
-                Log.info("taskbar: quit \(item.app) \(app.terminate() ? "requested" : "FAILED")")
-            })
+            menu.addItem(
+                ClosureMenuItem(NSMenuItem(title: String(localized: "Quit \(name)"), action: nil, keyEquivalent: "")) {
+                    Log.info("taskbar: quit \(item.app) \(app.terminate() ? "requested" : "FAILED")")
+                })
         }
         if !item.app.hasPrefix("pid:") {
             menu.addItem(.separator())
             let pinned = settings.pinned.contains(item.app)
-            menu.addItem(ClosureMenuItem(NSMenuItem(title: pinned ? String(localized: "Unpin from Taskbar") : String(localized: "Pin to Taskbar"), action: nil, keyEquivalent: "")) {
-                [weak self] in
-                guard let self else { return }
-                var list = self.settings.pinned
-                if pinned { list.removeAll { $0 == item.app } } else { list.append(item.app) }
-                self.setPinned(list)
-            })
+            menu.addItem(
+                ClosureMenuItem(
+                    NSMenuItem(
+                        title: pinned ? String(localized: "Unpin from Taskbar") : String(localized: "Pin to Taskbar"),
+                        action: nil, keyEquivalent: "")
+                ) {
+                    [weak self] in
+                    guard let self else { return }
+                    var list = self.settings.pinned
+                    if pinned { list.removeAll { $0 == item.app } } else { list.append(item.app) }
+                    self.setPinned(list)
+                })
         }
         NSMenu.popUpContextMenu(menu, with: event, for: view)
     }
@@ -62,7 +79,8 @@ extension TaskbarController {
             }
             submenu.addItem(entry)
         }
-        let title = windows.count == 1
+        let title =
+            windows.count == 1
             ? String(localized: "Move to Workspace") : String(localized: "Move All Windows to Workspace")
         let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
         item.submenu = submenu

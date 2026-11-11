@@ -15,19 +15,26 @@ struct ConfigField {
 
     /// `what`: "a number of points from 0 to 64".
     func integer(in range: ClosedRange<Int>, _ what: String) throws(PaveConfig.Problem) -> Int {
-        guard case .integer(let n) = value, range.contains(n) else { throw problem("\(path) must be \(what), not \(value.shown)") }
+        guard case .integer(let n) = value, range.contains(n) else {
+            throw problem("\(path) must be \(what), not \(value.shown)")
+        }
         return n
     }
 
     /// One of an enum's raw values; `allowed` phrases them for the message.
-    func choice<T: RawRepresentable>(_ type: T.Type, allowed: String) throws(PaveConfig.Problem) -> T where T.RawValue == String {
-        guard case .string(let s) = value, let choice = T(rawValue: s) else { throw problem("\(path) must be \(allowed), not \(value.shown)") }
+    func choice<T: RawRepresentable>(_ type: T.Type, allowed: String) throws(PaveConfig.Problem) -> T
+    where T.RawValue == String {
+        guard case .string(let s) = value, let choice = T(rawValue: s) else {
+            throw problem("\(path) must be \(allowed), not \(value.shown)")
+        }
         return choice
     }
 
     /// One of `options`, as written.
     func string(oneOf options: [String], allowed: String) throws(PaveConfig.Problem) -> String {
-        guard case .string(let s) = value, options.contains(s) else { throw problem("\(path) must be \(allowed), not \(value.shown)") }
+        guard case .string(let s) = value, options.contains(s) else {
+            throw problem("\(path) must be \(allowed), not \(value.shown)")
+        }
         return s
     }
 

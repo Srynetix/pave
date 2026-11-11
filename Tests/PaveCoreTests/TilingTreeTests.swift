@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import PaveCore
 
 private func w(_ n: UInt32) -> WindowID { WindowID(n) }
@@ -126,8 +127,8 @@ private let area = Rect(x: 0, y: 40, width: 1800, height: 1089)
 
     @Test func aWindowAtTheEdgeOfADeepContainerEscapesToTheAncestor() {
         var tree = row(4)
-        _ = tree.move(w(4), .down)   // V[H[1 2 3] 4]
-        _ = tree.move(w(1), .up)     // V[1 H[2 3] 4]
+        _ = tree.move(w(4), .down)  // V[H[1 2 3] 4]
+        _ = tree.move(w(1), .up)  // V[1 H[2 3] 4]
         _ = tree.move(w(4), .right)  // H[V[1 H[2 3]] 4]
         #expect(shape(tree) == "H[V[1 H[2 3]] 4]")
         // 2 is at the left edge of H[2 3]: it goes left of V, in the root.

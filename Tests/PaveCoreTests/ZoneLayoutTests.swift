@@ -1,4 +1,5 @@
 import Testing
+
 @testable import PaveCore
 
 /// An ultrawide's usable area, round numbers.
@@ -9,7 +10,8 @@ private let focus = ZoneSettings().layout(named: "focus")!
     // MARK: Layouts
 
     @Test func zonesAreNumberedByColumnThenRow() throws {
-        let layout = try ZoneLayout(name: "x", zones: [.init(50, 50, 50, 50), .init(0, 0, 50, 100), .init(50, 0, 50, 50)])
+        let layout = try ZoneLayout(
+            name: "x", zones: [.init(50, 50, 50, 50), .init(0, 0, 50, 100), .init(50, 0, 50, 50)])
         #expect(layout.zones == [.init(0, 0, 50, 100), .init(50, 0, 50, 50), .init(50, 50, 50, 50)])
     }
 
@@ -34,18 +36,20 @@ private let focus = ZoneSettings().layout(named: "focus")!
     // MARK: Geometry
 
     @Test func cellsShareTheirEdges() {
-        #expect(focus.cells(in: area) == [
-            Rect(x: 0, y: 0, width: 860, height: 1400), Rect(x: 860, y: 0, width: 1720, height: 1400),
-            Rect(x: 2580, y: 0, width: 860, height: 700), Rect(x: 2580, y: 700, width: 860, height: 700),
-        ])
+        #expect(
+            focus.cells(in: area) == [
+                Rect(x: 0, y: 0, width: 860, height: 1400), Rect(x: 860, y: 0, width: 1720, height: 1400),
+                Rect(x: 2580, y: 0, width: 860, height: 700), Rect(x: 2580, y: 700, width: 860, height: 700),
+            ])
     }
 
     @Test func gapsAreEqualAtTheEdgesAndBetweenZones() {
         let frames = focus.frames(in: area, gaps: 8)
-        #expect(frames == [
-            Rect(x: 8, y: 8, width: 848, height: 1384), Rect(x: 864, y: 8, width: 1712, height: 1384),
-            Rect(x: 2584, y: 8, width: 848, height: 688), Rect(x: 2584, y: 704, width: 848, height: 688),
-        ])
+        #expect(
+            frames == [
+                Rect(x: 8, y: 8, width: 848, height: 1384), Rect(x: 864, y: 8, width: 1712, height: 1384),
+                Rect(x: 2584, y: 8, width: 848, height: 688), Rect(x: 2584, y: 704, width: 848, height: 688),
+            ])
         #expect(frames[1].x - frames[0].maxX == 8)
         #expect(frames[3].y - frames[2].maxY == 8)
     }
@@ -151,12 +155,18 @@ private let focus = ZoneSettings().layout(named: "focus")!
         #expect(settings.layout(screenID: "X", screenName: "LG HDR WQHD", isBuiltIn: false)?.name == "focus")
         #expect(settings.layout(screenID: "X", screenName: "Built-in Retina Display", isBuiltIn: true) == nil)
         // The UUID wins over the name.
-        #expect(settings.layout(screenID: "abcdef01-2345-4678-9abc-def012345678", screenName: "LG HDR WQHD", isBuiltIn: false)?.name == "thirds")
+        #expect(
+            settings.layout(
+                screenID: "abcdef01-2345-4678-9abc-def012345678", screenName: "LG HDR WQHD", isBuiltIn: false)?.name
+                == "thirds")
         #expect(settings.layout(screenID: "X", screenName: "DELL U2720Q", isBuiltIn: false) == nil)
         // Workspace overrides, only where the screen has a layout.
-        #expect(settings.layout(screenID: "X", screenName: "LG HDR WQHD", isBuiltIn: false, workspace: 3)?.name == "main-and-stack")
+        #expect(
+            settings.layout(screenID: "X", screenName: "LG HDR WQHD", isBuiltIn: false, workspace: 3)?.name
+                == "main-and-stack")
         #expect(settings.layout(screenID: "X", screenName: "LG HDR WQHD", isBuiltIn: false, workspace: 4) == nil)
-        #expect(settings.layout(screenID: "X", screenName: "Built-in Retina Display", isBuiltIn: true, workspace: 3) == nil)
+        #expect(
+            settings.layout(screenID: "X", screenName: "Built-in Retina Display", isBuiltIn: true, workspace: 3) == nil)
         settings.enabled = false
         #expect(settings.layout(screenID: "X", screenName: "LG HDR WQHD", isBuiltIn: false) == nil)
     }
@@ -191,11 +201,17 @@ private let focus = ZoneSettings().layout(named: "focus")!
 
     @Test func zoneErrorsPointAtTheirLine() {
         func problem(_ text: String) -> PaveConfig.Problem? {
-            do { _ = try PaveConfig.parse(text); return nil } catch { return error }
+            do {
+                _ = try PaveConfig.parse(text)
+                return nil
+            } catch { return error }
         }
-        #expect(problem("[zones.screens]\nLG = \"focsu\"")?.message.hasPrefix("zones.screens.LG must be a layout:") == true)
+        #expect(
+            problem("[zones.screens]\nLG = \"focsu\"")?.message.hasPrefix("zones.screens.LG must be a layout:") == true)
         #expect(problem("[zones.screens]\nLG = \"focsu\"")?.line == 2)
-        #expect(problem("[layouts.\"A\"]\nzones = [[0, 0, 60, 100], [50, 0, 50, 100]]")?.message == "layout \"A\": zones 1 and 2 overlap")
+        #expect(
+            problem("[layouts.\"A\"]\nzones = [[0, 0, 60, 100], [50, 0, 50, 100]]")?.message
+                == "layout \"A\": zones 1 and 2 overlap")
         #expect(problem("[layouts.\"A\"]\nzones = [[0, 0, 100]]")?.line == 2)
         #expect(problem("[zones.workspaces]\n12 = \"thirds\"") != nil)
         #expect(problem("[zones]\ngaps = 100") != nil)

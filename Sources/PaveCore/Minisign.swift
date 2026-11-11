@@ -22,7 +22,9 @@ public enum Minisign {
 
         /// The `.pub` file's text (its comment line is skipped) or its base64 line alone.
         public init(_ text: String) throws(Failure) {
-            guard let line = Minisign.payload(text).first, let raw = Data(base64Encoded: line).map(Array.init), raw.count == 42 else {
+            guard let line = Minisign.payload(text).first, let raw = Data(base64Encoded: line).map(Array.init),
+                raw.count == 42
+            else {
                 throw Failure("not a minisign public key")
             }
             guard raw[0] == 0x45, raw[1] == 0x64 else { throw Failure("not an Ed25519 minisign key") }  // "Ed"
@@ -62,14 +64,21 @@ public enum Minisign {
 
     /// Throws unless `data` was signed with `key`, pre-hashed, and the trusted
     /// comment is `trustedComment` (when given).
-    public static func verify(_ data: Data, signature: Signature, key: PublicKey, trustedComment: String? = nil) throws(Failure) {
+    public static func verify(_ data: Data, signature: Signature, key: PublicKey, trustedComment: String? = nil)
+        throws(Failure)
+    {
         guard signature.keyID == key.keyID else { throw Failure("signed with another key") }
         guard signature.prehashed else { throw Failure("legacy signature (not pre-hashed): refused") }
-        guard let ed = try? Curve25519.Signing.PublicKey(rawRepresentation: key.key) else { throw Failure("unusable public key") }
+        guard let ed = try? Curve25519.Signing.PublicKey(rawRepresentation: key.key) else {
+            throw Failure("unusable public key")
+        }
         guard ed.isValidSignature(signature.signature, for: Blake2b.hash(data)) else {
             throw Failure("the signature does not match the file")
         }
-        guard ed.isValidSignature(signature.globalSignature, for: signature.signature + Array(signature.trustedComment.utf8)) else {
+        guard
+            ed.isValidSignature(
+                signature.globalSignature, for: signature.signature + Array(signature.trustedComment.utf8))
+        else {
             throw Failure("the trusted comment was altered")
         }
         if let trustedComment, signature.trustedComment != trustedComment {

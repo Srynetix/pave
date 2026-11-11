@@ -27,7 +27,9 @@ enum MenuBarIcon {
         clear(NSRect(x: tall.minX + 1.6, y: tall.maxY - 3.6, width: tall.width - 3.2, height: 1.0), radius: 0.5)
 
         // The two others: outlined, one above the other.
-        for rect in [NSRect(x: 11.1, y: 8.6, width: 6.2, height: 6.6), NSRect(x: 11.1, y: 0.8, width: 6.2, height: 6.4)] {
+        for rect in [
+            NSRect(x: 11.1, y: 8.6, width: 6.2, height: 6.6), NSRect(x: 11.1, y: 0.8, width: 6.2, height: 6.4),
+        ] {
             let path = NSBezierPath(roundedRect: rect.insetBy(dx: line / 2, dy: line / 2), xRadius: 1.9, yRadius: 1.9)
             path.lineWidth = line
             path.stroke()

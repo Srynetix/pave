@@ -115,8 +115,11 @@ public struct TaskbarModel: Sendable {
                 let ws = windowsOf[app] ?? []
                 if ws.isEmpty {
                     return pinned.contains(app)
-                        ? [TaskbarItem(kind: .pinned, app: app, appName: nil, pid: nil, title: nil,
-                                       isActive: false, isDimmed: false, isPinned: true)]
+                        ? [
+                            TaskbarItem(
+                                kind: .pinned, app: app, appName: nil, pid: nil, title: nil,
+                                isActive: false, isDimmed: false, isPinned: true)
+                        ]
                         : []
                 }
                 return combined.contains(app) ? [groupItem(app, ws)] : ws.map(windowItem)
