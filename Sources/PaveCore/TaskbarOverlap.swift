@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Windows that slide under the taskbar. macOS has no "app bar" API: native
 /// zoom and apps that maximize themselves go down to the screen edge once the
 /// Dock is hidden. Pavé gives them back the usable area.

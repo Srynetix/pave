@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import PaveCore
 
 /// The sub-commands of `pave tiling | zones | arrangement | update`, parsed

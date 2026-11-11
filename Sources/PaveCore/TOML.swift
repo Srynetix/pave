@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Minimal TOML reader for Pavé's config file (`ConfigStore`).
 ///
 /// Supported subset, enough for `config.toml`: `[table]` and `[dotted.table]`

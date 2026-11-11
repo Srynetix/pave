@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import Foundation
 import Synchronization
 
@@ -6,7 +7,7 @@ import Synchronization
 /// Every line goes to `~/Library/Logs/Pave/pave.log`, rotated at 5 MB into
 /// `pave.1.log` and `pave.2.log` (≈ 15 MB at most), so a week of daily use can
 /// be read back (Rapport M1). Lines also go to stderr (`build/pave.log` with
-/// `just run`). Titles stay redacted, as everywhere: the log never holds window
+/// `just dev`). Titles stay redacted, as everywhere: the log never holds window
 /// contents. Thread-safe: the event tap thread logs too.
 public enum Log {
     /// Window titles are redacted unless PAVE_LOG_TITLES=1 (local debugging only).

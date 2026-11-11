@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 // Draws Pavé's app icon with AppKit, no image editor needed.
 //
 //   swift scripts/make-icon.swift <variant> <out.png> [size]

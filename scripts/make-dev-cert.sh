@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT OR Apache-2.0
 # One-time setup: create a self-signed code-signing certificate "Pave Dev" in the
 # login keychain, so every build of Pave.app has the same signing requirement
 # and keeps its Accessibility permission (see bundle.sh).

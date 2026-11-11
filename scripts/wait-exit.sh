@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT OR Apache-2.0
 # Wait until no process named $1 runs, at most $2 seconds (default 5).
 # usage: scripts/wait-exit.sh Pave 5
 set -euo pipefail

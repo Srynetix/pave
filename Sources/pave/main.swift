@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 // `pave`: command-line client of the Pavé agent, over its Unix socket.
 import Foundation
 import PaveCore
@@ -94,7 +95,7 @@ func send(_ request: IPCRequest, launchIfNeeded: Bool = false) -> IPCResponse {
             guard launchPave() else { fail("could not launch Pavé (bundle id dev.srynetix.pave.Pave)") }
             return send(request)
         }
-        fail("Pavé is not running (no socket at \(path)). Start it with `just run`.")
+        fail("Pavé is not running (no socket at \(path)). Start it with `just dev`.")
     } catch {
         fail("\(error)")
     }

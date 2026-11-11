@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Virtual workspaces: native Spaces are not used. Windows of inactive
 /// workspaces are parked in a screen corner, their frame remembered.
 ///
@@ -129,7 +130,7 @@ public struct Workspaces: Codable, Sendable, Equatable {
         return actions
     }
 
-    /// Planned restart of Pavé (`just install`, an update): the previous run
+    /// Planned restart of Pavé (`just deploy`, an update): the previous run
     /// left its windows parked on purpose, so this one carries on with its
     /// state instead of bringing everything back. Windows gone meanwhile are
     /// forgotten, new ones join the workspace shown on their screen, a changed

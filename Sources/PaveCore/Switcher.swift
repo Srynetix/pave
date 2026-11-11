@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// The window switcher, as a pure state machine.
 ///
 /// A session lives from ⌃Tab to the release of ⌃ (or Return / Escape in search

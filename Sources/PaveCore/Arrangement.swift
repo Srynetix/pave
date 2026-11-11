@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// A saved arrangement of windows ("Code", "Meeting"): where each window of
 /// each app goes, and on which workspace. Pure.
 ///

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Changes one setting of a config file **as text** (menu toggles, Settings
 /// window), so the user's comments, order and other settings stay untouched.
 public enum ConfigEdit {

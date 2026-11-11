@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Logical modifiers, as received *after* Karabiner / hidutil remapping.
 public struct Modifiers: OptionSet, Hashable, Sendable, Codable, CustomStringConvertible {
     public let rawValue: UInt8

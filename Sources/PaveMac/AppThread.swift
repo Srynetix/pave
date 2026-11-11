@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import Foundation
 
 /// A dedicated thread with its own CFRunLoop, one per tracked application.

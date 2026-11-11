@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Window magnetism and shared edges. Pure: PaveMac reads the frames (the
 /// dragged window's live bounds, the others' AX frames) and applies the result.
 ///

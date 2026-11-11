@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import Foundation
 
 /// Pavé's own updates, the pure part: which of a repository's GitHub releases

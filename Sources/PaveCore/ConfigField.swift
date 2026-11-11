@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// One `key = value` of the config file as `PaveConfig.parse` reads it: its
 /// path (`taskbar.grouping`), its value and its line, with the checks every
 /// table repeats. Errors never show a string's text (`TOMLValue.shown`).

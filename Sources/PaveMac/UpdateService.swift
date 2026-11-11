@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import CryptoKit
 import PaveCore
@@ -19,7 +20,7 @@ import Security
 ///   requirement (the same "Pave Dev" certificate, the same identifier):
 ///   what keeps the Accessibility permission, and refuses any other app.
 /// The app is then replaced where it runs and Pavé restarts, as with
-/// `just install` (Dock kept hidden, parked windows kept parked).
+/// `just deploy` (Dock kept hidden, parked windows kept parked).
 @MainActor
 public final class UpdateService {
     public enum Status: Equatable, Sendable {
@@ -47,7 +48,7 @@ public final class UpdateService {
     public init() {}
 
     /// The installed copy (~/Applications or /Applications): a dev build is
-    /// replaced by every `just run`, it never updates itself.
+    /// replaced by every `just dev`, it never updates itself.
     public static var isInstalledCopy: Bool {
         let path = Bundle.main.bundlePath
         return path.hasPrefix("/Applications/")

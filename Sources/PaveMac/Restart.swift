@@ -1,7 +1,8 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveIPC
 
-/// A planned restart (`just run`, `just install`, an update, a language
+/// A planned restart (`just dev`, `just deploy`, an update, a language
 /// change): the quitting Pavé keeps the Dock hidden and its windows parked,
 /// the next one carries on (DockController, WorkspaceController).
 public enum RestartMarker {

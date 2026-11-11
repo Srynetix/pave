@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Process identifier (mirrors `pid_t` without importing Darwin).
 public typealias PID = Int32
 

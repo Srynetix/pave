@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import Foundation
 
 /// Pavé's state directory, `~/.local/state/pave`: the socket, the workspaces

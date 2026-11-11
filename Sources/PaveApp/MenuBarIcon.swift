@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 
 /// The menu bar icon, matching the app icon: three cobbles laid as a zone

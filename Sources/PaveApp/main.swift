@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 import PaveIPC
@@ -6,7 +7,7 @@ import ServiceManagement
 
 /// Menu-bar agent: tracks every window (WindowRegistry), places them
 /// (Commander), runs the virtual workspaces, tiling and taskbar, and answers
-/// the `pave` CLI (IPCServer). Logs go to build/pave.log with `just run`.
+/// the `pave` CLI (IPCServer). Logs go to build/pave.log with `just dev`.
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSMenuItemValidation {
     var statusItem: NSStatusItem!
@@ -129,7 +130,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSMenu
 
     // MARK: - Quitting without losing windows
 
-    /// SIGTERM (`pkill`, `just run`) and SIGINT go through the normal quit path,
+    /// SIGTERM (`pkill`, `just dev`) and SIGINT go through the normal quit path,
     /// which brings parked windows back first.
     func installSignalHandlers() {
         // Belt and braces with SO_NOSIGPIPE: a client hanging up early must never
@@ -157,7 +158,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSMenu
     /// run: Pavé hung forever. Instead: cancel, restore, terminate again.
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         guard started, !readyToQuit, workspaces.state.hiddenCount > 0 else { return .terminateNow }
-        // A restart (`just run`, `just install`): the next run picks the
+        // A restart (`just dev`, `just deploy`): the next run picks the
         // parked windows up where they are (WorkspaceController.recover).
         if RestartMarker.isSet, workspaces.prepareRestart() {
             return .terminateNow

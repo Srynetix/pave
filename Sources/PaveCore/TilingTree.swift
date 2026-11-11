@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Tiling of one workspace, as i3 / AeroSpace: a tree of horizontal and
 /// vertical containers, windows as leaves, each child taking a share of its
 /// container proportional to its weight.

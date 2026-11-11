@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// The workspace numbers of one taskbar: the workspaces that live on this
 /// screen and have windows, plus the one shown there even when empty. Pure:
 /// PaveMac draws them and switches on a click.

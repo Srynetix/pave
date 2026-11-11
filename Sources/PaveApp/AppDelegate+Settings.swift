@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 import PaveIPC
@@ -82,7 +83,7 @@ extension AppDelegate {
     }
 
     /// Quits and starts again (language change). A planned restart, like
-    /// `just run`: parked windows stay parked and the next run picks them up.
+    /// `just dev`: parked windows stay parked and the next run picks them up.
     func relaunch() {
         do {
             try Relaunch.afterExit(reason: "language change")

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 
 /// The Trash in the taskbar (the one thing the user missed from the Dock).

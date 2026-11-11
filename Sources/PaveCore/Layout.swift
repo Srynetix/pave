@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Window placement commands. The arrow commands behave like Windows 11: what
 /// they do depends on where the window already is.
 public enum LayoutCommand: String, Codable, Sendable, CaseIterable {

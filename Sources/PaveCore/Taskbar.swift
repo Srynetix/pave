@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// What each taskbar shows. Pure: PaveMac feeds it the registry's windows and
 /// draws the result.
 ///

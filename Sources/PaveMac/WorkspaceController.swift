@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 import PaveIPC
@@ -64,8 +65,8 @@ public final class WorkspaceController {
     /// relaunching Pavé after a crash): they wait, then report what recovery did.
     private var waitingForRecovery: [@MainActor (Int) -> Void] = []
 
-    /// Written by a run that quits to be restarted at once (`just run`,
-    /// `just install`): it left its windows parked, the next run resumes.
+    /// Written by a run that quits to be restarted at once (`just dev`,
+    /// `just deploy`): it left its windows parked, the next run resumes.
     public static var resumeMarker: URL { StateFiles.url("resume") }
 
     /// Quitting for a restart: parked windows stay parked, the state on disk

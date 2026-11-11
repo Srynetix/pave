@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Pavé's configuration (`~/.config/pave/config.toml`).
 ///
 /// Every setting has a default equal to the current behaviour, so a missing

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 import PaveIPC
@@ -37,7 +38,7 @@ public final class DockController {
     public var isHiddenByPave: Bool { FileManager.default.fileExists(atPath: Self.stateURL.path) }
 
     public init() {
-        // A marker left by a `just run` with no Pavé to restart is stale.
+        // A marker left by a `just dev` with no Pavé to restart is stale.
         RestartMarker.clear()
     }
 
@@ -211,7 +212,7 @@ public final class DockController {
         Log.info("dock: settings restored (\(reason))")
     }
 
-    /// At quit: restore, unless this is a restart (`just run`/`just install`).
+    /// At quit: restore, unless this is a restart (`just dev`/`just deploy`).
     public func quitting() {
         if RestartMarker.isSet {
             RestartMarker.clear()

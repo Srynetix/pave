@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Where a window dragged with the cursor at a point would snap. Pure: driven
 /// by the cursor only — the AX frame lags ~150 ms behind a drag and is never
 /// used here.

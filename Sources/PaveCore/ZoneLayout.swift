@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// A layout of zones on one screen, FancyZones style: windows dragged or moved
 /// with the keyboard go into one zone, or span several. Pure.
 ///

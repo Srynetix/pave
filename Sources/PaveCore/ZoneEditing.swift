@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// A layout being edited (Z4): zones in integer percent, changed by the
 /// editor's operations, with undo. Pure; the editor window draws it.
 ///

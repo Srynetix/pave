@@ -13,7 +13,7 @@
 <p align="center">
   <img alt="macOS 15+" src="https://img.shields.io/badge/macOS-15%2B-0b1026">
   <img alt="Swift" src="https://img.shields.io/badge/Swift-6-f05138">
-  <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-2563eb">
+  <img alt="License: MIT OR Apache-2.0" src="https://img.shields.io/badge/license-MIT_OR_Apache--2.0-2563eb">
 </p>
 
 ---
@@ -29,26 +29,28 @@ way, and makes macOS feel like home.
 > use ⌃ instead. The Settings window follows the same rule; the config file keeps the
 > keys as macOS receives them (`ctrl`).
 
-## Every window, one keystroke away
+## What's inside
 
-<img src="docs/images/switcher.svg" alt="The window switcher" width="100%">
+### Every window, one keystroke away
+
+<img src="docs/screenshots/switcher.svg" alt="The window switcher" width="100%">
 
 **⌘Tab** shows every *window*, not every app, in the order you last used them, with live
 previews. Hold ⌘ and tap Tab to move along, release to switch. Type to search, **W** closes a
 window, **Q** quits its app. A quick ⌘Tab ⌘Tab flips between your last two windows, exactly as
 your fingers remember.
 
-## Snap like you mean it
+### Snap like you mean it
 
-<img src="docs/images/snap.svg" alt="Snapping a window to the right half" width="100%">
+<img src="docs/screenshots/snap.svg" alt="Snapping a window to the right half" width="100%">
 
 **⌘←** and **⌘→** for halves, **⌘↑** to maximize, quarters from there, **⌘⇧←/→** to send a
 window to the next screen. Prefer the mouse? Drag a window to an edge or a corner: a preview
 shows where it will land. Hold **⌥** to move it freely.
 
-## Zones for wide screens
+### Zones for wide screens
 
-<img src="docs/images/zones.svg" alt="Dragging a window into a zone layout" width="100%">
+<img src="docs/screenshots/zones.svg" alt="Dragging a window into a zone layout" width="100%">
 
 Halves are too wide on an ultrawide. Give a screen a **zone layout**, FancyZones style: drag a
 window and the zones light up under the pointer, hold **⇧** to span several, **⌥** to move
@@ -66,16 +68,16 @@ screens without one keep their halves and quarters. An app rule can open an app'
 straight in a zone, and when a screen is unplugged and plugged back, its windows return to
 their zones.
 
-## Arrangements: your desk, in one keystroke
+### Arrangements: your desk, in one keystroke
 
 Save the windows as they are ("Code", "Meeting") and put them back later with **⌘⇧A**: each
 window returns to its workspace and its place, and apps that are not running are launched and
 their windows placed as they open. Pavé recognises windows by app and order only: no title is
 ever written to disk.
 
-## A real taskbar
+### A real taskbar
 
-<img src="docs/images/taskbar.svg" alt="The taskbar with a hover preview" width="100%">
+<img src="docs/screenshots/taskbar.svg" alt="The taskbar with a hover preview" width="100%">
 
 One entry per window, on every screen, with hover previews, pinned apps and drag-and-drop
 onto apps; right-click a window to send it to another workspace. A **Start** button opens a launcher (tap **⌥** alone, like the Windows key), and the
@@ -83,24 +85,24 @@ Trash sits where you expect it. Pavé can even hide the Dock while its taskbar i
 the Dock back exactly as it was when you quit. If the bar ever looks out of place, right-click
 Start or an empty part of the bar, then choose **Reset Taskbar** (it is also in the menu bar menu).
 
-## Workspaces that respect your screens
+### Workspaces that respect your screens
 
-<img src="docs/images/workspaces.svg" alt="Two screens, each showing its own workspace" width="100%">
+<img src="docs/screenshots/workspaces.svg" alt="Two screens, each showing its own workspace" width="100%">
 
 Nine virtual workspaces, no native Spaces animations. **⌘1…9** shows a workspace on its
 screen, **⌘⇧1…9** sends the active window there. Each screen shows its own workspace, the
 taskbar and the menu bar show their numbers, and you can name them.
 
-## Tiling, when you want it
+### Tiling, when you want it
 
-<img src="docs/images/tiling.svg" alt="A tiled workspace" width="100%">
+<img src="docs/screenshots/tiling.svg" alt="A tiled workspace" width="100%">
 
 Turn tiling on for the workspaces you choose and keep the others floating. Windows are laid
 out in a tree, the way i3 and AeroSpace do it: **⌘⌥ + arrows** moves the focus,
 **⌘⌥⇧ + arrows** resizes, **⌘ + arrows** moves the window, **⌘⇧Space** floats it. Windows
 that refuse their tile size simply float instead of fighting back.
 
-## Your keyboard, finally
+### Your keyboard, finally
 
 Pavé remaps Mac keyboards to PC habits, per keyboard. The key next to the space bar drives
 Pavé's shortcuts; the bottom-left key, where a PC has Ctrl, takes over
@@ -109,35 +111,24 @@ them; right ⌘ becomes Alt Gr. Plug in a keyboard, wake
 the Mac, change a setting: the mapping is applied and checked again. Prefer
 Karabiner-Elements? Pavé steps aside.
 
-## Settings you can see, a file you can trust
+### Settings you can see, a file you can trust
 
 <p align="center">
-  <img src="docs/images/settings-general.png" alt="Settings, General" width="49%">
-  <img src="docs/images/settings-keyboard-dark.png" alt="Settings, Keyboard and shortcuts, dark" width="49%">
+  <img src="docs/screenshots/settings-general.png" alt="Settings, General" width="49%">
+  <img src="docs/screenshots/settings-keyboard-dark.png" alt="Settings, Keyboard and shortcuts, dark" width="49%">
 </p>
 
 A native Settings window, light and dark, in English or French. Behind it, a plain
 `config.toml` that stays the single source of truth: edit either one, Pavé reloads on save,
 keeps your comments, and refuses a broken file instead of guessing.
 
-## Private by design
-
-Window titles, workspace names and icons never reach the logs. Previews stay in memory. The control
-socket only answers your own user, and the app runs with the hardened runtime: no other code
-can be injected into it to borrow its permissions. Pavé needs Accessibility to move windows,
-and nothing leaves your Mac.
-
-<p align="center">
-  <img src="docs/images/about.png" alt="About Pavé" width="60%">
-</p>
-
----
-
-## Get started
+## Getting started
 
 You need macOS 15 or later.
 
-**From a release**: download `Pave_<version>.dmg` from the
+### Download the app
+
+Download `Pave_<version>.dmg` from the
 [releases](https://github.com/Srynetix/pave/releases), open it and drag Pavé to Applications.
 Pavé is not notarized, so macOS refuses to open it the first time (since macOS 15, right-click ›
 Open no longer gets around it). Remove the quarantine flag once:
@@ -148,14 +139,6 @@ xattr -dr com.apple.quarantine /Applications/Pave.app
 
 (or, after a first refused launch, System Settings › Privacy & Security › **Open Anyway**).
 Only the first install needs it: updates are downloaded by Pavé itself.
-
-**From source**, with Xcode in `/Applications/Xcode.app` and [just](https://just.systems) (`brew install just`):
-
-```sh
-git clone https://github.com/Srynetix/pave.git && cd pave
-just cert      # once: a self-signed "Pave Dev" certificate, so permissions survive rebuilds
-just install   # builds, installs ~/Applications/Pave.app and launches it
-```
 
 On first launch, grant **Accessibility** to Pavé in System Settings › Privacy & Security.
 Previews need **Screen Recording**, and emptying the Trash asks for **Automation** of the
@@ -173,7 +156,20 @@ that the new app is code-signed like the running one: the Accessibility permissi
 over, and nothing else can be slipped in. Pavé then replaces itself and restarts, with your
 parked windows and hidden Dock as they were. A copy you built from source is signed with your
 own certificate: it does not look for releases (it could not install them), it updates with
-your next `just install`.
+your next `just deploy`.
+
+### Build it
+
+You need Xcode in `/Applications/Xcode.app` and [just](https://just.systems) (`brew install just`).
+
+```sh
+git clone https://github.com/Srynetix/pave.git && cd pave
+just doctor    # what this machine is missing
+just cert      # once: a self-signed "Pave Dev" certificate, so permissions survive rebuilds
+just deploy    # builds, installs ~/Applications/Pave.app and launches it
+```
+
+`just` lists every other command; `just ci` runs every check.
 
 > Pavé is a personal project, used every day by its author but young. Expect rough edges,
 > and please open an issue when something feels wrong.
@@ -182,17 +178,21 @@ your next `just install`.
 <summary><b>Development</b></summary>
 
 ```sh
-just run            # build and sign build/Pave.app, then launch it (logs: build/pave.log)
+just dev            # build and sign build/Pave.app, then launch it (logs: build/pave.log)
+just deploy         # the same, installed as ~/Applications/Pave.app, the copy you use every day
+just fmt            # format the Swift sources (swift-format, .swift-format)
 just test           # unit tests
+just ci             # the gate: commits, formatting, a build without a warning, strings, tests
 just strings        # extract the interface strings into Resources/Localizable.xcstrings
 just check-strings  # fail if a string has no translation
 just icon           # redraw Resources/AppIcon.icns (scripts/make-icon.swift)
+just changelog      # the notes of the next release, from the commit subjects
 just release        # publish a GitHub release of this commit (just release --dry-run to try)
 ```
 
-Always launch through `just run` or `open`, never `build/Pave.app/Contents/MacOS/Pave` from a
+Always launch through `just dev` or `open`, never `build/Pave.app/Contents/MacOS/Pave` from a
 terminal: macOS would give the permissions to the terminal. Only one Pavé runs at a time:
-`just run` stops the installed copy, `just install` restarts it. The Command Line Tools alone
+`just dev` stops the installed copy, `just deploy` restarts it. The Command Line Tools alone
 lack the SwiftUI and Swift Testing macro plugins, hence the Xcode requirement.
 
 | Target | Role |
@@ -212,8 +212,8 @@ in the catalog.
 **Releases**: bump `CFBundleShortVersionString` in `Resources/Info.plist`, commit, push, then
 `just release`. It builds a release `Pave.app` signed with "Pave Dev" and publishes
 `Pave_<version>.dmg` (first install) and `Pave_<version>.app.tar.gz` (what updates install),
-each with a `.sha256` and a `.minisig`, as the release `pave-v<version>`, with the commit
-subjects since the previous one as notes. Signing uses `~/.minisign/pave.key` (or
+each with a `.sha256` and a `.minisig`, as the release `pave-v<version>`, with `just changelog` as
+notes. Signing uses `~/.minisign/pave.key` (or
 `PAVE_SIGN_KEY`), whose public half is `Resources/update-key.pub`; create it once with
 `minisign -G -s ~/.minisign/pave.key -p Resources/update-key.pub`. Installed copies look for
 releases only if they are signed with the certificate whose SHA-256 is in
@@ -321,13 +321,32 @@ The CLI is built as `build/pave`. It talks to Pavé over `~/.local/state/pave/pa
 
 </details>
 
-## How Pavé was built
+## Privacy
 
-Pavé was designed, tested and used every day by its author, with the help of an LLM coding
-agent ([Claude Code](https://claude.com/claude-code)). The agent wrote much of the code and the
-tests under the author's direction; the design decisions, the testing on real machines and
-the choice of what ships remain the author's.
+**Private by design.** Window titles, workspace names and icons never reach the logs. Previews stay in memory. The control
+socket only answers your own user, and the app runs with the hardened runtime: no other code
+can be injected into it to borrow its permissions. Pavé needs Accessibility to move windows,
+and nothing leaves your Mac.
+
+<p align="center">
+  <img src="docs/screenshots/about.png" alt="About Pavé" width="60%">
+</p>
+
+## How it was made
+
+Pavé was designed, tested and used every day by its author, with the help of an AI coding
+agent ([Claude Code](https://claude.com/claude-code)). The agent wrote most of the code and the
+tests under the author's direction; the design decisions, the testing on real machines and the
+choice of what ships remain the author's. It is part of the
+[P suite](https://github.com/Srynetix/p-suite), apps made this way.
+
+## Contributing
+
+Bug reports, ideas and pull requests are welcome: [CONTRIBUTING.md](CONTRIBUTING.md) says how,
+and [SECURITY.md](SECURITY.md) how to report a security problem privately.
 
 ## License
 
-[MIT](LICENSE) © 2026 Denis BOURGE
+Dual-licensed under either of [MIT](LICENSE-MIT) or [Apache 2.0](LICENSE-APACHE), at your
+option. Unless you state otherwise, any contribution you submit for inclusion is dual-licensed
+the same way, with no additional terms.

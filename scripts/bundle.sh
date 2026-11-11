@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT OR Apache-2.0
 # Build Pave.app from the SwiftPM products and sign it.
 #
 # Signing with a *stable* identity ("Pave Dev", see make-dev-cert.sh) keeps the

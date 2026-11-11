@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 /// Where to park a window of an inactive workspace.
 ///
 /// macOS refuses a window entirely off screen: a parked window keeps a 1 pt

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import AppKit
 import PaveCore
 import SwiftUI
@@ -27,7 +28,7 @@ struct GeneralPane: View {
                 ) {
                     Text("Launch Pavé at login")
                     switch status.login {
-                    case .devCopy: Text("Only for the installed copy (just install).")
+                    case .devCopy: Text("Only for the installed copy (just deploy).")
                     case .needsApproval: Text("To approve in System Settings > General > Login Items.")
                     default: EmptyView()
                     }

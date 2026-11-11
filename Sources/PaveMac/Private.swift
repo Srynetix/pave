@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 // ALL private macOS APIs used by Pavé live in this file, and only here: the
 // raw symbols are fileprivate, the rest of Pavé calls the `PrivateAPI`
 // wrappers below. Each one is a risk on every macOS update: keep this list

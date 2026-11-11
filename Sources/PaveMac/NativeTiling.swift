@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
 import Foundation
 
 /// macOS's own window tiling (Sequoia and later): dragging to an edge, or
