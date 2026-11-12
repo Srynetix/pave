@@ -5,8 +5,8 @@ taken. Each says what was decided, what else was considered and why it lost, and
 from it. Read the one behind a part of the code before proposing to change it.
 
 A record is not rewritten when things move on. A later one revises it and says so in its
-status. Decisions taken before the first record are described in the README's
-**Development** section and in the code's comments; they get a record when they are revisited.
+status. Decisions taken before the first record are described in [`docs/dev/`](../dev/README.md)
+and in the code's comments; they get a record when they are revisited.
 
 Decisions that hold for every app of the P suite are recorded in
 [p-suite](https://github.com/Srynetix/p-suite/tree/main/docs/adrs); a record here can cite them.

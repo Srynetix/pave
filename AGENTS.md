@@ -15,6 +15,8 @@ this file says only what is particular to Pavé.
 - `Sources/pave/` — the `pave` command-line tool.
 - `Tests/` — Swift Testing suites for `PaveCore` and `PaveIPC`.
 - `Resources/` — `Info.plist` (the version), `Localizable.xcstrings`, the release keys.
+- `docs/dev/` — how the code is built: architecture, patterns, building and releasing. Read
+  `architecture.md` before changing the structure.
 - `docs/adrs/` — technical decisions, indexed in its `README.md`.
 - `scripts/` — bundling, strings, checks and release; called by the justfile.
 
@@ -38,7 +40,10 @@ The justfile points `DEVELOPER_DIR` at Xcode; a bare `swift build` outside it fa
 - The change comes with its tests in `PaveCore` or `PaveIPC` wherever it can be tested there; a
   fixed bug with a test that fails without the fix.
 - A decision taken on the way is recorded in `docs/adrs/`, and added to its index.
-- The README and `CONTRIBUTING.md` say what is now true.
+- The code follows [SUITE.md § 12](https://github.com/Srynetix/p-suite/blob/main/SUITE.md#12-code):
+  a person could take it over by hand.
+- The README, `CONTRIBUTING.md` and `docs/dev/` say what is now true: a new module, flow or
+  pattern is documented in the same commit.
 - The commit follows Conventional Commits (`feat(snap): …`, `fix: …`); its subject is written
   for a user reading the release notes. `just check-commits` checks it.
 
@@ -50,6 +55,12 @@ The justfile points `DEVELOPER_DIR` at Xcode; a bare `swift build` outside it fa
   it. Do not run `just deploy` unless asked: it replaces the copy the author uses every day.
 - **Never log a window title, a workspace name or an icon.** The log is meant to be shareable.
 - **Private APIs live only in `Sources/PaveMac/Private.swift`.**
+- **The core decides, PaveMac applies.** A rule goes in `PaveCore`, as a function of values
+  returning an action, with its test; `PaveCore` never imports AppKit or PaveMac, and no AX
+  call runs on the main thread ([patterns](docs/dev/patterns.md)).
+- **Comments say why, never what or when**: no comment that repeats the code, narrates the
+  change or speaks to a reviewer; no code commented out; no `TODO` without an issue. An
+  explanation longer than a few lines goes in `docs/dev/`.
 - **Every interface string is localized**: `just strings` after adding one, then its French
   translation in `Resources/Localizable.xcstrings`; `just check-strings` must pass.
 - Signing matters: builds are signed with the "Pave Dev" certificate so the Accessibility
