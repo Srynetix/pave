@@ -370,24 +370,25 @@ public struct PaveConfig: Equatable, Sendable {
                     rule.zone = n
                     continue
                 }
-                if key == "profiles" {
-                    guard case .table(let profiles) = value else {
+                if key == "profiles" || key == "titles" {
+                    guard case .table(let entries) = value else {
                         throw Problem(
                             line: line(keyPath),
                             message:
-                                "apps.\"\(bundleID)\".profiles must be a [apps.\"\(bundleID)\".profiles] table, not \(value.shown)"
+                                "apps.\"\(bundleID)\".\(key) must be a [apps.\"\(bundleID)\".\(key)] table, not \(value.shown)"
                         )
                     }
-                    for (profile, value) in profiles {
-                        // The profile's name is not shown: the line is enough.
-                        guard !profile.isEmpty, case .integer(let n) = value, Workspaces.range.contains(n) else {
+                    let what = key == "profiles" ? "profile" : "title pattern"
+                    for (name, value) in entries {
+                        // The profile or pattern is not shown: the line is enough.
+                        guard !name.isEmpty, case .integer(let n) = value, Workspaces.range.contains(n) else {
                             throw Problem(
-                                line: line("\(keyPath).\(profile)"),
+                                line: line("\(keyPath).\(name)"),
                                 message:
-                                    "apps.\"\(bundleID)\".profiles: each profile needs a workspace number from 1 to 9, not \(value.shown)"
+                                    "apps.\"\(bundleID)\".\(key): each \(what) needs a workspace number from 1 to 9, not \(value.shown)"
                             )
                         }
-                        rule.profiles[profile] = n
+                        if key == "profiles" { rule.profiles[name] = n } else { rule.titles[name] = n }
                     }
                     continue
                 }
@@ -585,6 +586,8 @@ public struct PaveConfig: Equatable, Sendable {
             #   workspace = 3      # its new windows open on workspace 3
             #   [apps."com.brave.Browser".profiles]  # browsers: by profile, from the
             #   Work = 3                             # window title ("… - Brave - Work")
+            #   [apps."com.example.app".titles]  # by window title: * any text, ? one
+            #   "*Work" = 3                      # character, case ignored
             #   tile = false       # always floating, even on a tiled workspace
             # Dialogs, sheets and panels are never placed, whatever the rules.
 
@@ -668,6 +671,9 @@ public struct AppRule: Equatable, Sendable {
     /// with " - <profile>" (Brave, Chrome, Edge name the profile there).
     /// Wins over `workspace`, which still covers the other profiles.
     public var profiles: [String: Int] = [:]
+    /// `[apps."…".titles]`: workspace of the new windows whose title matches
+    /// a pattern (`TitlePattern`). After `profiles`, before `workspace`.
+    public var titles: [String: Int] = [:]
 
     public init(ignore: Bool = false, dragSnap: Bool = true, taskbarOverlap: Bool = false, workspace: Int? = nil) {
         self.ignore = ignore
@@ -682,22 +688,24 @@ public struct AppRule: Equatable, Sendable {
     /// never logged.
     public struct WorkspaceChoice: Equatable, Sendable {
         public var workspace: Int?
-        /// Chosen by its profile.
-        public var byProfile = false
+        /// Chosen by its title (a profile or a title pattern).
+        public var byTitle = false
         /// No profile matched: the title may still come (a browser names its
         /// window after creating it), worth looking at it again.
         public var awaitsTitle = false
 
-        public init(workspace: Int? = nil, byProfile: Bool = false, awaitsTitle: Bool = false) {
+        public init(workspace: Int? = nil, byTitle: Bool = false, awaitsTitle: Bool = false) {
             self.workspace = workspace
-            self.byProfile = byProfile
+            self.byTitle = byTitle
             self.awaitsTitle = awaitsTitle
         }
     }
 
     public func workspaceChoice(title: String) -> WorkspaceChoice {
-        if let n = profileWorkspace(title: title) { return WorkspaceChoice(workspace: n, byProfile: true) }
-        return WorkspaceChoice(workspace: workspace, awaitsTitle: !profiles.isEmpty)
+        if let n = profileWorkspace(title: title) ?? TitlePattern.workspace(titles, title: title) {
+            return WorkspaceChoice(workspace: n, byTitle: true)
+        }
+        return WorkspaceChoice(workspace: workspace, awaitsTitle: !profiles.isEmpty || !titles.isEmpty)
     }
 
     /// The workspace of the profile `title` ends with (the longest name wins:
@@ -721,6 +729,7 @@ public struct AppRule: Equatable, Sendable {
             ignore ? "ignore" : nil, !ignore && !dragSnap ? "no drag-snap" : nil,
             taskbarOverlap ? "taskbar-overlap allow" : nil,
             workspace.map { "workspace \($0)" }, profiles.isEmpty ? nil : "workspace by profile (\(profiles.count))",
+            titles.isEmpty ? nil : "workspace by title (\(titles.count))",
             tile ? nil : "no tiling", zone.map { "zone \($0)" },
         ]
         .compactMap { $0 }

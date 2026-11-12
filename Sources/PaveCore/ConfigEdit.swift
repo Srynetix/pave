@@ -2,7 +2,8 @@
 /// Changes one setting of a config file **as text** (menu toggles, Settings
 /// window), so the user's comments, order and other settings stay untouched.
 public enum ConfigEdit {
-    /// Sets `table.key = value` (`value` already in TOML form: `true`, `"pc"`).
+    /// Sets `table.key = value` (`value` already in TOML form: `true`, `"pc"`;
+    /// `key` as is: it is quoted when it must be, `"*Work"`).
     /// - the key exists in `[table]`: that line is replaced (its trailing
     ///   comment is kept);
     /// - the table exists without the key: the line goes right after the header;
@@ -21,16 +22,16 @@ public enum ConfigEdit {
             }
             guard inTable, keyOf(trimmed) == key else { continue }
             let indent = String(line.prefix { $0 == " " || $0 == "\t" })
-            lines[index] = indent + "\(key) = \(value)" + trailingComment(trimmed)
+            lines[index] = indent + "\(Self.key(key)) = \(value)" + trailingComment(trimmed)
             return lines.joined(separator: "\n")
         }
         if let header {
-            lines.insert("\(key) = \(value)", at: header + 1)
+            lines.insert("\(Self.key(key)) = \(value)", at: header + 1)
             return lines.joined(separator: "\n")
         }
         var result = text
         if !result.isEmpty, !result.hasSuffix("\n") { result += "\n" }
-        return result + "\n[\(table)]\n\(key) = \(value)\n"
+        return result + "\n[\(table)]\n\(Self.key(key)) = \(value)\n"
     }
 
     /// Removes `table.key` (the default applies again). Nothing to do: `text` as is.
@@ -51,9 +52,20 @@ public enum ConfigEdit {
         return text
     }
 
-    /// Removes `[table]` and its lines, up to the next table (an app rule).
-    /// Comments right above the header stay: they may introduce something else.
+    /// Removes `[table]` and its lines, up to the next table (an app rule),
+    /// and its subtables (`[apps."…".titles]`). Comments right above a header
+    /// stay: they may introduce something else.
     public static func removeTable(_ table: String, in text: String) -> String {
+        var result = removeOneTable(table, in: text)
+        func subtable(of text: String) -> String? {
+            text.split(separator: "\n").lazy.map { String($0).trimmedSpaces }
+                .first { $0.hasPrefix("[") && tableName($0).hasPrefix(table + ".") }.map(tableName)
+        }
+        while let sub = subtable(of: result) { result = removeOneTable(sub, in: result) }
+        return result
+    }
+
+    private static func removeOneTable(_ table: String, in text: String) -> String {
         var lines = text.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
         guard
             let start = lines.firstIndex(where: {
@@ -99,24 +111,56 @@ public enum ConfigEdit {
         String(trimmedHeader.dropFirst().prefix { $0 != "]" }).trimmedSpaces
     }
 
-    /// "enabled = false # x" → "enabled"; comments and blank lines → nil.
+    /// A key as TOML wants it: bare (`enabled`, `com-x_1`) or quoted (`"*Work"`).
+    public static func key(_ name: String) -> String {
+        let bare =
+            !name.isEmpty && name.allSatisfy { $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "-" || $0 == "_") }
+        return bare ? name : string(name)
+    }
+
+    /// "enabled = false # x" → "enabled", `"*a = b" = 2` → "*a = b";
+    /// comments and blank lines → nil.
     private static func keyOf(_ line: String) -> String? {
-        guard !line.hasPrefix("#"), let eq = line.firstIndex(of: "=") else { return nil }
-        var name = String(line[..<eq]).trimmedSpaces
-        if name.count >= 2, let first = name.first, first == "\"" || first == "'", name.last == first {
-            name = String(name.dropFirst().dropLast())
+        guard !line.hasPrefix("#") else { return nil }
+        if let quote = line.first, quote == "\"" || quote == "'" {
+            var name = ""
+            var escaped = false
+            for c in line.dropFirst() {
+                if escaped {
+                    switch c {
+                    case "n": name.append("\n")
+                    case "t": name.append("\t")
+                    default: name.append(c)
+                    }
+                    escaped = false
+                } else if c == "\\", quote == "\"" {
+                    escaped = true
+                } else if c == quote {
+                    return name
+                } else {
+                    name.append(c)
+                }
+            }
+            return nil
         }
-        return name
+        guard let eq = line.firstIndex(of: "=") else { return nil }
+        return String(line[..<eq]).trimmedSpaces
     }
 
     /// " # comment" after the value, if any (a `#` outside a string).
     private static func trailingComment(_ line: String) -> String {
-        guard let eq = line.firstIndex(of: "=") else { return "" }
         var quote: Character?
-        for index in line[line.index(after: eq)...].indices {
+        var escaped = false
+        for index in line.indices {
             let c = line[index]
             if let q = quote {
-                if c == q { quote = nil }
+                if escaped {
+                    escaped = false
+                } else if c == "\\", q == "\"" {
+                    escaped = true
+                } else if c == q {
+                    quote = nil
+                }
             } else if c == "\"" || c == "'" {
                 quote = c
             } else if c == "#" {

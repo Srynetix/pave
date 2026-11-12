@@ -247,6 +247,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSMenu
         }
         taskbar?.workspaceOf = { id in workspaces.isEnabled ? workspaces.state.workspace(of: id) : nil }
         taskbar?.workspaceNames = { [unowned self] in config.config.workspaceNames }
+        taskbar?.workspacesEnabled = { workspaces.isEnabled }
+        taskbar?.appRule = { [unowned self] app in config.config.rule(for: app) }
+        taskbar?.pinToWorkspace = { [unowned self] app, n in self.pinToWorkspace(app, n) }
+        taskbar?.editAppRule = { [unowned self] app in self.editAppRule(app) }
+        taskbar?.pinWindowTitle = { [unowned self] app, pattern, n in self.pinWindowTitle(app, pattern, n) }
         taskbar?.moveToWorkspace = { [unowned self] ids, n in
             for id in ids {
                 workspaces.move(id, to: n, source: "taskbar") { [weak self] message in
