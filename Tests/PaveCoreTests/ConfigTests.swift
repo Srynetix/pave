@@ -470,12 +470,12 @@ import Testing
 
     @Test func theMostSpecificPatternWinsWhateverTheOrder() {
         let patterns = ["*Work": 3, "*Home Work": 5, "*": 1]
-        #expect(TitlePattern.workspace(patterns, title: "Notes Home Work") == 5)
-        #expect(TitlePattern.workspace(patterns, title: "Notes Work") == 3)
-        #expect(TitlePattern.workspace(patterns, title: "Notes") == 1)
+        #expect(TitlePattern.best(patterns, title: "Notes Home Work") == 5)
+        #expect(TitlePattern.best(patterns, title: "Notes Work") == 3)
+        #expect(TitlePattern.best(patterns, title: "Notes") == 1)
         // Same weight: alphabetical, never the file's order.
-        #expect(TitlePattern.workspace(["*a*": 2, "*b*": 4], title: "ab") == 2)
-        #expect(TitlePattern.workspace([:], title: "x") == nil)
+        #expect(TitlePattern.best(["*a*": 2, "*b*": 4], title: "ab") == 2)
+        #expect(TitlePattern.best([:], title: "x") == nil)
     }
 
     @Test func titlesComeAfterProfilesAndBeforeTheAppWorkspace() throws {
@@ -502,7 +502,31 @@ import Testing
         #expect(titlesOnly.workspaceChoice(title: "") == .init(awaitsTitle: true))
     }
 
-    @Test(arguments: ["\"*Secret\" = 0", "\"*Secret\" = \"3\"", "\"\" = 3"])
+    @Test func aTitlePatternCanShowAWindowOnEveryWorkspace() throws {
+        let (config, warnings) = try PaveConfig.parse(
+            """
+            [apps."com.brave.Browser"]
+            workspace = 2
+            [apps."com.brave.Browser".titles]
+            "Picture*" = "all"
+            "*Work" = 3
+            """)
+        #expect(warnings.isEmpty)
+        let rule = config.rule(for: "com.brave.Browser")
+        #expect(rule.titles == ["Picture*": .everywhere, "*Work": 3])
+        #expect(rule.workspaceChoice(title: "Picture in picture") == .init(byTitle: true, everywhere: true))
+        #expect(rule.workspaceChoice(title: "Page - Work") == .init(workspace: 3, byTitle: true))
+        #expect(rule.workspaceChoice(title: "Page") == .init(workspace: 2, awaitsTitle: true))
+        #expect(TitleTarget.everywhere.toml == "\"all\"" && TitleTarget.workspace(4).toml == "4")
+    }
+
+    @Test func aProfileCannotBeShownEverywhere() {
+        #expect(throws: PaveConfig.Problem.self) { try PaveConfig.parse("[apps.\"x\".profiles]\nWork = \"all\"") }
+    }
+
+    @Test(arguments: [
+        "\"*Secret\" = 0", "\"*Secret\" = \"3\"", "\"\" = 3", "\"*Secret\" = \"every\"", "\"\" = \"all\"",
+    ])
     func invalidPatternIsRejectedWithoutTheTitle(line: String) {
         do {
             _ = try PaveConfig.parse("[apps.\"x\".titles]\n\(line)")

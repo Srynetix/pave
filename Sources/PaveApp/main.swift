@@ -251,7 +251,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSMenu
         taskbar?.appRule = { [unowned self] app in config.config.rule(for: app) }
         taskbar?.pinToWorkspace = { [unowned self] app, n in self.pinToWorkspace(app, n) }
         taskbar?.editAppRule = { [unowned self] app in self.editAppRule(app) }
-        taskbar?.pinWindowTitle = { [unowned self] app, pattern, n in self.pinWindowTitle(app, pattern, n) }
+        taskbar?.pinWindowTitle = { [unowned self] app, pattern, target in
+            self.pinWindowTitle(app, pattern, target)
+        }
+        taskbar?.isEverywhere = { id in workspaces.state.isEverywhere(id) }
+        taskbar?.setEverywhere = { [unowned self] id, on in
+            workspaces.setEverywhere(id, on, source: "taskbar") { [weak self] message in
+                Log.info("taskbar: \(message)")
+                self?.refresh()
+            }
+        }
         taskbar?.moveToWorkspace = { [unowned self] ids, n in
             for id in ids {
                 workspaces.move(id, to: n, source: "taskbar") { [weak self] message in

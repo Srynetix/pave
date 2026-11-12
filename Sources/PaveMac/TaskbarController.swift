@@ -67,8 +67,11 @@ public final class TaskbarController {
     public var appRule: (String) -> AppRule = { _ in AppRule() }
     public var pinToWorkspace: (String, Int?) -> Void = { _, _ in }
     public var editAppRule: (String) -> Void = { _ in }
-    /// A title rule `pattern = N` for an app (never logged: part of a title).
-    public var pinWindowTitle: (String, String, Int) -> Void = { _, _, _ in }
+    /// A title rule `pattern = N` or `"all"` for an app (never logged: part of a title).
+    public var pinWindowTitle: (String, String, TitleTarget) -> Void = { _, _, _ in }
+    /// "Show on All Workspaces": whether a window is, and the change.
+    public var isEverywhere: (WindowID) -> Bool = { _ in false }
+    public var setEverywhere: (WindowID, Bool) -> Void = { _, _ in }
     /// Tiled windows are kept in the usable area by the tiling: not corrected here.
     public var isTiled: (WindowID) -> Bool = { _ in false }
     var settings: Settings

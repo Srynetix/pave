@@ -144,7 +144,8 @@ instead when the window's workspace is tiled.
    windows, and sends it to the registry on the main actor.
 2. `WindowStore.apply` compares it with what it knew and returns `.created`.
 3. The registry hands the changes to every observer: the `WorkspaceController` gives the
-   window its workspace (from its app rule or its title), the `Commander` places it in its
+   window its workspace (from its app rule or its title), or all of them (a window its app
+   keeps on top, a title rule `"all"`), the `Commander` places it in its
    zone if a rule says so, the `TilingController` inserts it in the tree, the taskbar adds
    its button.
 

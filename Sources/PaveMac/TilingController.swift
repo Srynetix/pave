@@ -106,9 +106,10 @@ public final class TilingController {
         let standard =
             window.subrole == "AXStandardWindow" || window.state == .minimized
             || (window.state == .hidden && trees.values.contains { $0.contains(window.id) })
-        // A panel without a minimize button (Open, Save, settings) floats.
+        // A panel without a minimize button (Open, Save, settings) floats, so
+        // does a window shown on every workspace (a Picture in Picture video).
         return standard && window.minimizable != false && window.state != .fullscreen && !appRule.ignore && appRule.tile
-            && !floating.contains(window.id)
+            && !floating.contains(window.id) && !workspaces.state.isEverywhere(window.id)
     }
 
     private func scheduleSync(after delay: TimeInterval = 0) {

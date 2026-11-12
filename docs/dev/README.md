@@ -28,6 +28,7 @@ built this way; these documents say how it is built now.
 | Placement | Where a snap puts a window: a half, a quarter, maximized | [`Placement`](../../Sources/PaveCore/Layout.swift) |
 | Zone layout | A FancyZones-style split of a screen, in percent of its usable area | [`ZoneLayout`](../../Sources/PaveCore/ZoneLayout.swift) |
 | Workspace | One of nine virtual desktops; native Spaces are not used | [`Workspaces`](../../Sources/PaveCore/Workspaces.swift) |
+| Shown everywhere | A window never parked, which follows the workspace shown on its screen (Picture in Picture) | [`Workspaces.everywhere`](../../Sources/PaveCore/Workspaces.swift) |
 | Parking | How a window of a hidden workspace is kept out of sight: moved to a screen's edge, its frame remembered | [`ParkingSpot`](../../Sources/PaveCore/ParkingSpot.swift) |
 | Tiling tree | The i3-style tree of containers that lays out a tiled workspace | [`TilingTree`](../../Sources/PaveCore/TilingTree.swift) |
 | Arrangement | A saved set of windows, their workspaces and places ("Code", "Meeting") | [`Arrangement`](../../Sources/PaveCore/Arrangement.swift) |

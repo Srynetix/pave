@@ -117,7 +117,7 @@ private struct RuleRow: View {
     }
 }
 
-/// `[apps."…".titles]`: the workspace of new windows by title pattern.
+/// `[apps."…".titles]`: the workspace of new windows by title pattern, or all.
 private struct TitleRules: View {
     @ObservedObject var model: SettingsModel
     var bundleID: String
@@ -128,7 +128,7 @@ private struct TitleRules: View {
         VStack(alignment: .leading, spacing: 6) {
             ForEach(rule.titles.keys.sorted(), id: \.self) { pattern in
                 TitleRuleRow(
-                    model: model, bundleID: bundleID, pattern: pattern, workspace: rule.titles[pattern] ?? 1,
+                    model: model, bundleID: bundleID, pattern: pattern, target: rule.titles[pattern] ?? 1,
                     matches: open.filter { TitlePattern.matches(pattern, $0.title) }.count)
             }
             HStack {
@@ -139,7 +139,7 @@ private struct TitleRules: View {
                             ForEach(suggestions, id: \.self) { title in
                                 Button(title) {
                                     let n = open.first { $0.title == title }?.workspace ?? rule.workspace ?? 1
-                                    model.setTitleRule(bundleID, "*\(title)", n)
+                                    model.setTitleRule(bundleID, "*\(title)", .workspace(n))
                                 }
                             }
                         }
@@ -147,14 +147,14 @@ private struct TitleRules: View {
                     Button("Empty pattern") {
                         var pattern = "*"
                         while rule.titles[pattern] != nil { pattern += "*" }
-                        model.setTitleRule(bundleID, pattern, rule.workspace ?? 1)
+                        model.setTitleRule(bundleID, pattern, .workspace(rule.workspace ?? 1))
                     }
                 }
                 .fixedSize()
                 Spacer()
             }
             Text(
-                "New windows whose title matches a pattern open on its workspace: * is any text, ? one character, case ignored. *Work: titles ending with Work. The longest pattern wins, before the workspace above."
+                "New windows whose title matches a pattern open on its workspace, or on all of them: * is any text, ? one character, case ignored. *Work: titles ending with Work. The longest pattern wins, before the workspace above."
             )
             .font(.caption).foregroundStyle(.secondary)
         }
@@ -165,7 +165,7 @@ private struct TitleRuleRow: View {
     @ObservedObject var model: SettingsModel
     var bundleID: String
     var pattern: String
-    var workspace: Int
+    var target: TitleTarget
     var matches: Int
     @State private var text = ""
 
@@ -179,12 +179,15 @@ private struct TitleRuleRow: View {
                 .onChange(of: pattern) { text = pattern }
             Picker(
                 "Workspace",
-                selection: Binding(get: { workspace }, set: { model.setTitleRule(bundleID, pattern, $0) })
+                selection: Binding(get: { target }, set: { model.setTitleRule(bundleID, pattern, $0) })
             ) {
-                ForEach(Workspaces.range.map { $0 }, id: \.self) { Text(verbatim: "\($0)").tag($0) }
+                ForEach(Workspaces.range.map { $0 }, id: \.self) {
+                    Text(verbatim: "\($0)").tag(TitleTarget.workspace($0))
+                }
+                Text("All").tag(TitleTarget.everywhere)
             }
             .labelsHidden()
-            .frame(width: 60)
+            .frame(width: 70)
             Text(matches == 0 ? String(localized: "no open window") : String(localized: "\(matches) open window(s)"))
                 .font(.caption).foregroundStyle(.secondary)
                 .frame(width: 110, alignment: .leading)

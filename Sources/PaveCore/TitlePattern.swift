@@ -33,11 +33,11 @@ public enum TitlePattern {
         return pi == p.count
     }
 
-    /// The workspace of the most specific pattern `title` matches: the one
-    /// with the most characters other than `*` ("*Home Work" before "*Work"),
-    /// then the first in alphabetical order, so the choice never depends on
-    /// the order of the file.
-    public static func workspace(_ patterns: [String: Int], title: String) -> Int? {
+    /// The value of the most specific pattern `title` matches: the one with
+    /// the most characters other than `*` ("*Home Work" before "*Work"), then
+    /// the first in alphabetical order, so the choice never depends on the
+    /// order of the file.
+    public static func best<Value>(_ patterns: [String: Value], title: String) -> Value? {
         func weight(_ pattern: String) -> Int { pattern.filter { $0 != "*" }.count }
         return patterns.filter { matches($0.key, title) }
             .min { weight($0.key) != weight($1.key) ? weight($0.key) > weight($1.key) : $0.key < $1.key }?.value
