@@ -59,7 +59,7 @@ SPDX lines and every test. `just fmt` fixes the formatting.
 
 Technical decisions are recorded in [`docs/adrs`](docs/adrs/README.md), with what
 was considered and why it lost. A change that goes against a record comes with
-a new one. The README's **Development** section describes the layout of the code.
+a new one. [`docs/dev`](docs/dev/README.md) describes how the code is built: start there.
 
 ## Licence
 

@@ -175,60 +175,8 @@ just deploy    # builds, installs ~/Applications/Pave.app and launches it
 > Pavé is a personal project, used every day by its author but young. Expect rough edges,
 > and please open an issue when something feels wrong.
 
-<details>
-<summary><b>Development</b></summary>
-
-```sh
-just dev            # build and sign build/Pave.app, then launch it (logs: build/pave.log)
-just deploy         # the same, installed as ~/Applications/Pave.app, the copy you use every day
-just fmt            # format the Swift sources (swift-format, .swift-format)
-just test           # unit tests
-just ci             # the gate: commits, formatting, a build without a warning, strings, tests
-just strings        # extract the interface strings into Resources/Localizable.xcstrings
-just check-strings  # fail if a string has no translation
-just icon           # redraw Resources/AppIcon.icns (scripts/make-icon.swift)
-just changelog      # the notes of the next release, from the commit subjects
-just release        # publish a GitHub release of this commit (just release --dry-run to try)
-```
-
-Always launch through `just dev` or `open`, never `build/Pave.app/Contents/MacOS/Pave` from a
-terminal: macOS would give the permissions to the terminal. Only one Pavé runs at a time:
-`just dev` stops the installed copy, `just deploy` restarts it. The Command Line Tools alone
-lack the SwiftUI and Swift Testing macro plugins, hence the Xcode requirement.
-
-| Target | Role |
-|---|---|
-| `PaveCore` | Pure logic (model, layout, workspaces, tiling, config), no AppKit, fast to test |
-| `PaveIPC` | JSON protocol and Unix socket, shared by the agent and the CLI |
-| `PaveMac` | Everything that talks to macOS (Accessibility, event tap, window server). Private APIs live **only** in `Private.swift` |
-| `PaveApp` | The menu bar agent, Settings and About windows, bundled as `build/Pave.app` |
-| `pave` | The command-line tool |
-
-**Localization**: strings live in `Resources/Localizable.xcstrings`, English being the source
-language. Literals given to SwiftUI views are localized keys; strings built in code go
-through `String(localized:)`. To add a language, add it to `LANGUAGES` in
-`scripts/strings.sh` and to `CFBundleLocalizations` in `Resources/Info.plist`, then translate
-in the catalog.
-
-**Releases**: bump `CFBundleShortVersionString` in `Resources/Info.plist`, commit, push, then
-`just release`. It builds a release `Pave.app` signed with "Pave Dev" and publishes
-`Pave_<version>.dmg` (first install) and `Pave_<version>.app.tar.gz` (what updates install),
-each with a `.sha256` and a `.minisig`, as the release `pave-v<version>`, with `just changelog` as
-notes. Signing uses `~/.minisign/pave.key` (or
-`PAVE_SIGN_KEY`), whose public half is `Resources/update-key.pub`; create it once with
-`minisign -G -s ~/.minisign/pave.key -p Resources/update-key.pub`. Installed copies look for
-releases only if they are signed with the certificate whose SHA-256 is in
-`Resources/update-cert.sha256` (`just release` checks it); a fork that publishes its own
-releases replaces both files. Keep a backup of that key
-and of the "Pave Dev" certificate (Keychain Access › export as `.p12`): without the same two,
-installed copies refuse the next update, or lose the Accessibility permission. Releases are
-built on a Mac, not in CI, for that reason.
-
-**Private APIs**: Pavé uses `_AXUIElementGetWindow` and a few CGS functions (to tell windows
-of other native Spaces apart), all in `Sources/PaveMac/Private.swift`. They may break with a
-macOS update, and they rule out the Mac App Store.
-
-</details>
+How the code is built, the development loop, localization and releases are in
+[`docs/dev/`](docs/dev/README.md).
 
 <details>
 <summary><b>Configuration</b></summary>
@@ -346,6 +294,12 @@ and nothing leaves your Mac.
 <p align="center">
   <img src="docs/screenshots/about.png" alt="About Pavé" width="60%">
 </p>
+
+## Documentation
+
+- [Developing Pavé](docs/dev/README.md) — how the code is built: architecture, patterns, the
+  development loop, releases
+- [Decisions](docs/adrs/README.md) — every technical choice, and what it was chosen against
 
 ## How it was made
 
