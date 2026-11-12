@@ -246,11 +246,11 @@ final class SettingsModel: ObservableObject {
     }
 
     /// `[apps."…".titles]`: new windows whose title matches `pattern` open
-    /// on `workspace` (nil: the pattern goes).
-    func setTitleRule(_ bundleID: String, _ pattern: String, _ workspace: Int?) {
+    /// on `target` (nil: the pattern goes).
+    func setTitleRule(_ bundleID: String, _ pattern: String, _ target: TitleTarget?) {
         let table = ConfigEdit.appTable(bundleID) + ".titles"
-        if let workspace {
-            apply(setPrivateKey(table, pattern, "\(workspace)"))
+        if let target {
+            apply(setPrivateKey(table, pattern, target.toml))
         } else {
             apply(removePrivateKey(table, pattern))
             if rule(bundleID).titles.isEmpty { apply(removeTable(table)) }
@@ -258,12 +258,12 @@ final class SettingsModel: ObservableObject {
         if config.appRules[bundleID] == AppRule() { apply(removeTable(ConfigEdit.appTable(bundleID))) }
     }
 
-    /// Renames a title pattern, keeping its workspace.
+    /// Renames a title pattern, keeping its target.
     func renameTitleRule(_ bundleID: String, from old: String, to new: String) {
         guard old != new, !new.isEmpty, let n = rule(bundleID).titles[old], rule(bundleID).titles[new] == nil else {
             return
         }
-        apply(setPrivateKey(ConfigEdit.appTable(bundleID) + ".titles", new, "\(n)"))
+        apply(setPrivateKey(ConfigEdit.appTable(bundleID) + ".titles", new, n.toml))
         apply(removePrivateKey(ConfigEdit.appTable(bundleID) + ".titles", old))
     }
 

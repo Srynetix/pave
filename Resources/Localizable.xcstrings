@@ -307,12 +307,32 @@
         }
       }
     },
+    "All": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tous"
+          }
+        }
+      }
+    },
     "All %@ Windows": {
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
             "value": "Toutes les fenêtres de %@"
+          }
+        }
+      }
+    },
+    "All Workspaces": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tous les workspaces"
           }
         }
       }
@@ -1547,12 +1567,12 @@
         }
       }
     },
-    "New windows whose title matches a pattern open on its workspace: * is any text, ? one character, case ignored. *Work: titles ending with Work. The longest pattern wins, before the workspace above.": {
+    "New windows whose title matches a pattern open on its workspace, or on all of them: * is any text, ? one character, case ignored. *Work: titles ending with Work. The longest pattern wins, before the workspace above.": {
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Les nouvelles fenêtres dont le titre correspond à un motif s’ouvrent sur son workspace : * remplace n’importe quel texte, ? un caractère, sans tenir compte de la casse. *Work : les titres qui finissent par Work. Le motif le plus long l’emporte, avant le workspace ci-dessus."
+            "value": "Les nouvelles fenêtres dont le titre correspond à un motif s’ouvrent sur son workspace, ou sur tous : * remplace n’importe quel texte, ? un caractère, sans tenir compte de la casse. *Work : les titres qui finissent par Work. Le motif le plus long l’emporte, avant le workspace ci-dessus."
           }
         }
       }
@@ -2483,6 +2503,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Afficher dans le Finder"
+          }
+        }
+      }
+    },
+    "Show on All Workspaces": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher sur tous les workspaces"
           }
         }
       }

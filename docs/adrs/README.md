@@ -19,3 +19,4 @@ To add one: copy the shape of the latest record to the next number, and add its 
 |---|---|---|
 | [1](0001-in-line-with-the-p-suite.md) | Pavé follows the P suite's conventions: swift-format, the suite's recipes, a checked gate and commits, MIT OR Apache-2.0. | Yes |
 | [2](0002-workspace-by-window-title.md) | New windows go to a workspace by glob patterns on their title (`[apps."…".titles]`), set from the taskbar's "Pin to Workspace". | Yes |
+| [3](0003-windows-on-every-workspace.md) | A window can be shown on every workspace: one an app keeps on top (Picture in Picture), a title rule `"all"`, or the taskbar's "Show on All Workspaces". | Yes |

@@ -92,7 +92,9 @@ Start or an empty part of the bar, then choose **Reset Taskbar** (it is also in 
 
 Nine virtual workspaces, no native Spaces animations. **⌘1…9** shows a workspace on its
 screen, **⌘⇧1…9** sends the active window there. Each screen shows its own workspace, the
-taskbar and the menu bar show their numbers, and you can name them.
+taskbar and the menu bar show their numbers, and you can name them. A Picture in Picture video
+stays in sight on every workspace, as do windows you choose (right-click them in the taskbar:
+**Show on All Workspaces**).
 
 ### Tiling, when you want it
 
@@ -224,13 +226,16 @@ commented. Most settings are also in the Settings window.
   [apps."com.example.prism".titles]
   "*Work" = 3       # titles ending with "Work"
   "*poc-mac-wm*" = 2  # titles containing "poc-mac-wm"
+  "Picture*" = "all"  # on every workspace
   ```
 
   The pattern with the most characters other than `*` wins. Profiles come first, then titles,
   then the app's `workspace`. The taskbar's right-click menu has **Pin to Workspace**: all the
   app's windows (its `workspace`), **This Window** (a title rule from the window's title, then
-  Settings to shorten it to what stays the same, `*Work`), and **Pin by Window Title…**, which
-  opens the app's rule in Settings.
+  Settings to shorten it to what stays the same, `*Work`; or **All Workspaces**), and **Pin by
+  Window Title…**, which opens the app's rule in Settings. A window its app keeps above the
+  others (Picture in Picture) is shown on every workspace without a rule; **Show on All
+  Workspaces** in a window's menu does the same for that window until it closes.
 - `[windows]`: `magnet` (points, default `12`, `0` off): a window dropped this close to
   another window's edge or the screen's sticks to it (against it, or lined up), with a preview
   while dragging; `magnet-fill` (default `true`): stuck against another window, it also fills

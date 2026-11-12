@@ -26,6 +26,10 @@ public struct Workspaces: Codable, Sendable, Equatable {
     /// What each unplugged screen had, given back if it returns (a monitor
     /// that sleeps or loses its signal comes back seconds later).
     public private(set) var departed: [String: Departed] = [:]
+    /// Windows shown on every workspace (a Picture in Picture video): never
+    /// parked, they belong to the workspace shown on their screen and follow
+    /// it on every switch.
+    public private(set) var everywhere: Set<WindowID> = []
 
     public struct Departed: Codable, Sendable, Equatable {
         /// The workspace it showed.
@@ -47,6 +51,7 @@ public struct Workspaces: Codable, Sendable, Equatable {
         assignment = try c.decode([WindowID: Int].self, forKey: .assignment)
         savedFrames = try c.decode([WindowID: Rect].self, forKey: .savedFrames)
         departed = try c.decodeIfPresent([String: Departed].self, forKey: .departed) ?? [:]
+        everywhere = try c.decodeIfPresent(Set<WindowID>.self, forKey: .everywhere) ?? []
     }
 
     public enum Action: Equatable, Sendable {
@@ -56,6 +61,7 @@ public struct Workspaces: Codable, Sendable, Equatable {
 
     public func workspace(of id: WindowID) -> Int { assignment[id] ?? active }
     public func isHidden(_ id: WindowID) -> Bool { savedFrames[id] != nil }
+    public func isEverywhere(_ id: WindowID) -> Bool { everywhere.contains(id) }
     /// Parked, or of a workspace shown on no screen: minimized windows are
     /// never parked but belong to their workspace, the taskbar lists them there only.
     public func isOutOfSight(_ id: WindowID) -> Bool { isHidden(id) || !isVisible(workspace(of: id)) }
@@ -209,6 +215,14 @@ public struct Workspaces: Codable, Sendable, Equatable {
         return actions
     }
 
+    /// A standard window its app keeps above the others (Picture in Picture,
+    /// a player set to stay on top) is shown on every workspace, as macOS
+    /// shows it on every Space. `level`: its window server layer, 0 for a
+    /// normal window; from 20 on (the Dock) it is system interface, not managed.
+    public static func showsEverywhere(subrole: String, level: Int) -> Bool {
+        subrole == "AXStandardWindow" && (1..<20).contains(level)
+    }
+
     /// Single-screen form, kept for callers that do not know about screens.
     public mutating func adopt(_ id: WindowID) {
         if assignment[id] == nil { assignment[id] = active }
@@ -218,6 +232,7 @@ public struct Workspaces: Codable, Sendable, Equatable {
     public mutating func forget(_ id: WindowID) {
         assignment[id] = nil
         savedFrames[id] = nil
+        everywhere.remove(id)
     }
 
     /// A shown window moved (drag, Win+Shift+arrow, macOS after a re-plug):
@@ -237,6 +252,29 @@ public struct Workspaces: Codable, Sendable, Equatable {
         return visible[screen.id] ?? active
     }
 
+    /// Shows `window` on every workspace, or on the one of its screen only
+    /// again. A parked window comes back where it was.
+    public mutating func setEverywhere(_ window: WindowSnapshot, _ on: Bool, screens: [Screen]) -> [Action] {
+        guard on else {
+            everywhere.remove(window.id)
+            return []
+        }
+        everywhere.insert(window.id)
+        let frame = savedFrames.removeValue(forKey: window.id)
+        assignment[window.id] = workspaceShown(at: frame ?? window.frame, screens: screens)
+        return frame.map { [.setFrame(window.id, $0)] } ?? []
+    }
+
+    /// Workspace `n` is now shown on `screen`: the windows shown everywhere
+    /// that stand there join it.
+    private mutating func follow(_ n: Int, on screen: Screen, screens: [Screen], windows: [WindowSnapshot]) {
+        for window in windows
+        where everywhere.contains(window.id) && LayoutEngine.screen(for: window.frame, among: screens)?.id == screen.id
+        {
+            assignment[window.id] = n
+        }
+    }
+
     // MARK: - Commands
 
     /// Win+N. `focusedScreen` is used when N has no home yet (or its home is
@@ -254,7 +292,7 @@ public struct Workspaces: Codable, Sendable, Equatable {
         let screen = home[target].flatMap { sid in all.first { $0.id == sid } } ?? focusedScreen
         let outgoing = visible[screen.id] ?? active
         var actions: [Action] = []
-        for window in windows where workspace(of: window.id) == outgoing {
+        for window in windows where workspace(of: window.id) == outgoing && !isEverywhere(window.id) {
             // Minimized windows stay attached to the workspace, without parking.
             assignment[window.id] = outgoing
             if window.state == .normal, !isHidden(window.id) {
@@ -262,6 +300,7 @@ public struct Workspaces: Codable, Sendable, Equatable {
             }
         }
         actions += show(target, on: screen, screens: all, windows: windows)
+        follow(target, on: screen, screens: all, windows: windows)
         visible[screen.id] = target
         home[target] = screen.id
         active = target
@@ -286,7 +325,7 @@ public struct Workspaces: Codable, Sendable, Equatable {
         }
         var actions: [Action] = []
         let outgoing = visible[screen.id] ?? active
-        for window in windows where workspace(of: window.id) == outgoing {
+        for window in windows where workspace(of: window.id) == outgoing && !isEverywhere(window.id) {
             assignment[window.id] = outgoing
             if window.state == .normal, !isHidden(window.id) {
                 actions += park(window, screens: screens, preferring: screen)
@@ -294,7 +333,9 @@ public struct Workspaces: Codable, Sendable, Equatable {
         }
         let old = screens.first { $0.id == from }
         for window in windows
-        where workspace(of: window.id) == target && window.state == .normal && !isHidden(window.id) {
+        where workspace(of: window.id) == target && window.state == .normal && !isHidden(window.id)
+            && !isEverywhere(window.id)
+        {
             assignment[window.id] = target
             let frame =
                 old.map { LayoutEngine.carry(window.frame, from: $0.visibleFrame, to: screen.visibleFrame) }
@@ -303,12 +344,14 @@ public struct Workspaces: Codable, Sendable, Equatable {
         }
         visible[screen.id] = target
         home[target] = screen.id
+        follow(target, on: screen, screens: screens, windows: windows)
         visible[from] = nil
         if let old {
             let n = nextFreeWorkspace(for: from, windows: windows)
             visible[from] = n
             home[n] = from
             actions += self.show(n, on: old, screens: screens, windows: windows)
+            follow(n, on: old, screens: screens, windows: windows)
         }
         active = target
         return actions + focusAction(in: target, windows: windows)
@@ -340,6 +383,8 @@ public struct Workspaces: Codable, Sendable, Equatable {
     ) -> [Action] {
         let source = workspace(of: window.id)
         guard Self.range.contains(target), target != source else { return [] }
+        // Sent to one workspace: it is shown there only.
+        everywhere.remove(window.id)
         assignment[window.id] = target
         guard !isHidden(window.id) else { return [] }
 
@@ -399,6 +444,7 @@ public struct Workspaces: Codable, Sendable, Equatable {
     /// Emergency exit: every parked window back where it was, a fresh start
     /// (also used when workspaces are turned off). With `screens`, each screen
     /// then shows a workspace again and every window joins the one of its screen.
+    /// Windows shown everywhere stay so, those of `windows` at least.
     public mutating func restoreAll(screens: [Screen] = [], windows: [WindowSnapshot] = []) -> [Action] {
         // A frame saved on a screen that is gone is carried onto the primary one,
         // else macOS leaves the window almost entirely off screen.
@@ -415,6 +461,7 @@ public struct Workspaces: Codable, Sendable, Equatable {
         home.removeAll()
         departed.removeAll()
         active = Self.range.lowerBound
+        if !windows.isEmpty { everywhere.formIntersection(windows.map(\.id)) }
         if !screens.isEmpty {
             _ = screensChanged(screens, windows: [])
             for window in windows {
@@ -427,7 +474,8 @@ public struct Workspaces: Codable, Sendable, Equatable {
     /// A window shown again (app unhidden, window restored) while its
     /// workspace is on no screen: it must not stay in sight on another one.
     public mutating func parkStray(_ window: WindowSnapshot, screens: [Screen]) -> [Action] {
-        guard window.state == .normal, !isHidden(window.id), !visible.isEmpty, !isVisible(workspace(of: window.id))
+        guard window.state == .normal, !isHidden(window.id), !isEverywhere(window.id), !visible.isEmpty,
+            !isVisible(workspace(of: window.id))
         else { return [] }
         assignment[window.id] = workspace(of: window.id)
         return park(window, screens: screens)
@@ -464,7 +512,9 @@ public struct Workspaces: Codable, Sendable, Equatable {
     }
 
     private func focusAction(in n: Int, windows: [WindowSnapshot]) -> [Action] {
-        windows.first { workspace(of: $0.id) == n && $0.state == .normal }.map { [.focus($0.id)] } ?? []
+        windows.first { workspace(of: $0.id) == n && $0.state == .normal && !isEverywhere($0.id) }.map {
+            [.focus($0.id)]
+        } ?? []
     }
 
     /// Legacy parking spot: bottom-right corner, 1 pt left on screen.

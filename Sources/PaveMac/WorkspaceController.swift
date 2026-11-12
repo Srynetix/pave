@@ -84,7 +84,7 @@ public final class WorkspaceController {
         let markedAt = (try? FileManager.default.attributesOfItem(atPath: marker.path))?[.modificationDate] as? Date
         try? FileManager.default.removeItem(at: marker)
         // A fresh marker only: an old one means the restart never happened.
-        if let markedAt, Date().timeIntervalSince(markedAt) < 120, isEnabled, var resumed = leftover {
+        if let markedAt, Date().timeIntervalSince(markedAt) < 120, isEnabled, let resumed = leftover {
             let screens = Screens.all()
             let windows = registry.store.orderedWindows
             let before = resumed.hiddenCount
@@ -94,8 +94,10 @@ public final class WorkspaceController {
                 ?? []
             let alive = Set(info.compactMap { ($0[kCGWindowNumber as String] as? UInt32).map { WindowID($0) } })
                 .union(windows.map(\.id))
-            let actions = resumed.resume(screens: screens, windows: windows, alive: alive)
             state = resumed
+            let actions =
+                state.resume(screens: screens, windows: windows, alive: alive)
+                + showEverywhere(windows, screens: screens)
             knownScreens = screens.map(\.id)
             persist()
             Log.info(
@@ -226,7 +228,8 @@ public final class WorkspaceController {
     /// window joins the one of its screen. Nothing is parked at that point.
     private func regroup(reason: String) {
         let screens = Screens.all()
-        let actions = state.restoreAll(screens: screens, windows: registry.store.orderedWindows)
+        let windows = registry.store.orderedWindows
+        let actions = state.restoreAll(screens: screens, windows: windows) + showEverywhere(windows, screens: screens)
         knownScreens = screens.map(\.id)
         persist()
         Log.info("workspaces (\(reason)): \(describeVisible(screens))")
@@ -380,6 +383,13 @@ public final class WorkspaceController {
                     // must never open on a hidden workspace.
                     let choice =
                         window.subrole == "AXStandardWindow" ? workspaceRule(window) : AppRule.WorkspaceChoice()
+                    if let reason = everywhereReason(window, choice) {
+                        _ = state.adopt(window, screens: screens)
+                        actions += state.setEverywhere(window, true, screens: screens)
+                        Log.info("\(window.id) [\(window.appName)] → all workspaces (\(reason))")
+                        dirty = true
+                        break
+                    }
                     let preferred = choice.workspace
                     let adopted = state.adopt(window, screens: screens, preferred: preferred)
                     if let preferred, !adopted.isEmpty || state.workspace(of: window.id) == preferred {
@@ -461,6 +471,10 @@ public final class WorkspaceController {
             return
         }
         let choice = workspaceRule(window)
+        if choice.everywhere {
+            awaitingTitle[id] = nil
+            return setEverywhere(id, true, source: "title rule, title came late")
+        }
         guard choice.byTitle, let target = choice.workspace else { return }
         awaitingTitle[id] = nil
         guard target != state.workspace(of: id) else { return }
@@ -491,6 +505,53 @@ public final class WorkspaceController {
             actions,
             label: "\(id) [\(window.appName)] shown again on hidden workspace \(state.workspace(of: id)), parked"
         ) { _ in }
+    }
+
+    // MARK: - Shown on every workspace
+
+    /// Why a new window is shown on every workspace, or nil: its app keeps it
+    /// above the others (Picture in Picture), or a title rule says `"all"`.
+    private func everywhereReason(_ window: WindowSnapshot, _ choice: AppRule.WorkspaceChoice) -> String? {
+        if choice.everywhere { return "title rule" }
+        if let level = Self.level(of: window.id), Workspaces.showsEverywhere(subrole: window.subrole, level: level) {
+            return "kept above the others"
+        }
+        return nil
+    }
+
+    /// Windows found at start-up that are shown on every workspace.
+    private func showEverywhere(_ windows: [WindowSnapshot], screens: [Screen]) -> [Workspaces.Action] {
+        var actions: [Workspaces.Action] = []
+        for window in windows where !state.isEverywhere(window.id) {
+            let choice =
+                window.subrole == "AXStandardWindow" ? workspaceRule(window) : AppRule.WorkspaceChoice()
+            guard let reason = everywhereReason(window, choice) else { continue }
+            actions += state.setEverywhere(window, true, screens: screens)
+            Log.info("\(window.id) [\(window.appName)] → all workspaces (\(reason))")
+        }
+        return actions
+    }
+
+    /// The window server layer of a window (0: a normal one). Public API, no AX.
+    private static func level(of id: WindowID) -> Int? {
+        let info = CGWindowListCopyWindowInfo([.optionIncludingWindow], CGWindowID(id.rawValue)) as? [[String: Any]]
+        return info?.first?[kCGWindowLayer as String] as? Int
+    }
+
+    /// Taskbar "Show on All Workspaces": `on`, the window is never parked and
+    /// follows the workspace shown on its screen; off, it stays on that one.
+    public func setEverywhere(
+        _ id: WindowID, _ on: Bool, source: String, completion: @escaping @MainActor (String) -> Void = { _ in }
+    ) {
+        guard isEnabled else { return completion("workspaces are disabled (workspaces.enabled in the config)") }
+        guard !registry.isSessionLocked else { return completion("session locked, ignored") }
+        guard let window = registry.store.windows[id] else { return completion("unknown window \(id)") }
+        guard on != state.isEverywhere(id) else { return completion("\(id) unchanged") }
+        let actions = state.setEverywhere(window, on, screens: Screens.all())
+        persist()
+        let label =
+            "\(source): \(id) [\(window.appName)] → \(on ? "all workspaces" : "workspace \(state.workspace(of: id))")"
+        execute(actions, label: label) { _ in completion(on ? "\(id) on all workspaces" : "\(id) on one workspace") }
     }
 
     /// When Pavé itself last asked for a window's focus (FocusService): W3.

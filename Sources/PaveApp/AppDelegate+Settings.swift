@@ -25,11 +25,11 @@ extension AppDelegate {
         refresh()
     }
 
-    /// Taskbar "This Window ▸ N": a title rule from the window's title, then
-    /// Settings on it, where the pattern is shortened to what stays the same
-    /// ("*Work"): the full title rarely comes back.
-    func pinWindowTitle(_ app: String, _ pattern: String, _ n: Int) {
-        if let problem = config.setPrivateKey(ConfigEdit.appTable(app) + ".titles", pattern, to: "\(n)") {
+    /// Taskbar "This Window ▸ N" or "All Workspaces": a title rule from the
+    /// window's title, then Settings on it, where the pattern is shortened to
+    /// what stays the same ("*Work"): the full title rarely comes back.
+    func pinWindowTitle(_ app: String, _ pattern: String, _ target: TitleTarget) {
+        if let problem = config.setPrivateKey(ConfigEdit.appTable(app) + ".titles", pattern, to: target.toml) {
             Log.info("config: title rule of \(app) not changed: \(problem)")
             showAlert(String(localized: "Setting not changed"), problem)
             return

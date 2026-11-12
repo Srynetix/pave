@@ -36,6 +36,7 @@ extension TaskbarController {
                 })
         }
         if let move = workspaceMenu(windows) { menu.addItem(move) }
+        if let everywhere = everywhereItem(windows) { menu.addItem(everywhere) }
         if let pin = pinMenu(item, name: name) { menu.addItem(pin) }
         if let pid = item.pid, let app = NSRunningApplication(processIdentifier: pid) {
             menu.addItem(
@@ -96,9 +97,13 @@ extension TaskbarController {
             let pattern = "*" + windows[0].title
             let this = NSMenu()
             for n in Workspaces.range {
-                entry(this, label(n), checked: rule.titles[pattern] == n) { [weak self] in
-                    self?.pinWindowTitle(app, pattern, n)
+                entry(this, label(n), checked: rule.titles[pattern] == .workspace(n)) { [weak self] in
+                    self?.pinWindowTitle(app, pattern, .workspace(n))
                 }
+            }
+            this.addItem(.separator())
+            entry(this, String(localized: "All Workspaces"), checked: rule.titles[pattern] == .everywhere) {
+                [weak self] in self?.pinWindowTitle(app, pattern, .everywhere)
             }
             let thisItem = NSMenuItem(title: String(localized: "This Window"), action: nil, keyEquivalent: "")
             thisItem.submenu = this
@@ -113,6 +118,20 @@ extension TaskbarController {
         let pin = NSMenuItem(title: String(localized: "Pin to Workspace"), action: nil, keyEquivalent: "")
         pin.submenu = submenu
         return pin
+    }
+
+    /// "Show on All Workspaces", checked when it is: one window, never parked,
+    /// it follows the workspace shown on its screen. Until it closes; a title
+    /// rule `"all"` covers the windows to come.
+    func everywhereItem(_ windows: [WindowSnapshot]) -> NSMenuItem? {
+        guard workspacesEnabled(), windows.count == 1 else { return nil }
+        let id = windows[0].id
+        let on = isEverywhere(id)
+        let item = ClosureMenuItem(
+            NSMenuItem(title: String(localized: "Show on All Workspaces"), action: nil, keyEquivalent: "")
+        ) { [weak self] in self?.setEverywhere(id, !on) }
+        item.state = on ? .on : .off
+        return item
     }
 
     /// "Move to Workspace ▸ 1…9": the item's windows; the workspace they are

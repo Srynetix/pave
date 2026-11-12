@@ -378,17 +378,24 @@ public struct PaveConfig: Equatable, Sendable {
                                 "apps.\"\(bundleID)\".\(key) must be a [apps.\"\(bundleID)\".\(key)] table, not \(value.shown)"
                         )
                     }
-                    let what = key == "profiles" ? "profile" : "title pattern"
                     for (name, value) in entries {
                         // The profile or pattern is not shown: the line is enough.
-                        guard !name.isEmpty, case .integer(let n) = value, Workspaces.range.contains(n) else {
+                        if key == "titles", !name.isEmpty, let target = TitleTarget(value) {
+                            rule.titles[name] = target
+                            continue
+                        }
+                        guard key == "profiles", !name.isEmpty, case .integer(let n) = value,
+                            Workspaces.range.contains(n)
+                        else {
+                            let expected =
+                                key == "profiles"
+                                ? "each profile needs a workspace number from 1 to 9"
+                                : "each title pattern needs a workspace number from 1 to 9 or \"all\""
                             throw Problem(
                                 line: line("\(keyPath).\(name)"),
-                                message:
-                                    "apps.\"\(bundleID)\".\(key): each \(what) needs a workspace number from 1 to 9, not \(value.shown)"
-                            )
+                                message: "apps.\"\(bundleID)\".\(key): \(expected), not \(value.shown)")
                         }
-                        if key == "profiles" { rule.profiles[name] = n } else { rule.titles[name] = n }
+                        rule.profiles[name] = n
                     }
                     continue
                 }
@@ -588,6 +595,7 @@ public struct PaveConfig: Equatable, Sendable {
             #   Work = 3                             # window title ("… - Brave - Work")
             #   [apps."com.example.app".titles]  # by window title: * any text, ? one
             #   "*Work" = 3                      # character, case ignored
+            #   "Picture*" = "all"               # on every workspace
             #   tile = false       # always floating, even on a tiled workspace
             # Dialogs, sheets and panels are never placed, whatever the rules.
 
@@ -653,6 +661,31 @@ extension HotkeyAction {
     }
 }
 
+/// Where a title rule (`[apps."…".titles]`) puts a window.
+public enum TitleTarget: Hashable, Sendable, ExpressibleByIntegerLiteral {
+    case workspace(Int)
+    /// `"all"`: shown on every workspace.
+    case everywhere
+
+    public init(integerLiteral n: Int) { self = .workspace(n) }
+
+    init?(_ value: TOMLValue) {
+        switch value {
+        case .integer(let n) where Workspaces.range.contains(n): self = .workspace(n)
+        case .string("all"): self = .everywhere
+        default: return nil
+        }
+    }
+
+    /// As written in config.toml.
+    public var toml: String {
+        switch self {
+        case .workspace(let n): "\(n)"
+        case .everywhere: "\"all\""
+        }
+    }
+}
+
 /// What Pavé may do with one app's windows.
 public struct AppRule: Equatable, Sendable {
     /// Never placed: neither by hotkeys nor by dragging.
@@ -672,8 +705,8 @@ public struct AppRule: Equatable, Sendable {
     /// Wins over `workspace`, which still covers the other profiles.
     public var profiles: [String: Int] = [:]
     /// `[apps."…".titles]`: workspace of the new windows whose title matches
-    /// a pattern (`TitlePattern`). After `profiles`, before `workspace`.
-    public var titles: [String: Int] = [:]
+    /// a pattern (`TitlePattern`), or all of them. After `profiles`, before `workspace`.
+    public var titles: [String: TitleTarget] = [:]
 
     public init(ignore: Bool = false, dragSnap: Bool = true, taskbarOverlap: Bool = false, workspace: Int? = nil) {
         self.ignore = ignore
@@ -693,19 +726,24 @@ public struct AppRule: Equatable, Sendable {
         /// No profile matched: the title may still come (a browser names its
         /// window after creating it), worth looking at it again.
         public var awaitsTitle = false
+        /// A title pattern `= "all"`: shown on every workspace.
+        public var everywhere = false
 
-        public init(workspace: Int? = nil, byTitle: Bool = false, awaitsTitle: Bool = false) {
+        public init(workspace: Int? = nil, byTitle: Bool = false, awaitsTitle: Bool = false, everywhere: Bool = false) {
             self.workspace = workspace
             self.byTitle = byTitle
             self.awaitsTitle = awaitsTitle
+            self.everywhere = everywhere
         }
     }
 
     public func workspaceChoice(title: String) -> WorkspaceChoice {
-        if let n = profileWorkspace(title: title) ?? TitlePattern.workspace(titles, title: title) {
-            return WorkspaceChoice(workspace: n, byTitle: true)
+        if let n = profileWorkspace(title: title) { return WorkspaceChoice(workspace: n, byTitle: true) }
+        switch TitlePattern.best(titles, title: title) {
+        case .workspace(let n): return WorkspaceChoice(workspace: n, byTitle: true)
+        case .everywhere: return WorkspaceChoice(byTitle: true, everywhere: true)
+        case nil: return WorkspaceChoice(workspace: workspace, awaitsTitle: !profiles.isEmpty || !titles.isEmpty)
         }
-        return WorkspaceChoice(workspace: workspace, awaitsTitle: !profiles.isEmpty || !titles.isEmpty)
     }
 
     /// The workspace of the profile `title` ends with (the longest name wins:
