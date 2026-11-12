@@ -41,6 +41,13 @@ final class SettingsModel: ObservableObject {
         let remapped: Bool
     }
 
+    /// An open window of an app (title rules: suggestions and matches).
+    /// Titles stay in memory, never logged.
+    struct OpenWindow: Hashable {
+        let title: String
+        let workspace: Int
+    }
+
     struct RunningApp: Identifiable, Hashable {
         var id: String { bundleID }
         let bundleID: String
@@ -82,6 +89,8 @@ final class SettingsModel: ObservableObject {
     @Published private(set) var runningApps: [RunningApp] = []
     /// The section shown in the Settings window.
     @Published var section: SettingsView.Section = .general
+    /// The app rule to scroll to (taskbar "Pin by Window Title…").
+    @Published var focusedRule: String?
     /// A change the file refused (shown at the top of the window).
     @Published var lastError: String?
 
@@ -98,6 +107,9 @@ final class SettingsModel: ObservableObject {
     var setValue: (_ table: String, _ key: String, _ value: String, _ logValue: Bool) -> String? = { _, _, _, _ in nil }
     var removeValue: (_ table: String, _ key: String) -> String? = { _, _ in nil }
     var removeTable: (_ table: String) -> String? = { _ in nil }
+    /// Keys that are part of a window title: never logged.
+    var setPrivateKey: (_ table: String, _ key: String, _ value: String) -> String? = { _, _, _ in nil }
+    var removePrivateKey: (_ table: String, _ key: String) -> String? = { _, _ in nil }
     var setLogin: (Bool) -> Void = { _ in }
     var toggleNativeTiling: () -> Void = {}
     var displayWorkspace: (_ n: Int, _ screen: Int) -> Void = { _, _ in }
@@ -106,6 +118,8 @@ final class SettingsModel: ObservableObject {
     var restart: () -> Void = {}
     /// Fresh status now (the welcome guide watches the permissions).
     var requestRefresh: () -> Void = {}
+    /// The open standard windows of an app, by bundle ID.
+    var windowTitles: (_ bundleID: String) -> [OpenWindow] = { _ in [] }
     /// Uses a layout on a screen (windows in zones follow it).
     var assignZoneLayout: (_ screen: Int, _ layout: String) -> Void = { _, _ in }
     /// Opens the zone editor on a screen (nil: under the mouse), from a layout (nil: the screen's).
@@ -229,6 +243,28 @@ final class SettingsModel: ObservableObject {
         apply(value.map { setValue(table, key, $0, true) } ?? removeValue(table, key))
         // A rule left with no key: its table goes too.
         if config.appRules[bundleID] == AppRule() { apply(removeTable(table)) }
+    }
+
+    /// `[apps."…".titles]`: new windows whose title matches `pattern` open
+    /// on `workspace` (nil: the pattern goes).
+    func setTitleRule(_ bundleID: String, _ pattern: String, _ workspace: Int?) {
+        let table = ConfigEdit.appTable(bundleID) + ".titles"
+        if let workspace {
+            apply(setPrivateKey(table, pattern, "\(workspace)"))
+        } else {
+            apply(removePrivateKey(table, pattern))
+            if rule(bundleID).titles.isEmpty { apply(removeTable(table)) }
+        }
+        if config.appRules[bundleID] == AppRule() { apply(removeTable(ConfigEdit.appTable(bundleID))) }
+    }
+
+    /// Renames a title pattern, keeping its workspace.
+    func renameTitleRule(_ bundleID: String, from old: String, to new: String) {
+        guard old != new, !new.isEmpty, let n = rule(bundleID).titles[old], rule(bundleID).titles[new] == nil else {
+            return
+        }
+        apply(setPrivateKey(ConfigEdit.appTable(bundleID) + ".titles", new, "\(n)"))
+        apply(removePrivateKey(ConfigEdit.appTable(bundleID) + ".titles", old))
     }
 
     func addRule(_ bundleID: String) {

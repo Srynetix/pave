@@ -80,7 +80,8 @@ ever written to disk.
 <img src="docs/screenshots/taskbar.svg" alt="The taskbar with a hover preview" width="100%">
 
 One entry per window, on every screen, with hover previews, pinned apps and drag-and-drop
-onto apps; right-click a window to send it to another workspace. A **Start** button opens a launcher (tap **⌥** alone, like the Windows key), and the
+onto apps; right-click a window to send it to another workspace, or pin its app to one so its
+new windows always open there (by window title too). A **Start** button opens a launcher (tap **⌥** alone, like the Windows key), and the
 Trash sits where you expect it. Pavé can even hide the Dock while its taskbar is on, and puts
 the Dock back exactly as it was when you quit. If the bar ever looks out of place, right-click
 Start or an empty part of the bar, then choose **Reset Taskbar** (it is also in the menu bar menu).
@@ -268,6 +269,20 @@ commented. Most settings are also in the Settings window.
   moment after opening it, Pavé looks at the title for 2 s: the window then goes to its
   profile's workspace, which is shown if the window is in front. Titles are only compared,
   never logged. Windows already open stay where they are.
+- `[apps."<bundle id>".titles]`: the same, by pattern on the whole window title, for apps
+  without ` - <profile>`: `*` is any text, `?` one character, case ignored.
+
+  ```toml
+  [apps."com.example.prism".titles]
+  "*Work" = 3       # titles ending with "Work"
+  "*poc-mac-wm*" = 2  # titles containing "poc-mac-wm"
+  ```
+
+  The pattern with the most characters other than `*` wins. Profiles come first, then titles,
+  then the app's `workspace`. The taskbar's right-click menu has **Pin to Workspace**: all the
+  app's windows (its `workspace`), **This Window** (a title rule from the window's title, then
+  Settings to shorten it to what stays the same, `*Work`), and **Pin by Window Title…**, which
+  opens the app's rule in Settings.
 - `[windows]`: `magnet` (points, default `12`, `0` off): a window dropped this close to
   another window's edge or the screen's sticks to it (against it, or lined up), with a preview
   while dragging; `magnet-fill` (default `true`): stuck against another window, it also fills

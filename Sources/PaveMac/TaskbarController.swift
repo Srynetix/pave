@@ -61,6 +61,14 @@ public final class TaskbarController {
     public var workspaceOf: (WindowID) -> Int? = { _ in nil }
     public var workspaceNames: () -> [String] = { [] }
     public var moveToWorkspace: ([WindowID], Int) -> Void = { _, _ in }
+    /// "Pin to Workspace": workspaces are on, the app rule of a bundle ID,
+    /// writing its `workspace` (nil: removed), and its rule in Settings.
+    public var workspacesEnabled: () -> Bool = { false }
+    public var appRule: (String) -> AppRule = { _ in AppRule() }
+    public var pinToWorkspace: (String, Int?) -> Void = { _, _ in }
+    public var editAppRule: (String) -> Void = { _ in }
+    /// A title rule `pattern = N` for an app (never logged: part of a title).
+    public var pinWindowTitle: (String, String, Int) -> Void = { _, _, _ in }
     /// Tiled windows are kept in the usable area by the tiling: not corrected here.
     public var isTiled: (WindowID) -> Bool = { _ in false }
     var settings: Settings

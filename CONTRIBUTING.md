@@ -9,7 +9,7 @@ and we can agree on the shape before you write it.
 
 Open an issue with what you did, what you expected and what happened instead,
 your macOS version and Pavé's (About Pavé), and the part of your `config.toml`
-involved, if any. The log (`~/Library/Logs/Pave/pave.log`) helps too: it never
+involved, if any (`[apps."…".titles]` holds parts of window titles: check them first). The log (`~/Library/Logs/Pave/pave.log`) helps too: it never
 holds a window title.
 
 A security problem goes through [SECURITY.md](SECURITY.md), not an issue.
@@ -50,7 +50,7 @@ SPDX lines and every test. `just fmt` fixes the formatting.
   must pass.
 - Logic that does not need macOS goes into `PaveCore`, with tests. A fixed bug
   gets a test that fails without the fix, wherever it can be tested.
-- Never log a window title or a workspace name.
+- Never log a window title, a title pattern (`ConfigStore.setPrivateKey`) or a workspace name.
 - Private APIs only in `Sources/PaveMac/Private.swift`.
 - Every source file starts with `SPDX-License-Identifier: MIT OR Apache-2.0` in
   its first three lines; `just spdx` checks it.

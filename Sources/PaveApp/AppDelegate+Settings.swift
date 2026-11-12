@@ -12,6 +12,45 @@ extension AppDelegate {
     @objc func openSettings() { windows.showSettings() }
     @objc func openAbout() { windows.showAbout() }
 
+    /// Taskbar "Pin to Workspace": `[apps."…"] workspace = N` (nil: removed,
+    /// and the rule too if nothing else is left in it).
+    func pinToWorkspace(_ app: String, _ n: Int?) {
+        let table = ConfigEdit.appTable(app)
+        var problem = n.map { config.set(table, "workspace", to: "\($0)") } ?? config.remove(table, "workspace")
+        if problem == nil, n == nil, config.config.appRules[app] == AppRule() { problem = config.removeTable(table) }
+        if let problem {
+            Log.info("config: workspace of \(app) not changed: \(problem)")
+            showAlert(String(localized: "Setting not changed"), problem)
+        }
+        refresh()
+    }
+
+    /// Taskbar "This Window ▸ N": a title rule from the window's title, then
+    /// Settings on it, where the pattern is shortened to what stays the same
+    /// ("*Work"): the full title rarely comes back.
+    func pinWindowTitle(_ app: String, _ pattern: String, _ n: Int) {
+        if let problem = config.setPrivateKey(ConfigEdit.appTable(app) + ".titles", pattern, to: "\(n)") {
+            Log.info("config: title rule of \(app) not changed: \(problem)")
+            showAlert(String(localized: "Setting not changed"), problem)
+            return
+        }
+        refresh()
+        editAppRule(app)
+    }
+
+    /// Opens Settings on the app rules, with one for `app` (made if missing).
+    func editAppRule(_ app: String) {
+        if config.config.appRules[app] == nil {
+            if let problem = config.set(ConfigEdit.appTable(app), "tile", to: "true") {
+                showAlert(String(localized: "Setting not changed"), problem)
+                return
+            }
+        }
+        settingsModel.section = .apps
+        settingsModel.focusedRule = app
+        windows.showSettings()
+    }
+
     func configureSettings() {
         let model = settingsModel
         windows.onOpen = { [weak self] in self?.updateSettingsModel() }
@@ -24,6 +63,16 @@ extension AppDelegate {
             guard let self else { return nil }
             defer { self.refresh() }
             return self.config.remove(table, key)
+        }
+        model.setPrivateKey = { [weak self] table, key, value in
+            guard let self else { return nil }
+            defer { self.refresh() }
+            return self.config.setPrivateKey(table, key, to: value)
+        }
+        model.removePrivateKey = { [weak self] table, key in
+            guard let self else { return nil }
+            defer { self.refresh() }
+            return self.config.removePrivateKey(table, key)
         }
         model.removeTable = { [weak self] table in
             guard let self else { return nil }
@@ -64,6 +113,14 @@ extension AppDelegate {
         windows.onboardingDone = {
             UserDefaults.standard.set(true, forKey: "onboardingDone")
             Log.info("welcome guide done")
+        }
+        model.windowTitles = { [weak self] app in
+            guard let self else { return [] }
+            return self.registry.store.orderedWindows
+                .filter { $0.subrole == "AXStandardWindow" && self.bundleID($0.pid) == app && !$0.title.isEmpty }
+                .map {
+                    SettingsModel.OpenWindow(title: $0.title, workspace: self.workspaces.state.workspace(of: $0.id))
+                }
         }
         model.assignZoneLayout = { [weak self] index, name in
             guard let self else { return }

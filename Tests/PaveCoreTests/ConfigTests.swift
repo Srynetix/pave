@@ -388,8 +388,8 @@ import Testing
         let rule = config.rule(for: "com.brave.Browser")
         #expect(rule.profiles == ["Work": 3, "Home Work": 5])
         #expect(rule.summary == "workspace 2, workspace by profile (2)")
-        #expect(rule.workspaceChoice(title: "Page - Brave - Work") == .init(workspace: 3, byProfile: true))
-        #expect(rule.workspaceChoice(title: "Page - Brave - Home Work") == .init(workspace: 5, byProfile: true))
+        #expect(rule.workspaceChoice(title: "Page - Brave - Work") == .init(workspace: 3, byTitle: true))
+        #expect(rule.workspaceChoice(title: "Page - Brave - Home Work") == .init(workspace: 5, byTitle: true))
         // Another profile, or no title yet: the app's workspace, and the title is looked at again.
         #expect(rule.workspaceChoice(title: "Page - Brave - Perso") == .init(workspace: 2, awaitsTitle: true))
         #expect(rule.workspaceChoice(title: "") == .init(workspace: 2, awaitsTitle: true))
@@ -448,5 +448,109 @@ import Testing
         #expect(items.map(\.icon) == [.symbol("globe")])
         let none = WorkspaceIndicator.items(for: screen.id, primaryID: screen.id, state: ws, windows: [], icons: [""])
         #expect(none.map(\.icon) == [nil])
+    }
+}
+
+@Suite struct TitleRuleTests {
+    @Test(arguments: [
+        ("*Work", "Inbox — Prism Work", true),
+        ("*Work", "Inbox — Prism work", true),  // case ignored
+        ("*Work", "Homework due", false),  // the whole title must match
+        ("*pave*", "main.swift — Pavé — poc-pave", true),
+        ("Re?ort", "Report", true),
+        ("Re?ort", "Rport", false),
+        ("*", "", true),
+        ("a*b*c", "aXbYbZc", true),
+        ("a*b*c", "aXbYbZ", false),
+        ("Work", "Work", true),
+    ])
+    func globMatchesTheWholeTitle(pattern: String, title: String, expected: Bool) {
+        #expect(TitlePattern.matches(pattern, title) == expected)
+    }
+
+    @Test func theMostSpecificPatternWinsWhateverTheOrder() {
+        let patterns = ["*Work": 3, "*Home Work": 5, "*": 1]
+        #expect(TitlePattern.workspace(patterns, title: "Notes Home Work") == 5)
+        #expect(TitlePattern.workspace(patterns, title: "Notes Work") == 3)
+        #expect(TitlePattern.workspace(patterns, title: "Notes") == 1)
+        // Same weight: alphabetical, never the file's order.
+        #expect(TitlePattern.workspace(["*a*": 2, "*b*": 4], title: "ab") == 2)
+        #expect(TitlePattern.workspace([:], title: "x") == nil)
+    }
+
+    @Test func titlesComeAfterProfilesAndBeforeTheAppWorkspace() throws {
+        let (config, warnings) = try PaveConfig.parse(
+            """
+            [apps."com.example.prism"]
+            workspace = 2
+            [apps."com.example.prism".profiles]
+            Perso = 7
+            [apps."com.example.prism".titles]
+            "*Work" = 3
+            "*Perso" = 4
+            """)
+        #expect(warnings.isEmpty)
+        let rule = config.rule(for: "com.example.prism")
+        #expect(rule.titles == ["*Work": 3, "*Perso": 4])
+        #expect(rule.summary == "workspace 2, workspace by profile (1), workspace by title (2)")
+        // No " - " needed: the Prism case.
+        #expect(rule.workspaceChoice(title: "Prism Work") == .init(workspace: 3, byTitle: true))
+        #expect(rule.workspaceChoice(title: "Page - Perso") == .init(workspace: 7, byTitle: true))
+        #expect(rule.workspaceChoice(title: "Prism") == .init(workspace: 2, awaitsTitle: true))
+        // Titles alone also wait for the title.
+        let titlesOnly = try PaveConfig.parse("[apps.\"x\".titles]\n\"*A\" = 1").0.rule(for: "x")
+        #expect(titlesOnly.workspaceChoice(title: "") == .init(awaitsTitle: true))
+    }
+
+    @Test(arguments: ["\"*Secret\" = 0", "\"*Secret\" = \"3\"", "\"\" = 3"])
+    func invalidPatternIsRejectedWithoutTheTitle(line: String) {
+        do {
+            _ = try PaveConfig.parse("[apps.\"x\".titles]\n\(line)")
+            Issue.record("accepted")
+        } catch {
+            #expect(error.line == 2 || error.line == 0)
+            #expect(!error.message.contains("Secret"))
+        }
+    }
+
+    @Test func patternsAreWrittenAndRemovedAsQuotedKeys() throws {
+        let table = ConfigEdit.appTable("x") + ".titles"
+        var text = "[apps.\"x\"]\nworkspace = 2\n"
+        for pattern in ["*Work", "*a = b # c", "*\"quoted\"*", "back\\slash"] {
+            text = ConfigEdit.set(table, pattern, to: "3", in: text)
+            text = ConfigEdit.set(table, pattern, to: "4", in: text)  // replaced, not added
+        }
+        let rule = try PaveConfig.parse(text).0.rule(for: "x")
+        #expect(rule.titles == ["*Work": 4, "*a = b # c": 4, "*\"quoted\"*": 4, "back\\slash": 4])
+        for pattern in ["*a = b # c", "*\"quoted\"*", "back\\slash"] {
+            text = ConfigEdit.remove(table, pattern, in: text)
+        }
+        #expect(try PaveConfig.parse(text).0.rule(for: "x").titles == ["*Work": 4])
+        #expect(ConfigEdit.key("tile") == "tile")
+        #expect(ConfigEdit.key("*Work") == "\"*Work\"")
+    }
+
+    @Test func aTrailingCommentStaysWhenAQuotedKeyChanges() {
+        let text = "[apps.\"x\".titles]\n\"*a#b\" = 3 # mine\n"
+        #expect(ConfigEdit.set("apps.\"x\".titles", "*a#b", to: "5", in: text).contains("\"*a#b\" = 5 # mine"))
+    }
+
+    @Test func deletingAnAppRuleTakesItsSubtables() throws {
+        let text = """
+            [apps."x"]
+            workspace = 2
+
+            [apps."x".titles]
+            "*Work" = 3
+
+            [apps."x".profiles]
+            Perso = 1
+
+            [apps."xy"]
+            tile = false
+            """
+        let edited = ConfigEdit.removeTable(ConfigEdit.appTable("x"), in: text)
+        #expect(!edited.contains("Work") && !edited.contains("Perso"))
+        #expect(try PaveConfig.parse(edited).0.appRules.keys.sorted() == ["xy"])
     }
 }

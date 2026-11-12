@@ -95,6 +95,16 @@
         }
       }
     },
+    "%lld open window(s)": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld fenêtre(s) ouverte(s)"
+          }
+        }
+      }
+    },
     "%lld pt": {
       "localizations": {
         "fr": {
@@ -277,12 +287,32 @@
         }
       }
     },
+    "Add a title rule": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter une règle de titre"
+          }
+        }
+      }
+    },
     "Add an app": {
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
             "value": "Ajouter une app"
+          }
+        }
+      }
+    },
+    "All %@ Windows": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toutes les fenêtres de %@"
           }
         }
       }
@@ -737,6 +767,16 @@
         }
       }
     },
+    "Delete this title rule": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer cette règle de titre"
+          }
+        }
+      }
+    },
     "Development build: updates go to the copy in Applications": {
       "localizations": {
         "fr": {
@@ -847,6 +887,16 @@
         }
       }
     },
+    "Empty pattern": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Motif vide"
+          }
+        }
+      }
+    },
     "Empty the Trash?": {
       "localizations": {
         "fr": {
@@ -923,6 +973,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Focus vers le haut"
+          }
+        }
+      }
+    },
+    "From an open window": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "D’après une fenêtre ouverte"
           }
         }
       }
@@ -1487,6 +1547,16 @@
         }
       }
     },
+    "New windows whose title matches a pattern open on its workspace: * is any text, ? one character, case ignored. *Work: titles ending with Work. The longest pattern wins, before the workspace above.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les nouvelles fenêtres dont le titre correspond à un motif s’ouvrent sur son workspace : * remplace n’importe quel texte, ? un caractère, sans tenir compte de la casse. *Work : les titres qui finissent par Work. Le motif le plus long l’emporte, avant le workspace ci-dessus."
+          }
+        }
+      }
+    },
     "No rules: every app follows the general settings.": {
       "localizations": {
         "fr": {
@@ -1543,6 +1613,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Aucun pour l'instant : S enregistre les fenêtres telles qu'elles sont."
+          }
+        }
+      }
+    },
+    "Not Pinned": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non épinglée"
           }
         }
       }
@@ -1767,6 +1847,16 @@
         }
       }
     },
+    "Paste": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coller"
+          }
+        }
+      }
+    },
     "Pavé %@ is available": {
       "localizations": {
         "fr": {
@@ -1847,16 +1937,6 @@
         }
       }
     },
-    "Paste": {
-      "localizations": {
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Coller"
-          }
-        }
-      }
-    },
     "Permissions": {
       "localizations": {
         "fr": {
@@ -1887,12 +1967,32 @@
         }
       }
     },
+    "Pin by Window Title…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Épingler selon le titre…"
+          }
+        }
+      }
+    },
     "Pin to Taskbar": {
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
             "value": "Épingler à la barre"
+          }
+        }
+      }
+    },
+    "Pin to Workspace": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Épingler au workspace"
           }
         }
       }
@@ -2687,6 +2787,16 @@
         }
       }
     },
+    "This Window": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette fenêtre"
+          }
+        }
+      }
+    },
     "This screen": {
       "localizations": {
         "fr": {
@@ -2733,6 +2843,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tiling du workspace %lld"
+          }
+        }
+      }
+    },
+    "Title Rules (%lld)…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Règles de titre (%lld)…"
+          }
+        }
+      }
+    },
+    "Title pattern": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Motif de titre"
           }
         }
       }
@@ -3359,6 +3489,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "aucun fichier, valeurs par défaut"
+          }
+        }
+      }
+    },
+    "no open window": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "aucune fenêtre ouverte"
           }
         }
       }

@@ -74,6 +74,19 @@ public final class ConfigStore {
         edit("\(table).\(key) removed") { ConfigEdit.remove(table, key, in: $0) }
     }
 
+    /// `set` for a key that is part of a window title (`[apps."…".titles]`):
+    /// the log names the table only.
+    @discardableResult
+    public func setPrivateKey(_ table: String, _ key: String, to value: String) -> String? {
+        edit("\(table): a key set to \(value)") { ConfigEdit.set(table, key, to: value, in: $0) }
+    }
+
+    /// `remove` for a key that is part of a window title.
+    @discardableResult
+    public func removePrivateKey(_ table: String, _ key: String) -> String? {
+        edit("\(table): a key removed") { ConfigEdit.remove(table, key, in: $0) }
+    }
+
     /// Removes a whole table (an app rule).
     @discardableResult
     public func removeTable(_ table: String) -> String? {

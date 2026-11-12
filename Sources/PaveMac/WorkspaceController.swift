@@ -384,7 +384,7 @@ public final class WorkspaceController {
                     let adopted = state.adopt(window, screens: screens, preferred: preferred)
                     if let preferred, !adopted.isEmpty || state.workspace(of: window.id) == preferred {
                         Log.info(
-                            "\(window.id) [\(window.appName)] → workspace \(preferred) (\(choice.byProfile ? "profile" : "app") rule)"
+                            "\(window.id) [\(window.appName)] → workspace \(preferred) (\(choice.byTitle ? "title" : "app") rule)"
                         )
                     }
                     if choice.awaitsTitle { awaitingTitle[window.id] = Date().addingTimeInterval(Self.titleWait) }
@@ -443,14 +443,15 @@ public final class WorkspaceController {
         for id in retitled { resolveProfile(id) }
     }
 
-    /// How long a new window with no profile in its title is looked at again.
+    /// How long a new window whose title matched no profile or title rule yet
+    /// is looked at again.
     static let titleWait: TimeInterval = 2
-    /// New windows of an app with profile rules whose title named no profile
+    /// New windows of an app with profile or title rules whose title matched none
     /// yet, until when their titles are checked.
     private var awaitingTitle: [WindowID: Date] = [:]
 
-    /// A window of an app with profile rules got a title (the profile, a
-    /// moment after it opened): it goes to the profile's workspace.
+    /// A window of an app with profile or title rules got a title (a browser
+    /// names the profile a moment after opening it): it goes to its workspace.
     private func resolveProfile(_ id: WindowID) {
         guard let deadline = awaitingTitle[id] else { return }
         guard Date() < deadline, isEnabled, recoveryDone, !registry.isSessionLocked,
@@ -460,7 +461,7 @@ public final class WorkspaceController {
             return
         }
         let choice = workspaceRule(window)
-        guard choice.byProfile, let target = choice.workspace else { return }
+        guard choice.byTitle, let target = choice.workspace else { return }
         awaitingTitle[id] = nil
         guard target != state.workspace(of: id) else { return }
         let screens = Screens.all()
@@ -473,7 +474,7 @@ public final class WorkspaceController {
         ignoreFocusUntil = .distantFuture
         let shown = follow ? ", workspace \(from) → \(state.active)" : ""
         execute(
-            actions, label: "\(id) [\(window.appName)] → workspace \(target) (profile rule, title came late)\(shown)"
+            actions, label: "\(id) [\(window.appName)] → workspace \(target) (title rule, title came late)\(shown)"
         ) {
             [weak self] _ in self?.ignoreFocusUntil = Date().addingTimeInterval(0.4)
         }
@@ -569,7 +570,7 @@ public final class WorkspaceController {
     }
 
     /// The app rule's workspace for a new window (`[apps."…"] workspace = N`,
-    /// or its `profiles`).
+    /// its `profiles` or its `titles`).
     public var workspaceRule: (WindowSnapshot) -> AppRule.WorkspaceChoice = { _ in AppRule.WorkspaceChoice() }
 
     /// Called after every change of the state (taskbar numbers, tiling).
