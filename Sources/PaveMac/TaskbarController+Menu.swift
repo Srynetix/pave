@@ -3,9 +3,23 @@ import AppKit
 import PaveCore
 
 /// An entry's context menu, from the gentlest action to the most destructive:
-/// open, workspaces, pin to the taskbar, then close and quit last.
+/// open, the app's quick actions, workspaces, pin to the taskbar, then close
+/// and quit last.
 extension TaskbarController {
     func contextMenu(_ item: TaskbarItem, event: NSEvent, view: NSView) {
+        // The Dock only has a menu worth reading for a running app it knows.
+        guard let pid = item.pid, !item.app.hasPrefix("pid:") else {
+            return showContextMenu(item, quickActions: [], event: event, view: view)
+        }
+        Task { [weak self] in
+            guard let entries = await self?.dockMenu.read(bundleID: item.app), let self else { return }
+            let titles = Set(self.registry.store.windows.values.filter { $0.pid == pid }.map(\.title))
+            let actions = DockMenu.quickActions(entries, windowTitles: titles)
+            self.showContextMenu(item, quickActions: actions, event: event, view: view)
+        }
+    }
+
+    private func showContextMenu(_ item: TaskbarItem, quickActions: [DockMenuEntry], event: NSEvent, view: NSView) {
         let menu = NSMenu()
         let windows = item.windowIDs.compactMap { registry.store.windows[$0] }
         let name = item.appName ?? appURL(item).map { FileManager.default.displayName(atPath: $0.path) } ?? item.app
@@ -16,6 +30,8 @@ extension TaskbarController {
                     self?.launch(item)
                 })
         }
+        menu.addSection()
+        for entry in quickActions { menu.addItem(quickActionItem(entry, path: [], app: item.app)) }
         menu.addSection()
         if let move = workspaceMenu(windows) { menu.addItem(move) }
         if let everywhere = everywhereItem(windows) { menu.addItem(everywhere) }
@@ -65,6 +81,27 @@ extension TaskbarController {
         }
         if menu.items.last?.isSeparatorItem == true { menu.removeItem(at: menu.numberOfItems - 1) }
         NSMenu.popUpContextMenu(menu, with: event, for: view)
+    }
+
+    /// An entry of the app's Dock menu, pressed in the Dock when chosen.
+    private func quickActionItem(_ entry: DockMenuEntry, path: [String], app: String) -> NSMenuItem {
+        if entry.isSeparator { return .separator() }
+        let path = path + [entry.title]
+        let item: NSMenuItem
+        if !entry.children.isEmpty {
+            item = NSMenuItem(title: entry.title, action: nil, keyEquivalent: "")
+            let submenu = NSMenu()
+            for child in entry.children { submenu.addItem(quickActionItem(child, path: path, app: app)) }
+            item.submenu = submenu
+        } else if entry.isEnabled {
+            item = ClosureMenuItem(NSMenuItem(title: entry.title, action: nil, keyEquivalent: "")) { [weak self] in
+                Task { await self?.dockMenu.press(bundleID: app, path: path) }
+            }
+        } else {
+            item = NSMenuItem(title: entry.title, action: nil, keyEquivalent: "")
+        }
+        item.state = entry.isChecked ? .on : .off
+        return item
     }
 
     /// "Pin to Workspace ▸": where new windows open.
