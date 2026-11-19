@@ -39,6 +39,8 @@ public final class WindowRegistry {
     static let refreshInterval: TimeInterval = 30
 
     private var connections: [PID: AppConnection] = [:]
+    /// Running apps that are not regular yet, watched until they become so.
+    private var policyWatchers: [PID: NSKeyValueObservation] = [:]
     private var tokens: [NSObjectProtocol] = []
     private var refreshTimer: Timer?
 
@@ -195,9 +197,10 @@ public final class WindowRegistry {
 
     private func connect(_ pid: PID) {
         guard connections[pid] == nil, pid != ProcessInfo.processInfo.processIdentifier,
-            let app = NSRunningApplication(processIdentifier: pid),
-            app.activationPolicy == .regular
+            let app = NSRunningApplication(processIdentifier: pid)
         else { return }
+        guard app.activationPolicy == .regular else { return watchPolicy(of: app) }
+        policyWatchers[pid] = nil
         let name = app.localizedName ?? app.bundleIdentifier ?? "pid \(pid)"
         let connection = AppConnection(pid: pid, name: name) { [weak self] event in
             Task { @MainActor in self?.receive(event) }
@@ -206,7 +209,21 @@ public final class WindowRegistry {
         connection.start()
     }
 
+    /// A menu bar app (WireGuard) turns regular only when it opens a window, and
+    /// an unbundled executable (a Tauri app in development) only once it set
+    /// itself up: neither is regular when it launches, and no notification says
+    /// when it becomes so.
+    private func watchPolicy(of app: NSRunningApplication) {
+        let pid = app.processIdentifier
+        guard policyWatchers[pid] == nil else { return }
+        policyWatchers[pid] = app.observe(\.activationPolicy) { [weak self] app, _ in
+            guard app.activationPolicy == .regular else { return }
+            Task { @MainActor in self?.connect(pid) }
+        }
+    }
+
     private func disconnect(_ pid: PID) {
+        policyWatchers[pid] = nil
         guard let connection = connections.removeValue(forKey: pid) else { return }
         connection.stop()
         unresponsive[pid] = nil
