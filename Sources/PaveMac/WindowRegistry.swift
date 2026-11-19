@@ -40,7 +40,7 @@ public final class WindowRegistry {
 
     private var connections: [PID: AppConnection] = [:]
     /// Running apps that are not regular yet, watched until they become so.
-    private var policyWatchers: [PID: NSKeyValueObservation] = [:]
+    private var policyWatchers: [PID: PolicyWatcher] = [:]
     private var tokens: [NSObjectProtocol] = []
     private var refreshTimer: Timer?
 
@@ -200,7 +200,7 @@ public final class WindowRegistry {
             let app = NSRunningApplication(processIdentifier: pid)
         else { return }
         guard app.activationPolicy == .regular else { return watchPolicy(of: app) }
-        policyWatchers[pid] = nil
+        policyWatchers.removeValue(forKey: pid)?.stop()
         let name = app.localizedName ?? app.bundleIdentifier ?? "pid \(pid)"
         let connection = AppConnection(pid: pid, name: name) { [weak self] event in
             Task { @MainActor in self?.receive(event) }
@@ -216,14 +216,15 @@ public final class WindowRegistry {
     private func watchPolicy(of app: NSRunningApplication) {
         let pid = app.processIdentifier
         guard policyWatchers[pid] == nil else { return }
-        policyWatchers[pid] = app.observe(\.activationPolicy) { [weak self] app, _ in
+        let observation = app.observe(\.activationPolicy) { [weak self] app, _ in
             guard app.activationPolicy == .regular else { return }
             Task { @MainActor in self?.connect(pid) }
         }
+        policyWatchers[pid] = PolicyWatcher(app: app, observation: observation)
     }
 
     private func disconnect(_ pid: PID) {
-        policyWatchers[pid] = nil
+        policyWatchers.removeValue(forKey: pid)?.stop()
         guard let connection = connections.removeValue(forKey: pid) else { return }
         connection.stop()
         unresponsive[pid] = nil
@@ -301,5 +302,17 @@ public final class WindowRegistry {
         }) {
             onChange?()
         }
+    }
+}
+
+/// Keeps the observed app alive as long as its observation: an
+/// `NSRunningApplication` made from a pid is a fresh object nobody else retains,
+/// and one deallocated while still observed crashes in KVO teardown.
+private struct PolicyWatcher {
+    let app: NSRunningApplication
+    let observation: NSKeyValueObservation
+
+    func stop() {
+        observation.invalidate()
     }
 }
