@@ -2,7 +2,8 @@
 import AppKit
 import PaveCore
 
-/// An entry's context menu: open, close, move or pin to a workspace, quit, pin.
+/// An entry's context menu, from the gentlest action to the most destructive:
+/// open, workspaces, pin to the taskbar, then close and quit last.
 extension TaskbarController {
     func contextMenu(_ item: TaskbarItem, event: NSEvent, view: NSView) {
         let menu = NSMenu()
@@ -15,6 +16,27 @@ extension TaskbarController {
                     self?.launch(item)
                 })
         }
+        menu.addSection()
+        if let move = workspaceMenu(windows) { menu.addItem(move) }
+        if let everywhere = everywhereItem(windows) { menu.addItem(everywhere) }
+        if let pin = pinMenu(item, name: name) { menu.addItem(pin) }
+        menu.addSection()
+        if !item.app.hasPrefix("pid:") {
+            let pinned = settings.pinned.contains(item.app)
+            menu.addItem(
+                ClosureMenuItem(
+                    NSMenuItem(
+                        title: pinned ? String(localized: "Unpin from Taskbar") : String(localized: "Pin to Taskbar"),
+                        action: nil, keyEquivalent: "")
+                ) {
+                    [weak self] in
+                    guard let self else { return }
+                    var list = self.settings.pinned
+                    if pinned { list.removeAll { $0 == item.app } } else { list.append(item.app) }
+                    self.setPinned(list)
+                })
+        }
+        menu.addSection()
         for window in windows.prefix(1) where windows.count == 1 {
             menu.addItem(
                 ClosureMenuItem(NSMenuItem(title: String(localized: "Close Window"), action: nil, keyEquivalent: "")) {
@@ -35,31 +57,13 @@ extension TaskbarController {
                     Log.info("taskbar: close \(windows.count) window(s) of \(item.app)")
                 })
         }
-        if let move = workspaceMenu(windows) { menu.addItem(move) }
-        if let everywhere = everywhereItem(windows) { menu.addItem(everywhere) }
-        if let pin = pinMenu(item, name: name) { menu.addItem(pin) }
         if let pid = item.pid, let app = NSRunningApplication(processIdentifier: pid) {
             menu.addItem(
                 ClosureMenuItem(NSMenuItem(title: String(localized: "Quit \(name)"), action: nil, keyEquivalent: "")) {
                     Log.info("taskbar: quit \(item.app) \(app.terminate() ? "requested" : "FAILED")")
                 })
         }
-        if !item.app.hasPrefix("pid:") {
-            menu.addItem(.separator())
-            let pinned = settings.pinned.contains(item.app)
-            menu.addItem(
-                ClosureMenuItem(
-                    NSMenuItem(
-                        title: pinned ? String(localized: "Unpin from Taskbar") : String(localized: "Pin to Taskbar"),
-                        action: nil, keyEquivalent: "")
-                ) {
-                    [weak self] in
-                    guard let self else { return }
-                    var list = self.settings.pinned
-                    if pinned { list.removeAll { $0 == item.app } } else { list.append(item.app) }
-                    self.setPinned(list)
-                })
-        }
+        if menu.items.last?.isSeparatorItem == true { menu.removeItem(at: menu.numberOfItems - 1) }
         NSMenu.popUpContextMenu(menu, with: event, for: view)
     }
 
@@ -159,5 +163,13 @@ extension TaskbarController {
         let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
         item.submenu = submenu
         return item
+    }
+}
+
+extension NSMenu {
+    /// A separator, unless the menu is empty or already ends with one: a
+    /// section may turn out empty for some entries.
+    fileprivate func addSection() {
+        if let last = items.last, !last.isSeparatorItem { addItem(.separator()) }
     }
 }
