@@ -80,7 +80,8 @@ ever written to disk.
 <img src="docs/screenshots/taskbar.svg" alt="The taskbar with a hover preview" width="100%">
 
 One entry per window, on every screen, with hover previews, pinned apps and drag-and-drop
-onto apps; right-click a window to send it to another workspace, or pin its app to one so its
+onto apps; right-click an entry for the app's quick actions from its Dock menu (New Window,
+New Private Window…), to send a window to another workspace, or to pin its app to one so its
 new windows always open there (by window title too). A **Start** button opens a launcher (tap **⌥** alone, like the Windows key), and the
 Trash sits where you expect it. Pavé can even hide the Dock while its taskbar is on, and puts
 the Dock back exactly as it was when you quit. If the bar ever looks out of place, right-click

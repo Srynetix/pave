@@ -28,6 +28,7 @@ public final class TaskbarController {
     let thumbnails: ThumbnailService
     let dock: DockController
     let badges = DockBadges()
+    let dockMenu = DockMenuReader()
     /// App rule of a window (taskbar-overlap), from the config.
     let rule: (WindowSnapshot) -> AppRule
     var overlapChecks: [WindowID: DispatchWorkItem] = [:]
