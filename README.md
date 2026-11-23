@@ -202,7 +202,9 @@ commented. Most settings are also in the Settings window.
 - `[zones]`: `enabled`, `gaps`, `show` (`"always"`, or `"ctrl"`: only while ctrl is held),
   `keyboard` (arrows move between zones). `[zones.screens]` gives each screen a layout (key:
   its UUID, `builtin`, or part of its name; value: a layout or `"none"`), `[zones.workspaces]`
-  one per workspace number, on screens that have one. `[layouts."<name>"]` defines a layout:
+  one per workspace number, on screens that have one. `order` lists layouts (built-in or
+  yours) in the order the picker and Settings show them; the others follow.
+  `[layouts."<name>"]` defines a layout:
   `zones = [[x, y, width, height], …]` in percent of the usable area (the editor writes it).
 - `[apps."<bundle id>"]`: `ignore`, `drag-snap`, `taskbar-overlap = "allow"`,
   `workspace = N`, `tile = false`, `zone = N` (new windows open in that zone). `pave apps` lists the bundle IDs of running apps.

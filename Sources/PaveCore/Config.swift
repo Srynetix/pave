@@ -321,6 +321,17 @@ public struct PaveConfig: Equatable, Sendable {
                 for (screen, name) in screens.sorted(by: { $0.key < $1.key }) {
                     config.zones.screens[screen] = try layoutName(name, "\(field.path).\(screen)")
                 }
+            case "order":
+                let names = try field.list("\(field.path) must be a list of layout names, like [\"Coding\", \"focus\"]")
+                {
+                    item -> String? in
+                    guard case .string(let name) = item else { return nil }
+                    return name
+                }
+                for name in names where config.zones.layout(named: name) == nil {
+                    warnings.append(field.problem("\(field.path): no layout is named \"\(name)\", ignored"))
+                }
+                config.zones.order = names
             case "workspaces":
                 guard case .table(let workspaces) = field.value else {
                     throw field.problem("\(field.path) must be a [zones.workspaces] table, like 3 = \"thirds\"")
@@ -555,6 +566,9 @@ public struct PaveConfig: Equatable, Sendable {
             show = "always"
             # ctrl+left / ctrl+right move between zones on a screen that has a layout.
             keyboard = true
+            # The order of the layouts in the picker (ctrl+shift+Z: 1 is the first);
+            # the others follow:
+            #   order = ["Coding", "focus"]
             # Layout of each screen ("builtin", part of its name, or its UUID). Built-in
             # layouts: "focus" (25/50/25), "thirds", "main-and-stack", "halves", "grid";
             # "none" keeps halves and quarters.

@@ -200,6 +200,22 @@ private let focus = ZoneSettings().layout(named: "focus")!
         #expect(config.zones.layout(screenID: "", screenName: "LG HDR WQHD", isBuiltIn: false)?.name == "Coding")
     }
 
+    @Test func theOrderIsReadAndUnknownNamesAreWarnings() throws {
+        let text = """
+            [zones]
+            order = ["Coding", "focsu", "halves"]
+
+            [layouts."Coding"]
+            zones = [[0, 0, 50, 100], [50, 0, 50, 100]]
+            """
+        let (config, warnings) = try PaveConfig.parse(text)
+        #expect(config.zones.order == ["Coding", "focsu", "halves"])
+        #expect(config.zones.names.prefix(2) == ["Coding", "halves"])
+        #expect(warnings.map(\.line) == [2])
+        #expect(warnings.first?.message == "zones.order: no layout is named \"focsu\", ignored")
+        #expect(throws: PaveConfig.Problem.self) { try PaveConfig.parse("[zones]\norder = \"Coding\"") }
+    }
+
     @Test func zoneErrorsPointAtTheirLine() {
         func problem(_ text: String) -> PaveConfig.Problem? {
             do {

@@ -135,38 +135,20 @@ struct ZonesPane: View {
             }
             .disabled(!z.enabled || !model.config.workspacesEnabled)
             SwiftUI.Section {
-                ForEach(
-                    ZoneLayout.builtIn.map(\.name)
-                        + z.layouts.keys.filter { name in !ZoneLayout.builtIn.contains { $0.name == name } }.sorted(),
-                    id: \.self
-                ) { name in
-                    let layout = z.layout(named: name)!
-                    let mine = z.layouts[name] != nil
-                    HStack(spacing: 12) {
-                        ZoneMiniature(layout: layout).frame(width: 64, height: 27)
-                        VStack(alignment: .leading) {
-                            Text(name)
-                            Text(mine ? "\(layout.zones.count) zones" : "\(layout.zones.count) zones · built-in")
-                                .font(.caption).foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        Button(mine ? "Edit…" : "Copy and edit…") { model.editZones(nil, name) }
-                        if mine {
-                            Button(role: .destructive) {
-                                model.deleteZoneLayout(name)
-                            } label: {
-                                Image(systemName: "trash")
-                            }
-                            .disabled(model.isZoneLayoutUsed(name))
-                            .help(
-                                model.isZoneLayoutUsed(name)
-                                    ? String(localized: "Used by a screen or a workspace") : String(localized: "Delete")
-                            )
-                            .accessibilityLabel("Delete \(name)")
+                List {
+                    ForEach(z.names, id: \.self) { name in
+                        if let layout = z.layout(named: name) {
+                            LayoutRow(model: model, layout: layout, mine: z.layouts[name] != nil)
                         }
                     }
+                    .onMove { model.moveZoneLayouts($0, to: $1) }
                 }
-                Button("New layout…") { model.editZones(nil, nil) }
+                HStack {
+                    Text("Drag to reorder: the layout picker numbers them in this order.")
+                        .font(.caption).foregroundStyle(.secondary)
+                    Spacer()
+                    Button("New layout…") { model.editZones(nil, nil) }
+                }
             } header: {
                 Text("Layouts")
             } footer: {
@@ -183,6 +165,41 @@ struct ZonesPane: View {
 
     static func title(of name: String) -> String {
         name == ZoneSettings.none ? String(localized: "None (halves)") : name
+    }
+}
+
+private struct LayoutRow: View {
+    @ObservedObject var model: SettingsModel
+    var layout: ZoneLayout
+    var mine: Bool
+
+    var body: some View {
+        let name = layout.name
+        HStack(spacing: 12) {
+            ZoneMiniature(layout: layout).frame(width: 64, height: 27)
+            VStack(alignment: .leading) {
+                Text(name)
+                Text(mine ? "\(layout.zones.count) zones" : "\(layout.zones.count) zones · built-in")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Button(mine ? "Edit…" : "Copy and edit…") { model.editZones(nil, name) }
+                .buttonStyle(.borderless)
+            if mine {
+                Button(role: .destructive) {
+                    model.deleteZoneLayout(name)
+                } label: {
+                    Image(systemName: "trash")
+                }
+                .buttonStyle(.borderless)
+                .disabled(model.isZoneLayoutUsed(name))
+                .help(
+                    model.isZoneLayoutUsed(name)
+                        ? String(localized: "Used by a screen or a workspace") : String(localized: "Delete")
+                )
+                .accessibilityLabel("Delete \(name)")
+            }
+        }
     }
 }
 

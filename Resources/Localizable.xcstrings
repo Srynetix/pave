@@ -847,6 +847,16 @@
         }
       }
     },
+    "Drag to reorder: the layout picker numbers them in this order.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glisse pour changer l'ordre : le choix de disposition les numérote dans cet ordre."
+          }
+        }
+      }
+    },
     "Each window's app, workspace and place are saved, never its title. The same name replaces the arrangement.": {
       "localizations": {
         "fr": {

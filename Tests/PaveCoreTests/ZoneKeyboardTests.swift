@@ -126,6 +126,37 @@ private func window(_ frame: Rect) -> WindowSnapshot {
         #expect(settings.choices == ["focus", "thirds", "main-and-stack", "halves", "grid", "Coding", "none"])
     }
 
+    @Test func theOrderPutsItsLayoutsFirstAndSkipsUnknownOrRepeatedNames() throws {
+        var settings = ZoneSettings()
+        settings.layouts["Coding"] = try ZoneLayout(
+            name: "Coding", zones: [.init(0, 0, 30, 100), .init(30, 0, 70, 100)])
+        settings.order = ["Coding", "gone", "halves", "Coding"]
+        #expect(settings.choices == ["Coding", "halves", "focus", "thirds", "main-and-stack", "grid", "none"])
+    }
+
+    @Test func movingLayoutsWritesTheWholeOrder() throws {
+        var settings = ZoneSettings()
+        settings.layouts["Coding"] = try ZoneLayout(
+            name: "Coding", zones: [.init(0, 0, 30, 100), .init(30, 0, 70, 100)])
+        // focus, thirds, main-and-stack, halves, grid, Coding
+        #expect(
+            settings.order(moving: [5], to: 0) == ["Coding", "focus", "thirds", "main-and-stack", "halves", "grid"])
+        #expect(
+            settings.order(moving: [0], to: 3) == ["thirds", "main-and-stack", "focus", "halves", "grid", "Coding"])
+        #expect(
+            settings.order(moving: [0, 2], to: 6) == ["thirds", "halves", "grid", "Coding", "focus", "main-and-stack"])
+        settings.order = settings.order(moving: [5], to: 0)
+        #expect(
+            settings.order(moving: [0], to: 6) == ["focus", "thirds", "main-and-stack", "halves", "grid", "Coding"])
+    }
+
+    @Test func deletingALayoutKeepsTheOrderOfABuiltInOfTheSameName() {
+        var settings = ZoneSettings()
+        settings.order = ["focus", "Coding", "halves"]
+        #expect(settings.order(deleting: "Coding") == ["focus", "halves"])
+        #expect(settings.order(deleting: "focus") == ["focus", "Coding", "halves"])
+    }
+
     @Test func aScreenWithoutKeyGetsAShortOne() {
         #expect(ZoneSettings.newScreenKey(screenID: "U", screenName: "LG ULTRAGEAR", isBuiltIn: false) == "LG")
         #expect(ZoneSettings.newScreenKey(screenID: "U", screenName: "Color LCD", isBuiltIn: true) == "builtin")
