@@ -35,6 +35,13 @@ public struct Hotkey: Hashable, Sendable, CustomStringConvertible {
         public static let a: UInt16 = 0
         /// Top-row digit keys 1…9 (virtual key codes, layout independent).
         public static let digits: [UInt16] = [18, 19, 20, 21, 23, 22, 26, 28, 25]
+        /// Numeric keypad keys 1…9.
+        public static let keypadDigits: [UInt16] = [83, 84, 85, 86, 87, 88, 89, 91, 92]
+
+        /// 1…9 for a digit key of the top row or of the numeric keypad.
+        public static func digit(_ keyCode: UInt16) -> Int? {
+            (digits.firstIndex(of: keyCode) ?? keypadDigits.firstIndex(of: keyCode)).map { $0 + 1 }
+        }
     }
 
     /// The keys pressed for this shortcut with the "pc" keyboard preset, which

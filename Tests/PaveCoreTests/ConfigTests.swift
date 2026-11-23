@@ -63,6 +63,16 @@ import Testing
 }
 
 @Suite struct HotkeyNameTests {
+    @Test func digitsComeFromTheTopRowOrTheKeypad() {
+        #expect(Hotkey.Key.digit(18) == 1)  // top-row 1
+        #expect(Hotkey.Key.digit(25) == 9)  // top-row 9
+        #expect(Hotkey.Key.digit(83) == 1)  // keypad 1
+        #expect(Hotkey.Key.digit(91) == 8)  // keypad 8: after 7 (89), not 90
+        #expect(Hotkey.Key.digit(92) == 9)  // keypad 9
+        #expect(Hotkey.Key.digit(82) == nil)  // keypad 0
+        #expect(Hotkey.Key.digit(29) == nil)  // top-row 0
+    }
+
     @Test func parsesShortcuts() throws {
         #expect(try Hotkey.parse("ctrl+left") == Hotkey(Hotkey.Key.leftArrow, .control))
         #expect(try Hotkey.parse(" Ctrl + Shift + 2 ") == Hotkey(Hotkey.Key.digits[1], [.control, .shift]))

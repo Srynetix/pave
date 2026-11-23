@@ -391,10 +391,10 @@ public final class HotkeyService: @unchecked Sendable {
             key = nil
             endSession(sending: .commit)  // return, keypad enter
         default:
-            if let index = Hotkey.Key.digits.firstIndex(of: keyCode) {
+            if let n = Hotkey.Key.digit(keyCode) {
                 // The picker closes by itself (onClose ends the session): a
                 // digit may be followed by another (layout, then zone).
-                key = .digit(index + 1)
+                key = .digit(n)
             } else if let c = layout.character(keyCode, shift: false)?.lowercased(), c.count == 1, c.first!.isLetter {
                 self.session = nil  // what it opens takes the keyboard, or the picker closes
                 key = .letter(c)
