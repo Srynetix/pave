@@ -55,9 +55,9 @@ shows where it will land. Hold **⌥** to move it freely.
 Halves are too wide on an ultrawide. Give a screen a **zone layout**, FancyZones style: drag a
 window and the zones light up under the pointer, hold **⇧** to span several, **⌥** to move
 freely. **⌘←/→** step from zone to zone, then on to the next screen. **⌘⇧Z** picks another
-layout, and the windows already in zones follow it. Type two digits there to place the focused
-window too: **2** then **4** puts it in zone 4 of the second layout (↩ after the first digit
-applies the layout alone).
+layout, and the windows already in zones follow it. Type two digits there (top row or numeric
+keypad) to place the focused window too: **2** then **4** puts it in zone 4 of the second layout
+(↩ after the first digit applies the layout alone).
 
 Outside zones, windows are **magnetic**: dropped near another window or the screen's edge, a
 window sticks to it, and against another window it fills the free space beside it. Resize a window by the edge it shares with another, and the other one
