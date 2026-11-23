@@ -38,7 +38,7 @@ running app. PaveMac and PaveApp are tested by hand, on a real Mac (see
 | [`WindowStore`](../../Sources/PaveCore/WindowStore.swift) | Every known window and the MRU order; turns a new snapshot into changes |
 | [`Layout`](../../Sources/PaveCore/Layout.swift) | `LayoutEngine`: what a snap command, a drop or a zone move does to a window, Windows 11 style |
 | [`SnapZones`](../../Sources/PaveCore/SnapZones.swift), [`Magnet`](../../Sources/PaveCore/Magnet.swift) | Where a dragged window would snap; magnetism and shared edges |
-| [`ZoneLayout`](../../Sources/PaveCore/ZoneLayout.swift), [`ZoneEditing`](../../Sources/PaveCore/ZoneEditing.swift) | Zone layouts, and the editor's operations with undo |
+| [`ZoneLayout`](../../Sources/PaveCore/ZoneLayout.swift), [`ZoneEditing`](../../Sources/PaveCore/ZoneEditing.swift), [`ZoneEditorSession`](../../Sources/PaveCore/ZoneEditorSession.swift) | Zone layouts, the editor's operations with undo, and its drafts per layout |
 | [`Workspaces`](../../Sources/PaveCore/Workspaces.swift), [`ParkingSpot`](../../Sources/PaveCore/ParkingSpot.swift) | Which workspace each window and screen has; where to park a hidden window |
 | [`TilingTree`](../../Sources/PaveCore/TilingTree.swift) | The tiling tree of one workspace and the frames it gives |
 | [`Switcher`](../../Sources/PaveCore/Switcher.swift) | The window switcher as a state machine |

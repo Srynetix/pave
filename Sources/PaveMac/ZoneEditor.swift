@@ -4,7 +4,9 @@ import PaveCore
 
 /// The zone layout editor (Z4): full screen on the screen it edits, the zones
 /// at their real size. Click a zone to select it, ⇧-click a neighbour to
-/// merge with it, drag the lines between zones (5 % steps, ⇧: 1 %).
+/// merge with it, drag the lines between zones (5 % steps, ⇧: 1 %). Its
+/// Layout menu switches to any layout, each keeping its changes until it is
+/// saved or the editor closes (`ZoneEditorSession`).
 /// It takes the keyboard while open (it is a real window), and gives the
 /// focus back to the app that had it when it closes.
 @MainActor
@@ -13,23 +15,34 @@ public final class ZoneEditor {
         /// The screen edited (AX coordinates).
         public var screen: Screen
         public var screenName: String
-        /// Where the editing starts.
-        public var layout: ZoneLayout
-        /// Proposed name: the user's layout being edited, else empty.
-        public var name: String
+        /// Every layout, in the picker's order.
+        public var entries: [ZoneEditorSession.Entry]
+        /// The layout opened first; nil: a new one.
+        public var start: String?
         public var gaps: Int
-        public init(screen: Screen, screenName: String, layout: ZoneLayout, name: String, gaps: Int) {
+        public init(screen: Screen, screenName: String, entries: [ZoneEditorSession.Entry], start: String?, gaps: Int) {
             self.screen = screen
             self.screenName = screenName
-            self.layout = layout
-            self.name = name
+            self.entries = entries
+            self.start = start
             self.gaps = gaps
         }
     }
 
-    /// Saved: the layout (named) and the gaps. Returns nil if written, else
-    /// why not (shown in the editor, which stays open).
-    public var onSave: (ZoneLayout, Int) -> String? = { _, _ in nil }
+    public struct Saved {
+        public var layout: ZoneLayout
+        public var gaps: Int
+        /// Saved under a new name: it must not replace a layout.
+        public var isNew: Bool
+        /// The layout the editor opened on, or one made from it: the edited
+        /// screen may take it.
+        public var isOrigin: Bool
+    }
+
+    /// Returns nil if written, else why not (shown in the editor).
+    public var onSave: (Saved) -> String? = { _ in nil }
+    /// Closed, saved or not.
+    public var onClose: () -> Void = {}
 
     private var window: EditorWindow?
     private var previousApp: NSRunningApplication?
@@ -46,18 +59,14 @@ public final class ZoneEditor {
             Log.info("zones: editor cancelled")
             self?.close(restoreFocus: true)
         }
-        window.editor.onSave = { [weak self] layout, gaps in
-            guard let self else { return nil }
-            if let problem = self.onSave(layout, gaps) { return problem }
-            self.close(restoreFocus: true)
-            return nil
-        }
+        window.editor.onSave = { [weak self] saved in self?.onSave(saved) }
+        window.editor.onDone = { [weak self] in self?.close(restoreFocus: true) }
         self.window = window
         NSApp.activate()
         window.makeKeyAndOrderFront(nil)
         window.makeFirstResponder(window.editor)
         Log.info(
-            "zones: editor opened on \(request.screenName), from \(request.layout.name) (\(request.layout.zones.count) zones)"
+            "zones: editor opened on \(request.screenName), from \(request.start ?? "a new layout")"
         )
     }
 
@@ -67,6 +76,7 @@ public final class ZoneEditor {
         window.orderOut(nil)
         if restoreFocus, let app = previousApp, app != NSRunningApplication.current { app.activate() }
         previousApp = nil
+        onClose()
     }
 }
 
@@ -90,16 +100,29 @@ private final class EditorWindow: NSWindow {
 
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { true }
-    override func cancelOperation(_ sender: Any?) { editor.onCancel() }
+    override func cancelOperation(_ sender: Any?) { editor.cancel() }
 }
 
 private final class EditorView: NSView, NSTextFieldDelegate {
     var onCancel: () -> Void = {}
-    var onSave: (ZoneLayout, Int) -> String? = { _, _ in nil }
+    var onSave: (ZoneEditor.Saved) -> String? = { _ in nil }
+    /// Saved with no changes left elsewhere.
+    var onDone: () -> Void = {}
 
     private let request: ZoneEditor.Request
-    private var draft: ZoneDraft
+    private var session: ZoneEditorSession
+    private var draft: ZoneDraft {
+        get { session.draft }
+        set {
+            session.draft = newValue
+            confirmingDiscard = false
+        }
+    }
     private var gaps: Int
+    /// The user's layout is being saved under a new name.
+    private var copying = false
+    /// Esc or Cancel once with unsaved changes: again discards them.
+    private var confirmingDiscard = false
     private var selected: Int? = 0
     /// ⇧-clicked neighbour, merged with the selection by Merge.
     private var secondary: Int?
@@ -108,6 +131,9 @@ private final class EditorView: NSView, NSTextFieldDelegate {
     private var message: String?
 
     private let toolbar = NSVisualEffectView()
+    private let toolbarRow = NSStackView()
+    private lazy var groupSeparator = separatorView()
+    private let layoutMenu = NSPopUpButton(frame: .zero, pullsDown: false)
     private let nameField = NSTextField()
     private let gapsLabel = NSTextField(labelWithString: "")
     private let gapsStepper = NSStepper()
@@ -123,7 +149,7 @@ private final class EditorView: NSView, NSTextFieldDelegate {
 
     init(request: ZoneEditor.Request) {
         self.request = request
-        draft = ZoneDraft(request.layout)
+        session = ZoneEditorSession(entries: request.entries, start: request.start)
         gaps = request.gaps
         super.init(
             frame: NSRect(
@@ -144,12 +170,14 @@ private final class EditorView: NSView, NSTextFieldDelegate {
         toolbar.state = .active
         toolbar.wantsLayer = true
         toolbar.layer?.cornerRadius = 12
+        // The HUD is dark whatever the system's appearance: its controls must be too.
+        toolbar.appearance = NSAppearance(named: .vibrantDark)
 
-        let templates = NSPopUpButton(frame: .zero, pullsDown: true)
-        templates.addItem(withTitle: String(localized: "Start from…"))
-        for layout in ZoneLayout.builtIn { templates.addItem(withTitle: layout.name) }
-        templates.target = self
-        templates.action = #selector(startFrom(_:))
+        let layoutLabel = NSTextField(labelWithString: String(localized: "Layout"))
+        layoutLabel.textColor = .secondaryLabelColor
+        layoutMenu.target = self
+        layoutMenu.action = #selector(openLayout(_:))
+        layoutMenu.widthAnchor.constraint(greaterThanOrEqualToConstant: 170).isActive = true
 
         func button(_ key: String, _ title: String, _ action: Selector) -> NSButton {
             let b = NSButton(title: title, target: self, action: action)
@@ -164,15 +192,13 @@ private final class EditorView: NSView, NSTextFieldDelegate {
         gapsStepper.target = self
         gapsStepper.action = #selector(gapsChanged)
 
-        nameField.placeholderString = String(localized: "Layout name")
-        nameField.stringValue = request.name
         nameField.delegate = self
-        nameField.widthAnchor.constraint(equalToConstant: 170).isActive = true
+        nameField.widthAnchor.constraint(equalToConstant: 190).isActive = true
 
         let save = button("save", String(localized: "Save"), #selector(save))
         save.keyEquivalent = "\r"
-        let row = NSStackView(views: [
-            templates,
+        let editing = NSStackView(views: [
+            layoutLabel, layoutMenu,
             separatorView(),
             button("columns", String(localized: "Split into columns"), #selector(splitColumns)),
             button("rows", String(localized: "Split into rows"), #selector(splitRows)),
@@ -181,31 +207,70 @@ private final class EditorView: NSView, NSTextFieldDelegate {
             button("undo", String(localized: "Undo"), #selector(undo)),
             separatorView(),
             gapsLabel, gapsStepper,
-            separatorView(),
+        ])
+        let saving = NSStackView(views: [
+            button("copy", String(localized: "Save as copy…"), #selector(toggleCopy)),
             nameField,
             button("cancel", String(localized: "Cancel"), #selector(cancel)),
             save,
         ])
-        row.orientation = .horizontal
-        row.spacing = 8
-        row.edgeInsets = NSEdgeInsets(top: 10, left: 14, bottom: 10, right: 14)
-        row.translatesAutoresizingMaskIntoConstraints = false
-        toolbar.addSubview(row)
+        for row in [editing, saving] {
+            row.orientation = .horizontal
+            row.spacing = 8
+        }
+        toolbarRow.setViews([editing, groupSeparator, saving], in: .leading)
+        toolbarRow.spacing = 8
+        toolbarRow.edgeInsets = NSEdgeInsets(top: 10, left: 14, bottom: 10, right: 14)
+        toolbarRow.translatesAutoresizingMaskIntoConstraints = false
+        toolbar.addSubview(toolbarRow)
         NSLayoutConstraint.activate([
-            row.leadingAnchor.constraint(equalTo: toolbar.leadingAnchor),
-            row.trailingAnchor.constraint(equalTo: toolbar.trailingAnchor),
-            row.topAnchor.constraint(equalTo: toolbar.topAnchor),
-            row.bottomAnchor.constraint(equalTo: toolbar.bottomAnchor),
+            toolbarRow.leadingAnchor.constraint(equalTo: toolbar.leadingAnchor),
+            toolbarRow.trailingAnchor.constraint(equalTo: toolbar.trailingAnchor),
+            toolbarRow.topAnchor.constraint(equalTo: toolbar.topAnchor),
+            toolbarRow.bottomAnchor.constraint(equalTo: toolbar.bottomAnchor),
         ])
         addSubview(toolbar)
-        let size = row.fittingSize
-        toolbar.frame = NSRect(
-            x: (area.x + (area.width - size.width) / 2).rounded(), y: area.y + 16, width: size.width,
-            height: size.height)
 
         hint.textColor = .white.withAlphaComponent(0.75)
         hint.font = .systemFont(ofSize: 12)
         addSubview(hint)
+    }
+
+    /// The Layout menu: every layout, a dot on those with unsaved changes,
+    /// then a new one.
+    private func updateLayoutMenu() {
+        layoutMenu.removeAllItems()
+        func add(_ title: String, _ target: ZoneEditorSession.Target) {
+            let modified = session.isModified(target) ? "  •" : ""
+            let item = NSMenuItem(title: title + modified, action: nil, keyEquivalent: "")
+            item.representedObject = target
+            layoutMenu.menu?.addItem(item)
+            if target == session.current { layoutMenu.select(item) }
+        }
+        for entry in session.entries {
+            let name = entry.layout.name
+            add(entry.isMine ? name : String(localized: "\(name) (built-in)"), .layout(name))
+        }
+        layoutMenu.menu?.addItem(.separator())
+        add(String(localized: "New layout"), .new)
+    }
+
+    /// Centred at the top of the usable area, as wide as its controls: the
+    /// editing and saving groups side by side, else one above the other.
+    private func placeToolbar() {
+        toolbarRow.orientation = .horizontal
+        groupSeparator.isHidden = false
+        toolbarRow.layoutSubtreeIfNeeded()
+        if toolbarRow.fittingSize.width > area.width - 32 {
+            toolbarRow.orientation = .vertical
+            toolbarRow.alignment = .leading
+            groupSeparator.isHidden = true
+            toolbarRow.layoutSubtreeIfNeeded()
+        }
+        let size = toolbarRow.fittingSize
+        toolbar.frame = NSRect(
+            x: (area.x + (area.width - size.width) / 2).rounded(), y: area.y + 16, width: size.width,
+            height: size.height)
     }
 
     private func separatorView() -> NSView {
@@ -222,15 +287,27 @@ private final class EditorView: NSView, NSTextFieldDelegate {
         buttons["delete"]?.isEnabled = one && draft.zones.count > 1
         buttons["merge"]?.isEnabled = selected != nil && secondary != nil
         buttons["undo"]?.isEnabled = draft.canUndo
-        buttons["save"]?.isEnabled = ZoneLayout.isValidName(nameField.stringValue.trimmedForName)
+        let naming = !session.isMine || copying
+        nameField.isHidden = !naming
+        nameField.placeholderString =
+            copying || session.current != .new
+            ? String(localized: "Name of the copy") : String(localized: "Name of the new layout")
+        buttons["copy"]?.isHidden = !session.isMine
+        buttons["copy"]?.title = copying ? String(localized: "Don't copy") : String(localized: "Save as copy…")
+        buttons["save"]?.isEnabled = !naming || ZoneLayout.isValidName(nameField.stringValue.trimmedForName)
         gapsLabel.stringValue = String(localized: "Gaps \(gaps)")
+        updateLayoutMenu()
+        placeToolbar()
         hint.stringValue =
             message
             ?? String(
                 localized:
                     "Click a zone · ⇧-click a neighbour, then Merge · drag the lines (⇧: 1 %) · V / H split · ⌫ delete · ⌘Z undo · esc cancel"
             )
+            + (session.isMine || session.current == .new
+                ? "" : "\n" + String(localized: "A built-in layout is saved as a copy, under a name of your own."))
         hint.textColor = message == nil ? .white.withAlphaComponent(0.75) : .systemOrange
+        hint.alignment = .center
         hint.sizeToFit()
         hint.frame.origin = NSPoint(
             x: (area.x + (area.width - hint.frame.width) / 2).rounded(), y: toolbar.frame.maxY + 8)
@@ -244,10 +321,19 @@ private final class EditorView: NSView, NSTextFieldDelegate {
 
     // MARK: Actions
 
-    @objc private func startFrom(_ sender: NSPopUpButton) {
-        guard let layout = ZoneLayout.builtIn.first(where: { $0.name == sender.titleOfSelectedItem }) else { return }
-        draft.replace(with: layout)
+    @objc private func openLayout(_ sender: NSPopUpButton) {
+        guard let target = sender.selectedItem?.representedObject as? ZoneEditorSession.Target else { return }
+        session.open(target)
+        copying = false
+        nameField.stringValue = ""
         select(0)
+    }
+
+    @objc private func toggleCopy() {
+        copying.toggle()
+        nameField.stringValue = ""
+        select(selected)
+        if copying { window?.makeFirstResponder(nameField) }
     }
 
     @objc private func splitColumns() { split(columns: true) }
@@ -286,31 +372,62 @@ private final class EditorView: NSView, NSTextFieldDelegate {
 
     @objc private func gapsChanged() {
         gaps = gapsStepper.integerValue
+        confirmingDiscard = false
         updateControls()
     }
 
-    @objc private func cancel() { onCancel() }
+    /// With unsaved changes, the first time only says which.
+    @objc func cancel() {
+        let unsaved = session.modified
+        guard unsaved.isEmpty || confirmingDiscard else {
+            confirmingDiscard = true
+            return flash(
+                String(localized: "Unsaved changes in \(names(unsaved)): esc or Cancel again to discard them"))
+        }
+        onCancel()
+    }
 
     @objc private func save() {
-        let name = nameField.stringValue.trimmedForName
-        guard ZoneLayout.isValidName(name) else {
-            return flash(String(localized: "A name of letters, digits, spaces, - or _"))
+        let copyName = nameField.isHidden ? nil : nameField.stringValue.trimmedForName
+        let layout: ZoneLayout
+        switch session.layoutToSave(copyName: copyName) {
+        case .success(let l): layout = l
+        case .failure(let problem): return flash(text(of: problem, copyName ?? ""))
         }
-        guard !ZoneLayout.builtIn.contains(where: { $0.name == name }) else {
-            return flash(String(localized: "\(name) is a built-in layout: choose another name"))
+        let saved = ZoneEditor.Saved(layout: layout, gaps: gaps, isNew: copyName != nil, isOrigin: session.isOrigin)
+        if let problem = onSave(saved) { return flash(problem) }
+        session.saved(layout)
+        copying = false
+        nameField.stringValue = ""
+        let unsaved = session.modified
+        guard !unsaved.isEmpty else { return onDone() }
+        select(selected.flatMap { draft.zones.indices.contains($0) ? $0 : nil })
+        message = String(localized: "\(layout.name) saved. Still unsaved: \(names(unsaved))")
+        updateControls()
+    }
+
+    private func text(of problem: ZoneEditorSession.SaveProblem, _ name: String) -> String {
+        switch problem {
+        case .invalidName, .needsName: String(localized: "A name of letters, digits, spaces, - or _")
+        case .builtInName: String(localized: "\(name) is a built-in layout: choose another name")
+        case .nameTaken: String(localized: "A layout is already named \(name): choose another name")
         }
-        do {
-            let layout = try draft.layout(named: name)
-            if let problem = onSave(layout, gaps) { flash(problem) }
-        } catch {
-            flash(error.message)
-        }
+    }
+
+    private func names(_ targets: [ZoneEditorSession.Target]) -> String {
+        targets.map { target in
+            switch target {
+            case .layout(let name): name
+            case .new: String(localized: "the new layout")
+            }
+        }.joined(separator: ", ")
     }
 
     private func select(_ i: Int?) {
         selected = i
         secondary = nil
         message = nil
+        confirmingDiscard = false
         updateControls()
     }
 
@@ -326,7 +443,7 @@ private final class EditorView: NSView, NSTextFieldDelegate {
         let mods = event.modifierFlags.intersection([.command, .control, .option])
         let key = event.charactersIgnoringModifiers?.lowercased() ?? ""
         switch (event.keyCode, key) {
-        case (53, _): onCancel()  // escape
+        case (53, _): cancel()  // escape
         case (51, _), (117, _): deleteZone()  // delete, forward delete
         case (48, _):  // tab: next zone
             let count = draft.zones.count

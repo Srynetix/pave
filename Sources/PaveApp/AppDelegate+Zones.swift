@@ -193,29 +193,44 @@ extension AppDelegate {
         openZoneEditor(on: screen, layoutName: nil)
     }
 
-    /// Opens the editor on `screen`, from `layoutName` or the layout it uses
-    /// (else `focus`). A user layout is proposed under its own name.
-    func openZoneEditor(on screen: Screen, layoutName: String?, assign: Bool = true) {
+    /// Opens the editor on `screen`, from `layoutName`, else the layout the
+    /// screen uses, else a new one (`new`: always a new one). Every layout can
+    /// then be opened from its Layout menu.
+    func openZoneEditor(on screen: Screen, layoutName: String?, new: Bool = false, assign: Bool = true) {
         guard let identity = Screens.identity(of: screen.id) else { return }
         let settings = config.config.zones
         let workspace = workspaces.isEnabled ? workspaces.state.visible[screen.id] : nil
-        let current =
-            layoutName.flatMap { settings.layout(named: $0) }
-            ?? settings.layout(
-                screenID: screen.id, screenName: identity.name, isBuiltIn: identity.isBuiltIn, workspace: workspace)
-            ?? ZoneLayout.builtIn[0]
+        let start =
+            new
+            ? nil
+            : layoutName
+                ?? settings.layout(
+                    screenID: screen.id, screenName: identity.name, isBuiltIn: identity.isBuiltIn, workspace: workspace
+                )?.name
+        let entries = settings.names.compactMap { name in
+            settings.layout(named: name).map {
+                ZoneEditorSession.Entry(layout: $0, isMine: settings.layouts[name] != nil)
+            }
+        }
+        zoneEditor.open(
+            .init(screen: screen, screenName: identity.name, entries: entries, start: start, gaps: settings.gaps))
+        // After opening: replacing an open editor closes it, which forgets its screen.
         editorScreen = screen
         editorAssigns = assign
-        zoneEditor.open(
-            .init(
-                screen: screen, screenName: identity.name, layout: current,
-                name: settings.layouts[current.name] != nil ? current.name : "", gaps: settings.gaps))
     }
 
-    /// The editor saved `layout`: written as `[layouts."<name>"]`, with the
-    /// gaps, then used on the edited screen (zones turned on if they were off).
-    func saveZoneLayout(_ layout: ZoneLayout, gaps: Int) -> String? {
+    /// The editor saved a layout: written as `[layouts."<name>"]`, with the
+    /// gaps. The one it opened on (or made from it) is then used on the edited
+    /// screen (zones turned on if they were off).
+    func saveZoneLayout(_ saved: ZoneEditor.Saved) -> String? {
+        let layout = saved.layout
+        let gaps = saved.gaps
         guard let screen = editorScreen else { return "the screen went away" }
+        // The editor checked its own list; the file may have gained the name since.
+        if saved.isNew, config.config.zones.layouts[layout.name] != nil {
+            return String(localized: "A layout is already named \(layout.name): choose another name")
+        }
+        let assigns = editorAssigns && saved.isOrigin
         let old = zones(on: screen)
         // Screens already using this layout: their windows follow the new version.
         let users = Screens.all().compactMap { s in
@@ -227,14 +242,13 @@ extension AppDelegate {
         if gaps != config.config.zones.gaps, let problem = config.set("zones", "gaps", to: "\(gaps)") { return problem }
         if !config.config.zones.enabled, let problem = config.set("zones", "enabled", to: "true") { return problem }
         Log.info("zones: layout \(layout.name) saved, \(layout.zones.count) zones, gaps \(gaps)")
-        editorScreen = nil
-        if editorAssigns { assignZones(layout.name, on: screen, old: old) }
+        if assigns { assignZones(layout.name, on: screen, old: old) }
         let zones = config.config.zones
-        for (s, before) in users where !(editorAssigns && s == screen) {
-            guard let saved = zones.layout(named: layout.name) else { continue }
+        for (s, before) in users where !(assigns && s == screen) {
+            guard let written = zones.layout(named: layout.name) else { continue }
             commander.reflow(
                 windowsInZones(on: s), on: s, from: before,
-                to: ScreenZones(layout: saved, gaps: Double(zones.gaps), needsControl: before.needsControl))
+                to: ScreenZones(layout: written, gaps: Double(zones.gaps), needsControl: before.needsControl))
         }
         return nil
     }

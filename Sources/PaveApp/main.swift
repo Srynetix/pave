@@ -305,11 +305,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSMenu
             self.pickerScreen = nil
             self.openZoneEditor(on: screen, layoutName: name == ZoneSettings.none ? nil : name)
         }
-        zoneEditor.onSave = { [weak self] layout, gaps in
+        zoneEditor.onSave = { [weak self] saved in
             // nil is success: not to be confused with a gone self.
             guard let self else { return "Pavé is quitting" }
-            return self.saveZoneLayout(layout, gaps: gaps)
+            return self.saveZoneLayout(saved)
         }
+        zoneEditor.onClose = { [weak self] in self?.editorScreen = nil }
         layoutObserver = KeyboardLayout.observeChanges { [weak service] in
             service?.update(layout: KeyboardLayout.current())
             Log.info("keyboard layout changed: switcher keys updated")

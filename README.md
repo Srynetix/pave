@@ -63,7 +63,8 @@ Outside zones, windows are **magnetic**: dropped near another window or the scre
 window sticks to it, and against another window it fills the free space beside it. Resize a window by the edge it shares with another, and the other one
 follows. Start from Focus (25·50·25), Thirds,
 Main and stack, Halves or Grid, or draw your own in the full-screen editor: split, merge,
-drag the lines, set the gaps. One layout per screen, another per workspace if you like;
+drag the lines, set the gaps. Its Layout menu opens any layout, each keeping its changes until
+you save; a built-in layout, or a copy of yours, is saved under a new name. One layout per screen, another per workspace if you like;
 screens without one keep their halves and quarters. An app rule can open an app's windows
 straight in a zone, and when a screen is unplugged and plugged back, its windows return to
 their zones.
