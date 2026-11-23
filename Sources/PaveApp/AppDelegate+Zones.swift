@@ -160,10 +160,10 @@ extension AppDelegate {
                         + settings.workspaces.sorted { $0.key < $1.key }.map { "\($0.key) → \($0.value)" }.joined(
                             separator: ", "))
             }
-            let mine = settings.layouts.values.sorted { $0.name < $1.name }.map {
-                "\($0.name) (\($0.zones.count) zones)"
+            let layouts = settings.names.map { name in
+                settings.layouts[name].map { "\(name) (\($0.zones.count) zones)" } ?? name
             }
-            lines.append("layouts: " + (ZoneLayout.builtIn.map(\.name) + mine).joined(separator: ", "))
+            lines.append("layouts: " + layouts.joined(separator: ", "))
             return (true, lines.joined(separator: "\n"))
         case .enable(let on):
             setConfig("zones", "enabled", to: on ? "true" : "false")

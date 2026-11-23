@@ -21,3 +21,4 @@ To add one: copy the shape of the latest record to the next number, and add its 
 | [2](0002-workspace-by-window-title.md) | New windows go to a workspace by glob patterns on their title (`[apps."…".titles]`), set from the taskbar's "Pin to Workspace". | Yes |
 | [3](0003-windows-on-every-workspace.md) | A window can be shown on every workspace: one an app keeps on top (Picture in Picture), a title rule `"all"`, or the taskbar's "Show on All Workspaces". | Yes |
 | [4](0004-quick-actions-from-the-dock-menu.md) | The taskbar's right-click menu shows an app's quick actions, read from the Dock's own menu through Accessibility, hidden under a still image of the screen while it is open. | Yes |
+| [5](0005-zone-layout-order.md) | The order of zone layouts (picker, Settings, CLI) is `[zones] order`, a list of names covering built-in and user layouts; the others follow in the default order. | Yes |

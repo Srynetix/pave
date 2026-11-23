@@ -201,6 +201,9 @@ public struct ZoneSettings: Equatable, Sendable {
     public var workspaces: [Int: String] = [:]
     /// The user's layouts, by name.
     public var layouts: [String: ZoneLayout] = [:]
+    /// `order`: layout names, built-in or the user's, in the order the picker
+    /// and Settings show them. Names it leaves out follow, in the default order.
+    public var order: [String] = []
 
     public enum Show: String, Sendable, CaseIterable {
         case always, ctrl
@@ -246,9 +249,33 @@ public struct ZoneSettings: Equatable, Sendable {
         return word.isEmpty ? screenID : word
     }
 
-    /// The ⌃⇧Z picker: built-in layouts, then the user's (sorted), then "none".
-    public var choices: [String] {
+    /// Every layout, in `order`, then the ones it leaves out: built-in layouts,
+    /// then the user's (sorted). A name `order` repeats or no layout has is skipped.
+    public var names: [String] {
         let builtIn = ZoneLayout.builtIn.map(\.name)
-        return builtIn + layouts.keys.filter { !builtIn.contains($0) }.sorted() + [Self.none]
+        let all = builtIn + layouts.keys.filter { !builtIn.contains($0) }.sorted()
+        var result: [String] = []
+        for name in order where all.contains(name) && !result.contains(name) { result.append(name) }
+        return result + all.filter { !result.contains($0) }
+    }
+
+    /// The ⌃⇧Z picker: every layout, in order, then "none".
+    public var choices: [String] { names + [Self.none] }
+
+    /// The `order` to write once the user's layout `name` is deleted: a
+    /// built-in of that name stays, and keeps its place.
+    public func order(deleting name: String) -> [String] {
+        ZoneLayout.builtIn.contains { $0.name == name } ? order : order.filter { $0 != name }
+    }
+
+    /// The `order` to write once the layouts at `offsets` of `names` are moved
+    /// before `destination`, as a list dragged in place.
+    public func order(moving offsets: [Int], to destination: Int) -> [String] {
+        let all = names
+        let moving = Set(offsets)
+        let moved = all.indices.filter(moving.contains).map { all[$0] }
+        let kept = all.indices.filter { !moving.contains($0) }
+        let split = kept.filter { $0 < destination }.count
+        return kept[..<split].map { all[$0] } + moved + kept[split...].map { all[$0] }
     }
 }

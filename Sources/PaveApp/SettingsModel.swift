@@ -163,7 +163,19 @@ final class SettingsModel: ObservableObject {
     }
 
     func deleteZoneLayout(_ name: String) {
+        let order = config.zones.order(deleting: name)
         apply(removeTable("layouts.\"\(name)\""))
+        if lastError == nil, order != config.zones.order { setZoneOrder(order) }
+    }
+
+    func moveZoneLayouts(_ offsets: IndexSet, to destination: Int) {
+        setZoneOrder(config.zones.order(moving: Array(offsets), to: destination))
+    }
+
+    private func setZoneOrder(_ order: [String]) {
+        apply(
+            order.isEmpty
+                ? removeValue("zones", "order") : setValue("zones", "order", ConfigEdit.list(order), true))
     }
 
     private func apply(_ problem: String?) {
