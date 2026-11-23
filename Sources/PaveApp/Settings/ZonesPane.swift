@@ -31,6 +31,12 @@ struct ZonesPane: View {
                     Text("Arrows move between zones")
                     Text("Off: \(model.mainKey)← → keep halves and quarters on every screen.")
                 }
+                Toggle(isOn: Binding(get: { z.follow }, set: { model.set("zones", "follow", $0) })) {
+                    Text("Windows follow a new layout")
+                    Text(
+                        "When a screen's layout changes, or a layout it uses is edited, its windows in zones move to the new zones. Off: they stay where they are."
+                    )
+                }
                 LabeledContent("Gaps") {
                     HStack {
                         Slider(value: $gaps, in: 0...32) { editing in
@@ -97,7 +103,7 @@ struct ZonesPane: View {
                 Text("Screens")
             } footer: {
                 Text(
-                    "Windows already in zones follow a new layout. A screen is found by its UUID, \"builtin\", or part of its name, so the layout survives a re-plug."
+                    "A screen is found by its UUID, \"builtin\", or part of its name, so the layout survives a re-plug."
                 )
                 .font(.caption).foregroundStyle(.secondary)
             }

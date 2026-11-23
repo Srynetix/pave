@@ -76,27 +76,31 @@ extension AppDelegate {
             current: current?.name ?? ZoneSettings.none, canPlace: pickerWindow != nil)
     }
 
-    /// A layout was picked for `pickerScreen`: written to the config (the
-    /// visible workspace's override if it has one, else the screen's), and
-    /// the windows in zones follow it.
-    /// With `zone`, the window focused at opening then goes into that zone.
+    /// A layout was picked for `pickerScreen`. Alone, it becomes the screen's
+    /// layout (`assignZones`). With `zone`, only the window focused at opening
+    /// goes into that zone of it: the screen keeps its layout, the other
+    /// windows stay where they are.
     func pickZones(_ name: String, zone: Int? = nil) {
         guard let screen = pickerScreen else { return }
         pickerScreen = nil
         let windowID = pickerWindow
         pickerWindow = nil
-        assignZones(name, on: screen, old: zones(on: screen))
-        guard let zone else { return }
-        // Its frame now: the layout change may have moved it (same app: moves run in order).
-        guard let id = windowID, let window = registry.store.windows[id], let zones = zones(on: screen) else {
+        guard let zone else { return assignZones(name, on: screen, old: zones(on: screen)) }
+        let settings = config.config.zones
+        guard let id = windowID, let window = registry.store.windows[id], let layout = settings.layout(named: name)
+        else {
             return Log.info("zones: picker zone \(zone) skipped, the window or the layout is gone")
         }
-        commander.place(window, inZone: zone, of: zones, on: screen, source: "zone picker")
+        let current = zones(on: screen, quiet: true)
+        let target = ScreenZones(
+            layout: layout, gaps: Double(settings.gaps), needsControl: current?.needsControl ?? (settings.show == .ctrl)
+        )
+        commander.place(window, inZone: zone, of: target, screenZones: current, on: screen, source: "zone picker")
     }
 
     /// `name` becomes the layout of `screen`: written to the config (the
     /// visible workspace's override if it has one, else the screen's), and
-    /// the windows that were in zones of `old` follow it.
+    /// the windows that were in zones of `old` follow it (`zones.follow`).
     func assignZones(_ name: String, on screen: Screen, old: ScreenZones?) {
         guard let identity = Screens.identity(of: screen.id) else { return }
         let settings = config.config.zones
@@ -112,6 +116,7 @@ extension AppDelegate {
         }
         Log.info("zones: \(name) for \(identity.name)")
         // Read after the writes: the layout may have just been saved by the editor.
+        guard config.config.zones.follow else { return commander.rehome(windowsInZones(on: screen), on: screen) }
         guard let old, let layout = config.config.zones.layout(named: name) else { return }
         let new = ScreenZones(layout: layout, gaps: Double(config.config.zones.gaps), needsControl: old.needsControl)
         commander.reflow(windowsInZones(on: screen), on: screen, from: old, to: new)
@@ -142,7 +147,7 @@ extension AppDelegate {
         switch command {
         case .report:
             var lines = [
-                "zones: \(settings.enabled ? "on" : "off"), gaps \(settings.gaps), show \(settings.show.rawValue), keyboard \(settings.keyboard ? "on" : "off")"
+                "zones: \(settings.enabled ? "on" : "off"), gaps \(settings.gaps), show \(settings.show.rawValue), keyboard \(settings.keyboard ? "on" : "off"), follow \(settings.follow ? "on" : "off")"
             ]
             lines.append("screens:")
             for (i, s) in screens.enumerated() {
@@ -234,7 +239,7 @@ extension AppDelegate {
         let old = zones(on: screen)
         // Screens already using this layout: their windows follow the new version.
         let users = Screens.all().compactMap { s in
-            zones(on: s, keyboard: true).flatMap { $0.layout.name == layout.name ? (s, $0) : nil }
+            zones(on: s, quiet: true).flatMap { $0.layout.name == layout.name ? (s, $0) : nil }
         }
         if let problem = config.replaceTable("layouts.\"\(layout.name)\"", "zones", to: layout.tomlZones) {
             return problem
@@ -245,6 +250,10 @@ extension AppDelegate {
         if assigns { assignZones(layout.name, on: screen, old: old) }
         let zones = config.config.zones
         for (s, before) in users where !(assigns && s == screen) {
+            guard zones.follow else {
+                commander.rehome(windowsInZones(on: s), on: s)
+                continue
+            }
             guard let written = zones.layout(named: layout.name) else { continue }
             commander.reflow(
                 windowsInZones(on: s), on: s, from: before,

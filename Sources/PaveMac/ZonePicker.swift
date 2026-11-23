@@ -7,8 +7,9 @@ import PaveCore
 /// the panel never takes focus nor the mouse.
 ///
 /// Two digits in a row place the focused window: the first picks a layout,
-/// the second one of its zones (2 then 4: zone 4 of the second layout).
-/// After the first, ↩ applies the layout alone, an arrow goes back to the layouts.
+/// the second one of its zones (2 then 4: zone 4 of the second layout), and
+/// the screen keeps its own layout. After the first, ↩ applies the layout to
+/// the screen instead, an arrow goes back to the layouts.
 @MainActor
 public final class ZonePicker {
     public struct Choice {
@@ -215,7 +216,7 @@ private final class PickerView: NSView {
             if let picking, let count = choices[picking].layout?.zones.count {
                 String(
                     localized:
-                        "1–\(min(count, 9)) put the window in that zone · ↩ apply the layout only · arrows back · esc cancel"
+                        "1–\(min(count, 9)) put the window in that zone, the screen keeps its layout · ↩ apply the layout to the screen · arrows back · esc cancel"
                 )
             } else if canPlace {
                 String(

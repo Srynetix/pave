@@ -197,12 +197,12 @@
         }
       }
     },
-    "1–%lld put the window in that zone · ↩ apply the layout only · arrows back · esc cancel": {
+    "1–%lld put the window in that zone, the screen keeps its layout · ↩ apply the layout to the screen · arrows back · esc cancel": {
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "1–%lld place la fenêtre dans cette zone · ↩ applique seulement la disposition · flèches retour · échap annule"
+            "value": "1–%lld place la fenêtre dans cette zone, l'écran garde sa disposition · ↩ applique la disposition à l'écran · flèches retour · échap annule"
           }
         }
       }
@@ -273,6 +273,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Un nom fait de lettres, chiffres, espaces, - ou _"
+          }
+        }
+      }
+    },
+    "A screen is found by its UUID, \"builtin\", or part of its name, so the layout survives a re-plug.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un écran est reconnu par son UUID, « builtin » ou une partie de son nom : la disposition survit à un rebranchement."
           }
         }
       }
@@ -3223,6 +3233,16 @@
         }
       }
     },
+    "When a screen's layout changes, or a layout it uses is edited, its windows in zones move to the new zones. Off: they stay where they are.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quand la disposition d'un écran change, ou qu'une disposition qu'il utilise est modifiée, ses fenêtres rangées passent dans les nouvelles zones. Désactivé : elles restent où elles sont."
+          }
+        }
+      }
+    },
     "When first shown": {
       "localizations": {
         "fr": {
@@ -3303,12 +3323,12 @@
         }
       }
     },
-    "Windows already in zones follow a new layout. A screen is found by its UUID, \"builtin\", or part of its name, so the layout survives a re-plug.": {
+    "Windows follow a new layout": {
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Les fenêtres déjà rangées suivent une nouvelle disposition. Un écran est reconnu par son UUID, « builtin » ou une partie de son nom : la disposition survit à un rebranchement."
+            "value": "Les fenêtres suivent une nouvelle disposition"
           }
         }
       }

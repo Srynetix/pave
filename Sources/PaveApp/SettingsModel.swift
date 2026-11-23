@@ -120,7 +120,7 @@ final class SettingsModel: ObservableObject {
     var requestRefresh: () -> Void = {}
     /// The open standard windows of an app, by bundle ID.
     var windowTitles: (_ bundleID: String) -> [OpenWindow] = { _ in [] }
-    /// Uses a layout on a screen (windows in zones follow it).
+    /// Uses a layout on a screen (windows in zones follow it, per `zones.follow`).
     var assignZoneLayout: (_ screen: Int, _ layout: String) -> Void = { _, _ in }
     /// Opens the zone editor on a screen (nil: under the mouse), from a layout (nil: the screen's).
     var editZones: (_ screen: Int?, _ layout: String?) -> Void = { _, _ in }

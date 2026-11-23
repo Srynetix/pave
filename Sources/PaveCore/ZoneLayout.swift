@@ -183,6 +183,16 @@ public struct ScreenZones: Equatable, Sendable {
         self.gaps = gaps
         self.needsControl = needsControl
     }
+
+    /// The zones of this, the screen's layout, a window put in zone `index`
+    /// of `placed` sits in: that zone when `placed` is this layout, else the
+    /// zones its frame matches, if any (nil: in none of the screen's zones).
+    public func home(ofZone index: Int, of placed: ScreenZones, in area: Rect) -> [Int]? {
+        if placed.layout == layout { return [index] }
+        guard placed.layout.zones.indices.contains(index) else { return nil }
+        return layout.zones(
+            matching: placed.layout.frame(of: [index], in: area, gaps: placed.gaps), in: area, gaps: gaps)
+    }
 }
 
 /// `[zones]` and `[layouts."<name>"]` of the config file.
@@ -195,6 +205,9 @@ public struct ZoneSettings: Equatable, Sendable {
     public var show: Show = .always
     /// ⌃← / ⌃→ move between zones on a screen with a layout (else: halves).
     public var keyboard = true
+    /// Windows in zones follow a screen's new layout, or a new version of it;
+    /// off: only the zones change, the windows stay where they are.
+    public var follow = true
     /// Screen ("builtin", part of its name, or its UUID) → layout name, or "none".
     public var screens: [String: String] = [:]
     /// Workspace number → layout name, on the screens that have a layout.

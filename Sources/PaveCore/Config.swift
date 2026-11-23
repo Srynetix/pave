@@ -310,6 +310,7 @@ public struct PaveConfig: Equatable, Sendable {
             switch key {
             case "enabled": config.zones.enabled = try field.bool()
             case "keyboard": config.zones.keyboard = try field.bool()
+            case "follow": config.zones.follow = try field.bool()
             case "gaps": config.zones.gaps = try field.integer(in: 0...64, points)
             case "show":
                 config.zones.show = try field.choice(
@@ -566,6 +567,9 @@ public struct PaveConfig: Equatable, Sendable {
             show = "always"
             # ctrl+left / ctrl+right move between zones on a screen that has a layout.
             keyboard = true
+            # Windows in zones follow a new layout of their screen (or a new version
+            # of it); false: only the zones change, the windows stay where they are.
+            follow = true
             # The order of the layouts in the picker (ctrl+shift+Z: 1 is the first);
             # the others follow:
             #   order = ["Coding", "focus"]
