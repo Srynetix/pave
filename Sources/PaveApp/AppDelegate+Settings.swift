@@ -135,7 +135,11 @@ extension AppDelegate {
             let screen =
                 index.flatMap { screens.indices.contains($0) ? screens[$0] : nil }
                 ?? Screens.underMouse(among: screens) ?? screens.first
-            if let screen { self.openZoneEditor(on: screen, layoutName: name, assign: index != nil) }
+            // Settings' "New layout…" names neither a screen nor a layout.
+            if let screen {
+                self.openZoneEditor(
+                    on: screen, layoutName: name, new: index == nil && name == nil, assign: index != nil)
+            }
         }
     }
 

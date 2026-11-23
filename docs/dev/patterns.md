@@ -86,7 +86,9 @@ Escape, with modes (held, search) and many keys. Spread over callbacks, such log
 silently.
 
 **Where.** [`SwitcherSession`](../../Sources/PaveCore/Switcher.swift),
-[`ZoneDraft`](../../Sources/PaveCore/ZoneEditing.swift) (the zone editor, with undo); the keys
+[`ZoneDraft`](../../Sources/PaveCore/ZoneEditing.swift) (the zone editor, with undo) and
+[`ZoneEditorSession`](../../Sources/PaveCore/ZoneEditorSession.swift) (a draft per layout it
+opens, and what Save may write); the keys
 come from [`HotkeyService`](../../Sources/PaveMac/HotkeyService.swift) as `SwitcherKey` and
 `PickerKey`.
 
