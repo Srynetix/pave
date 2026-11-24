@@ -1957,12 +1957,12 @@
         }
       }
     },
-    "PC preset: the key next to the space bar (Win on a PC keyboard) runs Pavé's shortcuts, the bottom-left key does copy and paste, right ⌘ is Alt Gr. Turn it off if you keep Karabiner.": {
+    "PC preset: the key next to the space bar (Win on a PC keyboard) runs Pavé's shortcuts, the bottom-left key does copy and paste, right ⌘ is Alt Gr, the keypad types a point. Turn it off if you keep Karabiner.": {
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Préréglage PC : la touche à côté de la barre d'espace (Windows sur un clavier PC) lance les raccourcis de Pavé, la touche en bas à gauche fait copier et coller, ⌘ droite devient Alt Gr. À couper si tu gardes Karabiner."
+            "value": "Préréglage PC : la touche à côté de la barre d'espace (Windows sur un clavier PC) lance les raccourcis de Pavé, la touche en bas à gauche fait copier et coller, ⌘ droite devient Alt Gr, le pavé numérique tape un point. À couper si tu gardes Karabiner."
           }
         }
       }

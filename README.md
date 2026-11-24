@@ -198,7 +198,8 @@ commented. Most settings are also in the Settings window.
   symbol keeps the number. Like names, icons never reach the logs.
 - `[switcher]`: `scope`, `"workspace"`, `"screen"` (the screen in use) or `"all"`.
 - `[keyboard]`: `remap`, `preset` (`"pc"` or `"none"`), `skip` (keyboards left alone, by the
-  `vendor:product` ID from `pave keyboards`, or `"built-in"`).
+  `vendor:product` ID from `pave keyboards`, or `"built-in"`; the keypad's point still applies
+  to them, see below).
 - `[taskbar]`: `enabled`, `hide-dock`, `start-key`, `grouping` (`"never"`, `"always"`,
   `"when_full"`), `pinned` (bundle IDs).
 - `[zones]`: `enabled`, `gaps`, `show` (`"always"`, or `"ctrl"`: only while ctrl is held),
@@ -263,6 +264,7 @@ The "pc" keyboard preset:
 | Every keyboard | left ⌘ → ⌃ (the key next to the space bar; Win on a PC keyboard), right ⌘ → right ⌥ (Alt Gr) |
 | Built-in | fn → ⌘, left ⌃ → fn: the bottom row `fn ⌃ ⌥ ⌘` becomes `⌘ fn ⌥ ⌃` |
 | External (Mac layout) | left ⌃ → ⌘: `⌃ ⌥ ⌘` becomes `⌘ ⌥ ⌃` |
+| Every keyboard | the keypad's decimal key types `.`, as on a French PC (the Mac's French layouts type `,`); with ⇧ or a modifier it keeps the layout's character. Pavé's event tap types it, so it reaches every keyboard, `skip` included, but not password fields, where macOS hides keys from Pavé |
 
 With `hide-dock`, the Dock is also shrunk to its smallest icons and moved to the left (Mission
 Control always shows it, as a thin strip away from the taskbar). Its settings are saved in `~/.local/state/pave/dock.json` and restored

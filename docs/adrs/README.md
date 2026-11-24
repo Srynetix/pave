@@ -24,3 +24,4 @@ To add one: copy the shape of the latest record to the next number, and add its 
 | [5](0005-zone-layout-order.md) | The order of zone layouts (picker, Settings, CLI) is `[zones] order`, a list of names covering built-in and user layouts; the others follow in the default order. | Yes |
 | [6](0006-zone-editor-switches-layouts.md) | The zone editor opens any layout from a menu and keeps a draft per layout until saved or closed; Save replaces the user's own layout, built-in ones and copies are saved under a new name, and the editor never renames. | Yes |
 | [7](0007-place-one-window-without-the-layout.md) | Two digits in the zone picker place the focused window only, the screen keeping its layout; `[zones] follow` says whether windows in zones follow a new layout. | Yes |
+| [8](0008-keypad-point-with-the-pc-preset.md) | With the "pc" keyboard preset, the keypad's decimal key types ".", rewritten by the event tap: `hidutil` cannot change a key's character. | Yes |
