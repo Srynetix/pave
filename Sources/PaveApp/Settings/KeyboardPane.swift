@@ -18,7 +18,7 @@ struct KeyboardPane: View {
                 Toggle(isOn: Binding(get: { c.keyboardRemap }, set: { model.set("keyboard", "remap", $0) })) {
                     Text("Keyboard remap")
                     Text(
-                        "PC preset: the key next to the space bar (Win on a PC keyboard) runs Pavé's shortcuts, the bottom-left key does copy and paste, right ⌘ is Alt Gr. Turn it off if you keep Karabiner."
+                        "PC preset: the key next to the space bar (Win on a PC keyboard) runs Pavé's shortcuts, the bottom-left key does copy and paste, right ⌘ is Alt Gr, the keypad types a point. Turn it off if you keep Karabiner."
                     )
                 }
                 Picker(

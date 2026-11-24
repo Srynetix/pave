@@ -188,6 +188,22 @@ import Testing
         #expect(KeyRemap.mappings(for: logitech, preset: .none).isEmpty)
     }
 
+    @Test func pcPresetTypesAPointOnTheKeypad() {
+        let decimal = Hotkey.Key.keypadDecimal
+        #expect(KeyRemap.character(keyCode: decimal, modifiers: [], preset: .pc) == ".")
+        #expect(KeyRemap.character(keyCode: decimal, modifiers: [], preset: .none) == nil)
+        #expect(KeyRemap.character(keyCode: decimal, modifiers: .shift, preset: .pc) == nil)
+        #expect(KeyRemap.character(keyCode: decimal, modifiers: .command, preset: .pc) == nil)
+        #expect(KeyRemap.character(keyCode: Hotkey.Key.keypadDigits[0], modifiers: [], preset: .pc) == nil)
+    }
+
+    @Test func theTapTypesNothingOfItsOwnWithTheRemapOffOrKarabinerOn() {
+        #expect(KeyRemap.typingPreset(remap: true, preset: .pc, karabinerRunning: false) == .pc)
+        #expect(KeyRemap.typingPreset(remap: false, preset: .pc, karabinerRunning: false) == .none)
+        #expect(KeyRemap.typingPreset(remap: true, preset: .pc, karabinerRunning: true) == .none)
+        #expect(KeyRemap.typingPreset(remap: true, preset: .none, karabinerRunning: false) == .none)
+    }
+
     @Test func hidutilArgumentsTargetTheWholeDevice() {
         #expect(builtIn.matching == #"{"Built-In":1}"#)
         var located = builtIn

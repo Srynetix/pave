@@ -72,6 +72,9 @@ public final class HotkeyService: @unchecked Sendable {
     /// Tap thread only: when left ⌥ went down alone, nil once anything else happened.
     private var optionDownAt: UInt64?
     private var optionTapEnabled = false
+    /// Tap thread only: the preset whose characters the tap types
+    /// (`KeyRemap.character`).
+    private var typingPreset: KeyRemap.Preset = .none
     static let leftOptionKey: Int64 = 58
     static let optionTapMax: UInt64 = 500_000_000
     /// Tap thread only.
@@ -130,8 +133,7 @@ public final class HotkeyService: @unchecked Sendable {
         return ok
     }
 
-    /// New bindings from a config reload. Keys held down right now keep
-    /// swallowing their key-up, so no stray key-up leaks to the apps.
+    /// Whether tapping left ⌥ alone opens the launcher.
     public func setOptionTap(enabled: Bool) {
         thread.perform {
             self.optionTapEnabled = enabled
@@ -139,6 +141,13 @@ public final class HotkeyService: @unchecked Sendable {
         }
     }
 
+    /// The preset whose characters the tap types (`KeyRemap.typingPreset`).
+    public func setTyping(preset: KeyRemap.Preset) {
+        thread.perform { self.typingPreset = preset }
+    }
+
+    /// New bindings from a config reload. Keys held down right now keep
+    /// swallowing their key-up, so no stray key-up leaks to the apps.
     public func update(bindings new: [Hotkey: HotkeyAction]) {
         thread.perform {
             self.bindings = new
@@ -260,7 +269,7 @@ public final class HotkeyService: @unchecked Sendable {
         case .keyUp:
             let keyCode = UInt16(event.getIntegerValueField(.keyboardEventKeycode))
             if swallowedKeyUps.remove(keyCode) != nil { return nil }
-            return Unmanaged.passUnretained(event)
+            return retyped(event, keyCode)
 
         case .keyDown:
             optionDownAt = nil  // ⌥ + a key (special characters): not a tap
@@ -290,7 +299,7 @@ public final class HotkeyService: @unchecked Sendable {
                 watchIdle()
                 return nil
             }
-            guard let action = bindings[hotkey] else { return Unmanaged.passUnretained(event) }
+            guard let action = bindings[hotkey] else { return retyped(event, keyCode) }
             swallowedKeyUps.insert(keyCode)
             // Holding the keys repeats the key-down: act once, swallow the repeats.
             if event.getIntegerValueField(.keyboardEventAutorepeat) == 0 {
@@ -301,6 +310,18 @@ public final class HotkeyService: @unchecked Sendable {
         default:
             return Unmanaged.passUnretained(event)
         }
+    }
+
+    /// A key going to the apps, with the preset's character instead of the
+    /// layout's (`KeyRemap.character`).
+    private func retyped(_ event: CGEvent, _ keyCode: UInt16) -> Unmanaged<CGEvent> {
+        if let text = KeyRemap.character(
+            keyCode: keyCode, modifiers: Self.modifiers(of: event.flags), preset: typingPreset)
+        {
+            let units = Array(text.utf16)
+            event.keyboardSetUnicodeString(stringLength: units.count, unicodeString: units)
+        }
+        return Unmanaged.passUnretained(event)
     }
 
     /// ⌃Tab (or the configured key) opens the switcher; the same key with ⇧ opens it backwards.
@@ -348,11 +369,15 @@ public final class HotkeyService: @unchecked Sendable {
                 key = .enterSearch
             }
         default:
-            let character = layout.character(keyCode, shift: shift)
             if current.searching {
+                // The search types what the apps would get.
+                let character =
+                    KeyRemap.character(
+                        keyCode: keyCode, modifiers: Self.modifiers(of: event.flags), preset: typingPreset)
+                    ?? layout.character(keyCode, shift: shift)
                 key = character.map { .type($0) }
             } else if !repeated {
-                switch character?.lowercased() {
+                switch layout.character(keyCode, shift: shift)?.lowercased() {
                 case "w": key = .close
                 case "q": key = .quit
                 default: break

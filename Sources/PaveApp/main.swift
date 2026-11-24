@@ -201,6 +201,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSMenu
         taskbar?.update(settings: Self.taskbarSettings(new))
         taskbar?.workspacesChanged()  // names in the workspace numbers
         hotkeys?.setOptionTap(enabled: new.taskbarEnabled && new.taskbarOptionOpensLauncher)
+        applyTyping(new)
         applyUpdates(new)
         refresh()
     }
@@ -273,6 +274,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSMenu
         taskbar?.isTiled = { [unowned self] id in self.tiling.isTiled(id) }
     }
 
+    /// Again when Karabiner-Elements starts or quits (the remap's `onChange`).
+    func applyTyping(_ c: PaveConfig) {
+        hotkeys?.setTyping(
+            preset: KeyRemap.typingPreset(
+                remap: c.keyboardRemap, preset: c.keyboardPreset, karabinerRunning: remap?.karabinerRunning ?? false))
+    }
+
     static func remapSettings(_ c: PaveConfig) -> KeyboardRemapService.Settings {
         .init(enabled: c.keyboardRemap, preset: c.keyboardPreset, skip: c.keyboardSkip)
     }
@@ -280,7 +288,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSMenu
     /// Needs no permission, but reads the config: started right after it.
     func startRemap() {
         let service = KeyboardRemapService(settings: Self.remapSettings(config.config))
-        service.onChange = { [weak self] in self?.refresh() }
+        service.onChange = { [weak self] in
+            guard let self else { return }
+            self.refresh()
+            self.applyTyping(self.config.config)
+        }
         service.start()
         remap = service
     }
@@ -319,6 +331,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSMenu
         service.setOptionTap(enabled: config.config.taskbarEnabled && config.config.taskbarOptionOpensLauncher)
         // After start(): the tap thread must be running to receive it.
         service.update(layout: KeyboardLayout.current())
+        applyTyping(config.config)
     }
 
     func perform(_ action: HotkeyAction, source: String) {

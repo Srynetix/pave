@@ -94,6 +94,25 @@ public enum KeyRemap {
         }
     }
 
+    /// The character a key types instead of the keyboard layout's, or nil to
+    /// keep the layout's. `hidutil` moves keys, not characters, so the event
+    /// tap rewrites these.
+    ///
+    /// Preset "pc": the keypad's decimal key types "." as on a French PC, where
+    /// the Mac's French layouts type ",". Only alone: with ⇧ or a shortcut's
+    /// modifier, the key keeps its meaning.
+    public static func character(keyCode: UInt16, modifiers: Modifiers, preset: Preset) -> String? {
+        guard preset == .pc, keyCode == Hotkey.Key.keypadDecimal, modifiers.isEmpty else { return nil }
+        return "."
+    }
+
+    /// The preset whose characters the event tap types: none with the remap
+    /// off, or while Karabiner-Elements has the keyboards (Pavé steps aside,
+    /// as for the `hidutil` remap).
+    public static func typingPreset(remap: Bool, preset: Preset, karabinerRunning: Bool) -> Preset {
+        remap && !karabinerRunning ? preset : .none
+    }
+
     /// hidutil `--set` argument. An empty list removes Pavé's mapping.
     public static func hidutilProperty(_ mappings: [Mapping]) -> String {
         let items = mappings.map {

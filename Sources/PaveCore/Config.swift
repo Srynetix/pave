@@ -536,11 +536,13 @@ public struct PaveConfig: Equatable, Sendable {
             # Pavé remaps the keyboard modifiers (see the README). Set to false if you
             # keep Karabiner-Elements: Pavé then leaves the keyboards alone.
             remap = true
-            # "pc": PC habits on Mac keyboards (Win = ctrl, Alt Gr = right cmd, §/< swapped).
+            # "pc": PC habits on Mac keyboards (Win = ctrl, Alt Gr = right cmd, §/< swapped,
+            # the keypad's decimal key types ".").
             # "none": stock keyboards.
             preset = "pc"
             # Keyboards left untouched: "built-in", or "vendor:product" as listed by
-            # `pave keyboards`, e.g. skip = ["1133:45944"].
+            # `pave keyboards`, e.g. skip = ["1133:45944"]. The keypad's "." still
+            # applies to them.
             skip = []
 
             [taskbar]
