@@ -216,6 +216,24 @@ private let focus = ZoneSettings().layout(named: "focus")!
         #expect(throws: PaveConfig.Problem.self) { try PaveConfig.parse("[zones]\norder = \"Coding\"") }
     }
 
+    @Test func aWindowPlacedWithAnotherLayoutIsHomeOnlyInZonesItMatches() throws {
+        let area = Rect(x: 0, y: 0, width: 1200, height: 800)
+        let named = { (name: String) in ZoneLayout.builtIn.first { $0.name == name }! }
+        let halves = ScreenZones(layout: named("halves"), gaps: 8)
+        #expect(halves.home(ofZone: 1, of: halves, in: area) == [1])
+        #expect(halves.home(ofZone: 0, of: ScreenZones(layout: named("thirds"), gaps: 8), in: area) == nil)
+        let sameZones = ScreenZones(
+            layout: try ZoneLayout(name: "Two", zones: [.init(0, 0, 50, 100), .init(50, 0, 50, 100)]), gaps: 8)
+        #expect(halves.home(ofZone: 1, of: sameZones, in: area) == [1])
+        #expect(halves.home(ofZone: 5, of: sameZones, in: area) == nil)
+    }
+
+    @Test func windowsFollowANewLayoutUnlessTurnedOff() throws {
+        #expect(try PaveConfig.parse("").config.zones.follow)
+        #expect(try !PaveConfig.parse("[zones]\nfollow = false").config.zones.follow)
+        #expect(throws: PaveConfig.Problem.self) { try PaveConfig.parse("[zones]\nfollow = \"no\"") }
+    }
+
     @Test func zoneErrorsPointAtTheirLine() {
         func problem(_ text: String) -> PaveConfig.Problem? {
             do {

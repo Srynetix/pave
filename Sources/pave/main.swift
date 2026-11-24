@@ -32,7 +32,7 @@ let usage = """
                         workspace overrides and the user's layouts
       zones set S L     use layout L (or "none") on screen S (its number,
                         builtin, part of its name, or its UUID); windows in
-                        zones follow it
+                        zones follow it, unless zones.follow is false
       zones edit [S] [L]  open the zone editor on screen S (else the one under
                         the mouse), from layout L (else the screen's)
       zones on|off      turn zones on or off (writes zones.enabled)

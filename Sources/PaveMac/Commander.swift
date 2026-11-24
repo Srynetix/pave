@@ -170,6 +170,15 @@ public final class Commander {
         remember(id, found.map { ($0.screen.id, $0.indices) })
     }
 
+    /// The layout of `screen` changed and its windows stayed (`zones.follow`
+    /// off): their zone homes are what their frames match in the new one.
+    public func rehome(_ windows: [WindowSnapshot], on screen: Screen) {
+        let screens = Screens.all()
+        for window in windows where zoneHomes[window.id]?.screen == screen.id {
+            rememberZones(of: window.id, at: engine.zoneTarget(of: window) ?? window.frame, among: screens)
+        }
+    }
+
     private func screensDidChange() {
         screenWork?.cancel()
         let work = DispatchWorkItem { [weak self] in MainActor.assumeIsolated { self?.screensSettled() } }
@@ -258,16 +267,20 @@ public final class Commander {
                     return Log.info(
                         "\(window.id) [\(window.appName)]: zone \(n) (app rule) skipped, no layout on its screen")
                 }
-                self.place(window, inZone: n, of: zones, on: screen, source: "app rule", showZones: false)
+                self.place(
+                    window, inZone: n, of: zones, screenZones: zones, on: screen, source: "app rule", showZones: false)
             }
         }
     }
 
     /// Puts `window` into zone `n` (from 1) of `zones` on `screen`;
     /// `showZones`: the layout flashes with that zone lit, as for the arrows.
+    /// `screenZones`: the screen's own layout, which `zones` may not be (the
+    /// picker places one window with any layout): the window's zone home is
+    /// in it (`ScreenZones.home`).
     public func place(
-        _ window: WindowSnapshot, inZone n: Int, of zones: ScreenZones, on screen: Screen, source: String,
-        showZones: Bool = true
+        _ window: WindowSnapshot, inZone n: Int, of zones: ScreenZones, screenZones: ScreenZones?, on screen: Screen,
+        source: String, showZones: Bool = true
     ) {
         guard case .setFrame(let target)? = engine.place(window, inZone: n - 1, of: zones, on: screen) else {
             let why =
@@ -276,7 +289,8 @@ public final class Commander {
             return Log.info("\(window.id) [\(window.appName)]: zone \(n) (\(source)) skipped, \(why)")
         }
         let screens = Screens.all()
-        remember(window.id, (screen.id, [n - 1]))
+        remember(
+            window.id, screenZones?.home(ofZone: n - 1, of: zones, in: screen.visibleFrame).map { (screen.id, $0) })
         if showZones { hud.show(screen.visibleFrame, zones, lit: [n - 1]) }
         registry.setFrame(of: window, to: target) { [weak self] result in
             self?.settle(window, result, screens: screens)

@@ -55,9 +55,10 @@ shows where it will land. Hold **⌥** to move it freely.
 Halves are too wide on an ultrawide. Give a screen a **zone layout**, FancyZones style: drag a
 window and the zones light up under the pointer, hold **⇧** to span several, **⌥** to move
 freely. **⌘←/→** step from zone to zone, then on to the next screen. **⌘⇧Z** picks another
-layout, and the windows already in zones follow it. Type two digits there (top row or numeric
-keypad) to place the focused window too: **2** then **4** puts it in zone 4 of the second layout
-(↩ after the first digit applies the layout alone).
+layout, and the windows already in zones follow it (unless you turn that off). Type two digits
+there (top row or numeric keypad) to place only the focused window: **2** then **4** puts it in
+zone 4 of the second layout, and the screen keeps its layout (↩ after the first digit applies
+the layout to the screen instead).
 
 Outside zones, windows are **magnetic**: dropped near another window or the screen's edge, a
 window sticks to it, and against another window it fills the free space beside it. Resize a window by the edge it shares with another, and the other one
@@ -201,7 +202,8 @@ commented. Most settings are also in the Settings window.
 - `[taskbar]`: `enabled`, `hide-dock`, `start-key`, `grouping` (`"never"`, `"always"`,
   `"when_full"`), `pinned` (bundle IDs).
 - `[zones]`: `enabled`, `gaps`, `show` (`"always"`, or `"ctrl"`: only while ctrl is held),
-  `keyboard` (arrows move between zones). `[zones.screens]` gives each screen a layout (key:
+  `keyboard` (arrows move between zones), `follow` (windows in zones follow a new layout of
+  their screen; `false`: they stay put). `[zones.screens]` gives each screen a layout (key:
   its UUID, `builtin`, or part of its name; value: a layout or `"none"`), `[zones.workspaces]`
   one per workspace number, on screens that have one. `order` lists layouts (built-in or
   yours) in the order the picker and Settings show them; the others follow.
